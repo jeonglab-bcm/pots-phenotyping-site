@@ -3,18 +3,23 @@
 Two graphs are kept apart and joined only through facets.
 
 **The curated graph** lives in `config/relations.yaml` and lands in
-`ontology_node` / `ontology_edge` with `source='curated'`. Its nodes are the 41
-facets plus 29 abstract classes. Every edge carries a provenance string naming
-the seed reference it rests on, or `taxonomy` for pure structure.
+`ontology_node` / `ontology_edge` with `source='curated'`. Its nodes are the 72
+facets plus 38 abstract classes. POTS is the root: every literature link points
+toward it.
 
-**Every literature edge is backed by a quote.** `config/relation_excerpts.yaml`
-holds, for each edge that cites a seed paper, the verbatim passage in that
-paper and a verdict (`supports` or `partial`). On 2026-10-01 the graph was
-refined against those excerpts: 9 edges with no supporting passage, or
-contradicted by their source, were removed, and edges whose only support was in
-a different seed paper were re-cited to it. The removed edges are listed under
-`removed` in the same file with the reason. `tests/test_relation_excerpts.py`
-keeps the two files consistent.
+**Literature links are built evidence first.** The questions the graph answers
+are in [`COMPETENCY_QUESTIONS.md`](COMPETENCY_QUESTIONS.md). Every link other
+than `is_a` starts as a claim in `config/relation_excerpts.yaml`: a verbatim
+passage from one of the seven seed papers, where it appears, and a verdict
+(`supports`, `partial`, or `contradicts` for passages arguing against). A link
+exists only if at least one passage supports it fully or partly.
+`scripts/build_relations.py` writes those links into the generated block of
+`relations.yaml`, naming the backing papers as provenance; the test suite fails
+if the block is stale or if any link lacks a backing claim. Claims that were
+extracted but not made into links are kept under `not_added` with the reason.
+
+**Taxonomy is structure.** `is_a` edges (provenance `taxonomy`) say what kind of
+thing a topic is, for mapping to OMOP domains, and are maintained by hand.
 
 **The resolved graph** is built by `pots-phenotyping ontology` and lands in
 `omop_concept` / `omop_concept_relationship` with the resolver named as the
@@ -41,7 +46,7 @@ not be traversed as if they were `is_a`.
 ## Why mechanisms are not subtypes
 
 There is deliberately **no** `is_a` edge from any mechanism flag to `pots`. The
-six flags relate to POTS by `proposed_mechanism_of` instead. An `is_a` edge
+seven flags relate to POTS by `proposed_mechanism_of` instead. An `is_a` edge
 would make them subclasses of the disorder, and subclasses invite a partition,
 and a partition is the thing Angeli et al. showed is false: 42% of 352 patients
 met two of the three classical definitions and 11% met all three.

@@ -12,27 +12,37 @@ POTS "subtypes" are not mutually exclusive categories. Angeli et al. classified
 separate them. So this repository models overlapping **evidence flags** rather
 than a partition, and derives combinations afterwards.
 
-Six mechanism flags form the intended phenotype output:
+Seven mechanism flags form the intended phenotype output:
 
 ```
-hyperadrenergic_evidence   neuropathic_evidence   hypovolemic_evidence
-deconditioning_evidence    autoimmune_evidence    postinfectious_evidence
+hyperadrenergic_evidence   neuropathic_evidence     hypovolemic_evidence
+deconditioning_evidence    autoimmune_evidence      postinfectious_evidence
+cerebral_hypoperfusion_evidence
 ```
 
-Around them sit 35 more facets covering the objective tests that make those
-flags observable, the comorbidities and triggers that change their
-interpretation, and the treatments whose prescription implies a clinician's
-mechanistic hypothesis. 41 facets in total, related by a real predicate graph
-(`is_a`, `part_of`, `evidence_for`, `indicates`, and seven more).
+Around them sit 65 more facets covering the objective tests that make those
+flags observable, the comorbidities, triggers and differential diagnoses that
+change their interpretation, and the treatments whose prescription implies a
+clinician's mechanistic hypothesis. 72 facets in total.
+
+**The ontology is built evidence first.** The questions it must answer are in
+[`docs/COMPETENCY_QUESTIONS.md`](docs/COMPETENCY_QUESTIONS.md). Every link
+that rests on the literature starts as a quoted claim from one of seven seed
+papers in `config/relation_excerpts.yaml`, and `scripts/build_relations.py`
+generates those links into `config/relations.yaml`. POTS is the root: links
+point from tests and treatments to causes, and from causes and conditions to
+POTS.
 
 ## What is here
 
 | Path | Contents |
 | --- | --- |
 | `config/query.yaml` | The broad-recall PubMed query, as named clauses with a rationale each. One profile, `core`; narrower corpora are derived downstream from `article_query_block`. |
-| `config/facets.yaml` | The 41-facet vocabulary: definitions, PubMed queries, MeSH descriptors, OMOP concept search terms, seed citations. |
-| `config/relations.yaml` | The ontology: 10 predicates, 29 abstract classes, 113 edges, each with provenance. |
-| `config/relation_excerpts.yaml` | For every literature-backed edge, the verbatim passage in the cited paper that supports it, with a verdict; plus the 9 edges removed for lack of support. |
+| `docs/COMPETENCY_QUESTIONS.md` | The ten questions the ontology answers, one per predicate. |
+| `config/facets.yaml` | The 72-facet vocabulary: definitions, PubMed queries, MeSH descriptors, OMOP concept search terms, seed citations. |
+| `config/relation_excerpts.yaml` | The source of truth for literature links: 132 claimed links backed by 401 verbatim passages from the seed papers (supports / partial / contradicts), plus claims not turned into links. |
+| `config/relations.yaml` | The ontology: 10 predicates, 38 abstract classes, 102 hand-kept `is_a` edges and 132 generated literature links. |
+| `scripts/build_relations.py`, `scripts/verify_excerpts.py` | Generate the literature links from the excerpts; check every quote against local copies of the seed texts. |
 | `src/pots_phenotyping/` | The harvester, parser, SQLite store, concept resolvers, report generator and CLI. |
 | `data/articles.jsonl` | The harvested corpus itself, one JSON object per article. Version-controlled: everything else under `data/` is derived from it. |
 | `data/derived/*.tsv` | Version-controlled outputs of the last run: facet counts, the relation graph and its closure, candidate concept mappings, corpus composition. |
@@ -68,23 +78,23 @@ one to the other.
 
 ## Results of the committed run
 
-Profile `core`, harvested 2026-09-03. Full numbers in
+Profile `core`, harvested 2026-10-01. Full numbers in
 [`docs/HARVEST_REPORT.md`](docs/HARVEST_REPORT.md).
 
 | | |
 | --- | --- |
-| Articles | 2,639 (all of them; esearch reported 2,639) |
-| With an abstract | 1,923 |
-| MeSH indexed | 2,006 |
-| Facet tag rows | 5,454 from queries, 3,549 from MeSH indexing |
-| Ontology | 70 nodes, 113 curated edges, 151 closure rows |
-| Candidate concept mappings | 195 across SNOMED, LOINC and RxNorm, all unreviewed |
-| Validation checks | 19 of 19 pass |
+| Articles | 2,668 (all of them; esearch reported 2,668) |
+| With an abstract | 1,950 |
+| MeSH indexed | 2,015 |
+| Facet tag rows | 6,572 from queries, 4,099 from MeSH indexing |
+| Ontology | 110 nodes, 234 edges (132 literature links), 271 closure rows |
+| Candidate concept mappings | 308 across SNOMED, LOINC and RxNorm, all unreviewed |
+| Validation checks | 23 of 23 pass |
 
 Two findings worth knowing before you use the corpus:
 
 - The historical-names clause (`neurocirculatory asthenia`, `soldier's heart`,
-  `irritable heart`, `Da Costa syndrome`) contributes 552 records, **551 of
+  `irritable heart`, `Da Costa syndrome`) contributes 556 records, **555 of
   which no other clause retrieves**. It is effectively a separate,
   mostly mid-twentieth-century corpus. Exclude it downstream by dropping
   records that only `tiab_historical` retrieved (`article_query_block`).
@@ -146,7 +156,7 @@ supplied. The report lists them separately from real errors.
 
 ## The record layer
 
-`data/articles.jsonl` is the corpus, tracked in git: 2,639 lines, 18 MB, one
+`data/articles.jsonl` is the corpus, tracked in git: 2,668 lines, 18 MB, one
 JSON object per article carrying the full parsed record including MeSH headings,
 structured abstract sections, authors and reference PMIDs.
 
@@ -179,12 +189,12 @@ parser can be replayed against the original XML without re-crawling.
   lists the rows most likely to be wrong. A `contains` match can still be the
   wrong concept: "heart rate variability" resolves to "Fetal heart rate
   variability" through OLS4.
-- **The curated graph was drafted by an AI assistant (Claude)** from five
-  papers and has not been reviewed by a clinician. Every non-taxonomy edge
-  now quotes the passage it rests on (`config/relation_excerpts.yaml`); 19 of
-  the 74 edge-paper citations are only partly supported, and edges with no
-  support were removed. `reports/ontology_graph.html` shows the graph with
-  its excerpts.
+- **The claims were extracted by an AI assistant (Claude)** from seven seed
+  papers and have not been reviewed by a clinician. Every quote is verbatim
+  (`scripts/verify_excerpts.py`), but which passages were chosen, and whether a
+  passage fully or only partly supports a link, are judgements to review.
+  174 of the 401 passages are marked partial and 5 argue against their link.
+  `reports/ontology_graph.html` shows each link with its quotes.
 - **Facet queries are keyword queries.** They find papers that discuss a facet,
   not papers that measured it. Negation and hedging are not handled.
 
@@ -198,7 +208,12 @@ parser can be replayed against the original XML without re-crawling.
   patients with postural orthostatic tachycardia syndrome. *Cureus*, 2022.
   PMID 36349067.
 - Larsen et al. Long-COVID POTS: a deep phenotyping study. *medRxiv* preprint,
-  2025. Not indexed in PubMed.
+  2025. Not indexed in PubMed; only the abstract was used.
+- Lau DH et al. Postural orthostatic tachycardia syndrome: a state-of-the-art
+  review. *Heart, Lung and Circulation*, 2026. PMID 41519610.
+- Chung TH, Raj SR. Postural orthostatic tachycardia syndrome (POTS): a review.
+  *JAMA*, 2026. PMID 42635998. The publisher reserves text and data mining
+  rights, so its quotes are kept short and withheld from the public site.
 - Low et al. Postural tachycardia syndrome (POTS). *Journal of Cardiovascular
   Electrophysiology*, 2009. PMID 19207771.
 

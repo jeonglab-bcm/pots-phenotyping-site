@@ -1,61 +1,101 @@
 node_id	label	kind	group_id	definition
 clinical_context	Clinical context	class		
+co_occurring_condition	Co-occurring condition	class		
+differential_condition	Must be ruled out before diagnosis	class		
 mechanistic_phenotype	Mechanistic phenotype	class		
 objective_evidence	Objective evidence source	class		
+onset_trigger	Onset trigger	class		
 therapeutic_proxy	Therapeutic proxy	class		
 pots	Postural orthostatic tachycardia syndrome	disorder		
+antihistamine_agent	Antihistamine or mast cell stabiliser	drug_class		
 cholinergic_agent	Cholinergic agent	drug_class		
 immunomodulator	Immunomodulatory agent	drug_class		
 negative_chronotrope	Negative chronotropic agent	drug_class		
+prokinetic_agent	Prokinetic agent	drug_class		
+sedative_agent	Sedative agent	drug_class		
 sympatholytic_agent	Sympatholytic agent	drug_class		
 vasoconstrictor_agent	Vasoconstrictor agent	drug_class		
 volume_expander	Volume expanding agent	drug_class		
 active_stand_test	Active stand test	facet	measurement	Ten-minute active standing with serial heart rate and blood pressure, the pragmatic clinic alternative to tilt. Yields a different heart-rate increment than tilt, which matters for phenotype threshold portability.
+adolescent_growth_spurt	Onset with adolescent growth spurt	facet	comorbidity	POTS beginning during the adolescent growth spurt.
 ambulatory_monitoring	Ambulatory heart rate and blood pressure monitoring	facet	measurement	Holter, patch electrocardiography, wearable heart-rate and 24-hour ambulatory blood pressure. The realistic source of a heart-rate criterion in routine electronic health record data, as opposed to a formal lab.
+antihistamine_therapy	Antihistamines and mast cell stabilisers	facet	treatment	H1 and H2 antihistamines and mast cell stabilisers, used when mast cell activation is suspected.
+anxiety_depression	Anxiety and depression	facet	comorbidity	Anxiety, panic and depressive disorders and somatic hypervigilance. Common in POTS and a frequent misdiagnosis, though anxiety does not cause the orthostatic tachycardia.
+arrhythmia_differential	Arrhythmias and inappropriate sinus tachycardia (rule out)	facet	comorbidity	Supraventricular tachycardias and inappropriate sinus tachycardia, which can resemble POTS and are excluded with ECG, Holter or electrophysiology.
+auricular_vagus_nerve_stimulation	Auricular vagus nerve stimulation	facet	treatment	Non-invasive stimulation of the auricular branch of the vagus nerve.
 autoimmune_evidence	Autoimmune evidence	facet	mechanism	Autoantibodies against autonomic targets (ganglionic acetylcholine receptor, adrenergic and muscarinic receptors) or a coexisting systemic autoimmune disease.
 autonomic_autoantibody_assay	Autonomic autoantibody assay	facet	measurement	Ganglionic acetylcholine receptor antibody, and adrenergic and muscarinic receptor antibody panels including functional cell-based assays.
 beta_blocker_therapy	Beta blockade	facet	treatment	Propranolol, metoprolol, bisoprolol and related agents, most often given on a hyperadrenergic rationale.
+cardiac_mri	Cardiac MRI (left ventricular mass)	facet	measurement	Cardiac magnetic resonance imaging; a smaller left ventricular mass in POTS is taken as evidence of cardiac deconditioning.
 cardiopulmonary_exercise_test	Cardiopulmonary exercise testing	facet	measurement	Peak oxygen uptake, chronotropic response and ventilatory efficiency, the objective substrate for the deconditioning flag and for post-exertional malaise phenotyping.
-central_sympatholytic_therapy	Central sympatholytics	facet	treatment	Clonidine and methyldopa, reserved almost exclusively for a hyperadrenergic presentation and therefore an unusually specific proxy.
+central_sympatholytic_therapy	Central sympatholytics	facet	treatment	Clonidine, guanfacine and methyldopa, alpha-2 agonists that lower central sympathetic tone; used mainly for a hyperadrenergic presentation.
 cerebral_blood_flow_measurement	Cerebral blood flow velocity	facet	measurement	Transcranial Doppler middle-cerebral-artery velocity, near-infrared spectroscopy, or cerebral oximetry during orthostasis. Explains symptoms that the heart-rate criterion does not.
+cerebral_hypoperfusion_evidence	Cerebral hypoperfusion evidence	facet	mechanism	Reduced cerebral blood flow on standing, often with orthostatic hyperventilation and hypocapnia that further constrict cerebral vessels, proposed as a driver of brain fog and of the orthostatic symptoms. Named as a proposed mechanism by Chung 2026 and Lau 2026; Larsen 2025 found cerebrovascular measures did not correlate with symptoms.
 chronic_migraine	Migraine and chronic headache	facet	comorbidity	Migraine, chronic daily headache and their overlap with orthostatic headache from cerebral hypoperfusion or cerebrospinal fluid leak.
 compression_therapy	Compression garments	facet	treatment	Abdominal binders and lower-limb compression that mechanically oppose venous pooling, targeting the neuropathic and hypovolemic flags.
 deconditioning_evidence	Deconditioning evidence	facet	mechanism	Reduced cardiac mass and stroke volume with low peak oxygen uptake, whether as primary cause or as a secondary consequence of activity avoidance. Its causal direction is contested, which is exactly why it is a flag and not a subtype.
-differential_syncope_oh	Competing orthostatic diagnoses	facet	comorbidity	Vasovagal syncope, neurogenic orthostatic hypotension, inappropriate sinus tachycardia and pure autonomic failure. Exclusion of these is part of the POTS definition, so a computable phenotype needs them explicitly.
+differential_syncope_oh	Competing orthostatic diagnoses	facet	comorbidity	Orthostatic hypotension, vasovagal and other reflex syncope, pure autonomic failure and multiple system atrophy. The absence of orthostatic hypotension is part of the POTS definition, so a computable phenotype needs these explicitly. Other causes of sinus tachycardia and arrhythmias are separate facets.
 droxidopa_therapy	Droxidopa	facet	treatment	Noradrenaline prodrug used where a peripheral noradrenergic deficit is suspected.
+end_tidal_co2	End-tidal CO2 on tilt	facet	measurement	Capnography during orthostatic challenge; low end-tidal CO2 at end-tilt shows orthostatic hypocapnia.
+endometriosis	Endometriosis	facet	comorbidity	Endometriosis, reported to co-occur with POTS.
 exercise_reconditioning	Exercise reconditioning	facet	treatment	Structured recumbent-to-upright exercise programmes such as the Levine and CHOP protocols, prescribed against a deconditioning hypothesis.
+fibromyalgia	Fibromyalgia	facet	comorbidity	Chronic widespread pain syndrome reported to co-occur with POTS.
+functional_neurological_disorder	Functional neurological disorder	facet	comorbidity	Functional neurological symptom disorder, reported alongside POTS.
 genetic_testing	Genetic testing	facet	measurement	Variant testing relevant to POTS and its comorbidities: noradrenaline transporter (SLC6A2), mast-cell and tryptase loci, and connective-tissue genes.
-gi_dysmotility	Gastrointestinal dysmotility	facet	comorbidity	Gastroparesis, chronic constipation and rapid gastric emptying, reflecting enteric autonomic involvement.
+gi_dysmotility	Gastrointestinal dysmotility and functional GI disorders	facet	comorbidity	Gastroparesis, chronic constipation, rapid gastric emptying, irritable bowel syndrome and other functional gastrointestinal symptoms.
 head_up_tilt_test	Head-up tilt table test	facet	measurement	Passive 60-70 degree head-up tilt with continuous heart rate and blood pressure. Supplies the diagnostic heart-rate increment itself.
 heart_rate_variability	Heart rate variability and baroreflex sensitivity	facet	measurement	Spectral and time-domain heart-rate variability, deep-breathing respiratory sinus arrhythmia, and baroreflex gain: the cardiovagal side of autonomic testing.
+hormonal_transition_onset	Onset with hormonal change	facet	comorbidity	POTS beginning or worsening around menarche, pregnancy or menopause.
 hyperadrenergic_evidence	Hyperadrenergic evidence	facet	mechanism	Excess sympathetic outflow or impaired noradrenaline clearance: upright plasma noradrenaline elevation, marked orthostatic hypertension, tremor and cold sweaty extremities, or a noradrenaline transporter deficiency.
 hypermobility_heds	Joint hypermobility and hypermobile Ehlers-Danlos syndrome	facet	comorbidity	Generalised joint hypermobility or hypermobile Ehlers-Danlos syndrome, offered as a mechanism for increased venous compliance and pooling.
 hypovolemic_evidence	Hypovolemic evidence	facet	mechanism	Reduced plasma or red-cell volume, frequently with a paradoxically low plasma renin activity and aldosterone for the degree of volume depletion.
 immunomodulatory_therapy	Immunomodulation	facet	treatment	Intravenous immunoglobulin, rituximab, plasma exchange and corticosteroids given for a presumed autoimmune mechanism.
+iron_deficiency	Iron deficiency	facet	comorbidity	Low iron stores (ferritin), reported in some patients with POTS.
 ivabradine_therapy	Ivabradine	facet	treatment	Selective sinoatrial funny-current inhibitor, lowering heart rate without lowering blood pressure. Signals a rate-centred rather than volume-centred hypothesis.
+lifestyle_modification	Behavioural and dietary measures	facet	treatment	Avoiding heat, prolonged standing, alcohol and large carbohydrate-rich meals; small frequent meals; head-up sleeping and similar measures.
 long_covid	Long COVID and post-acute sequelae of SARS-CoV-2	facet	comorbidity	POTS arising after SARS-CoV-2 infection. The subject of the Larsen deep phenotyping study, and the reason the modern incident cohort exists.
 mast_cell_activation	Mast cell activation syndrome	facet	comorbidity	Mast cell activation disorder with flushing, and raised tryptase or urinary methylhistamine, which can mimic or amplify a hyperadrenergic picture.
 me_cfs	ME/CFS and post-exertional malaise	facet	comorbidity	Myalgic encephalomyelitis / chronic fatigue syndrome, sharing orthostatic intolerance and post-exertional malaise with POTS.
+medication_induced_tachycardia	Medication-induced tachycardia (rule out)	facet	comorbidity	Tachycardia caused or worsened by drugs: stimulants, sympathomimetics, norepinephrine reuptake inhibitors, SNRIs, diuretics, alpha-1 blockers, vasodilators and anticholinergics.
 midodrine_therapy	Midodrine	facet	treatment	Alpha-1 agonist vasoconstrictor, used where venous pooling or neuropathic vasoconstrictor failure is suspected.
-neuropathic_evidence	Neuropathic evidence	facet	mechanism	Peripheral autonomic denervation, typically a length-dependent small-fibre and sudomotor deficit producing impaired lower-limb vasoconstriction and venous pooling.
+muscle_sympathetic_nerve_activity	Muscle sympathetic nerve activity (microneurography)	facet	measurement	Direct recording of sympathetic outflow to muscle; blunted in the legs of a subset of patients, supporting patchy sympathetic denervation.
+neurodevelopmental_disorder	Autism and ADHD	facet	comorbidity	Neurodevelopmental conditions reported to co-occur with POTS.
+neuropathic_evidence	Neuropathic evidence	facet	mechanism	Peripheral autonomic denervation: a small-fibre and sudomotor deficit, often patchy rather than length-dependent, that impairs lower-limb vasoconstriction and lets blood pool in the legs.
+offending_medication_withdrawal	Stopping drugs that worsen POTS	facet	treatment	Withdrawing or replacing medications that worsen orthostatic tachycardia.
+phenobarbital_therapy	Phenobarbital	facet	treatment	Low-dose phenobarbital, used by Low 2009 for unstable hypertensive tilt responses.
+physical_countermaneuvers	Physical countermaneuvers	facet	treatment	Leg crossing, muscle tensing, squatting and similar manoeuvres that push blood back from the legs on standing.
+physical_trauma_onset	Onset after trauma or concussion	facet	comorbidity	POTS beginning after physical trauma, including concussion.
 plasma_blood_volume_assay	Plasma and blood volume measurement	facet	measurement	Direct volume quantification by carbon monoxide rebreathing, indocyanine green, or iodinated-albumin dilution. The only way to make the hypovolemic flag objective rather than inferred.
 plasma_catecholamine_assay	Supine and upright plasma catecholamines	facet	measurement	Paired supine and standing noradrenaline and adrenaline. An upright noradrenaline above roughly 600 pg/mL is the most-cited hyperadrenergic criterion, and the paired design is what makes it interpretable.
 post_vaccination_onset	Post-vaccination onset	facet	comorbidity	Symptom onset temporally associated with vaccination, principally human papillomavirus and SARS-CoV-2 vaccines. Recorded because it appears in the literature as a claimed trigger and any phenotype must be able to identify and stratify these reports rather than silently absorb them.
 postinfectious_evidence	Post-infectious evidence	facet	mechanism	Symptom onset temporally linked to an infection, including SARS-CoV-2, Epstein-Barr virus, influenza and Lyme disease.
+prokinetic_therapy	Prokinetic agents	facet	treatment	Drugs that promote gastrointestinal motility, used for gut dysmotility in POTS.
+prolonged_bed_rest	Prolonged bed rest	facet	comorbidity	Extended bed rest or immobility, which produces deconditioning.
 pyridostigmine_therapy	Pyridostigmine	facet	treatment	Peripheral acetylcholinesterase inhibitor enhancing ganglionic transmission, used on a neuropathic or autoimmune rationale.
 qsart_sudomotor_testing	QSART and sudomotor testing	facet	measurement	Quantitative sudomotor axon reflex test and related sympathetic sweat measures. Zhang et al. found reduced sweat output in about a third of 356 patients tested.
-serotonergic_therapy	Serotonergic and other central agents	facet	treatment	Serotonin reuptake inhibitors, serotonin-noradrenaline reuptake inhibitors and modafinil. Deliberately kept as a low-specificity facet, since these are also prescribed for coexisting depression, anxiety and fatigue rather than for any orthostatic mechanism.
-skin_biopsy_ienfd	Skin biopsy and intraepidermal nerve fibre density	facet	measurement	Punch biopsy with PGP 9.5 immunostaining and nerve-fibre density quantification, the structural counterpart to sudomotor testing. Zhang et al. reported reduced density in about 24% of those biopsied.
+quantitative_sensory_testing	Quantitative sensory testing	facet	measurement	Thermal and vibration threshold testing of small and large sensory fibres; one of the three criteria for neuropathic POTS in Gibbons 2013.
+regional_norepinephrine_spillover	Regional norepinephrine spillover	facet	measurement	Research measurement of noradrenaline released into the venous drainage of a limb; reduced in the legs in neuropathic POTS.
+renin_aldosterone_assay	Plasma renin and aldosterone	facet	measurement	Plasma renin activity and aldosterone, inappropriately low for the degree of hypovolaemia in some patients (the renin-angiotensin-aldosterone paradox).
+secondary_sinus_tachycardia	Other causes of sinus tachycardia (rule out)	facet	comorbidity	Conditions that raise heart rate and must be excluded before POTS is diagnosed: anaemia, dehydration, infection, hyperthyroidism, adrenal insufficiency, pheochromocytoma, pain, anorexia nervosa and other transient states.
+serotonergic_therapy	Serotonergic and other central agents	facet	treatment	Serotonin reuptake inhibitors, serotonin-noradrenaline reuptake inhibitors and modafinil. Low specificity: these are mostly prescribed for coexisting depression, anxiety or fatigue, and SNRIs can worsen orthostatic tachycardia (Lau 2026, Chung 2026).
+skin_biopsy_ienfd	Skin biopsy and intraepidermal nerve fibre density	facet	measurement	Punch biopsy with PGP 9.5 immunostaining and nerve-fibre density quantification, the structural counterpart to sudomotor testing. Reduced density is reported in about 24% (Zhang 2022) to 45-53% (Chung 2026) of patients biopsied.
+sleep_disturbance	Sleep disturbance	facet	comorbidity	Insomnia, unrefreshing sleep and other sleep disorders in POTS.
 small_fiber_neuropathy_dx	Small fibre neuropathy diagnosis	facet	comorbidity	Small fibre neuropathy as a recorded diagnosis rather than as a test result. Held separately from the neuropathic mechanism flag because in electronic health record data the diagnosis code and the biopsy result are different observations with different reliability.
+structural_cardiopulmonary_disease	Structural heart and chronic lung disease (rule out)	facet	comorbidity	Cardiomyopathy, valvular and congenital heart disease, and chronic lung disease, which must be excluded as causes of tachycardia and dyspnoea.
+surgery_onset	Onset after surgery	facet	comorbidity	POTS beginning after a surgical procedure.
 systemic_autoimmune_disease	Sjogren and other systemic autoimmune disease	facet	comorbidity	Coexisting systemic autoimmune disease: Sjogren syndrome, systemic lupus erythematosus, coeliac disease, autoimmune thyroiditis.
 thermoregulatory_sweat_test	Thermoregulatory sweat test	facet	measurement	Whole-body sweat distribution under controlled heating, localising anhidrosis and distinguishing pre- from post-ganglionic lesions when read against QSART.
+urine_sodium_24h	24-hour urine sodium	facet	measurement	Sodium excreted over 24 hours, a proxy for salt intake and volume status; below 100 mmol/24 h marks the hypovolemic phenotype in Angeli 2024.
 valsalva_maneuver	Valsalva manoeuvre	facet	measurement	Valsalva ratio and phase II/IV blood-pressure response, separating adrenergic from cardiovagal failure. Part of the standard autonomic reflex screen alongside deep breathing and QSART.
 volume_expansion_therapy	Volume expansion therapy	facet	treatment	Fludrocortisone, salt and fluid loading, desmopressin, and intravenous saline. Prescription implies a clinician's hypovolemic hypothesis.
+neuromodulation	Neuromodulation	intervention_class		
 nonpharmacologic_intervention	Non-pharmacological intervention	intervention_class		
 autonomic_function_testing	Autonomic function testing	procedure_class		
+cardiac_imaging	Cardiac imaging	procedure_class		
 cerebrovascular_assessment	Cerebrovascular assessment	procedure_class		
 immunological_assessment	Immunological assessment	procedure_class		
 neurochemical_assessment	Sympathetic neurochemical assessment	procedure_class		
+sensory_nerve_assessment	Sensory nerve function assessment	procedure_class		
 structural_nerve_assessment	Structural peripheral nerve assessment	procedure_class		
 sudomotor_assessment	Sudomotor assessment	procedure_class		
 volume_assessment	Intravascular volume assessment	procedure_class		
@@ -66,6 +106,6 @@ nerve_fiber_density	Intraepidermal nerve fibre density	quantity
 orthostatic_heart_rate_increment	Orthostatic heart rate increment	quantity		
 sweat_output	Sweat output	quantity		
 upright_plasma_norepinephrine	Upright plasma norepinephrine	quantity		
-pots_phenotype_axis	POTS phenotyping axis	root		
+pots_phenotype_axis	POTS phenotyping topics	root		
 autonomic_reflex_screen	Autonomic reflex screen	test_battery		
 orthostatic_challenge_testing	Orthostatic challenge testing	test_battery		
