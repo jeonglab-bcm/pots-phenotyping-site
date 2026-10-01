@@ -1,0 +1,657 @@
+# POTS deep-phenotyping facet vocabulary.
+#
+# A facet is a labelled axis of evidence, NOT a mutually exclusive subtype.
+# Angeli et al. (Sci Rep 2024) classified 352 patients and found 42% met two
+# mechanistic definitions and 11% met all three; symptoms alone did not separate
+# them. The vocabulary is therefore built as overlapping evidence flags that a
+# patient (or a paper) can carry in any combination.
+#
+# Every facet carries:
+#   pubmed_query  - AND-ed with the corpus query to tag which papers discuss it.
+#   mesh_terms    - descriptor names for a second, indexing-based tag path.
+#   concepts      - search terms handed to the OMOP concept resolver. These are
+#                   SEARCH TERMS, not asserted codes: no concept_id or code is
+#                   hand-written in this repo. The resolver looks them up and
+#                   records provenance, and every mapping lands as
+#                   mapping_status='unreviewed' until a human signs it off.
+#                   fallback_gap: true marks a term that is correct against full
+#                   SNOMED but that the public fallback service cannot resolve,
+#                   because the EBI Ontology Lookup Service carries only a subset
+#                   of SNOMED. Such a term is kept deliberately: it is the right
+#                   thing to look up once an ATHENA bundle is available, and the
+#                   validation report lists it as a known fallback gap rather
+#                   than as a vocabulary error.
+#
+# groups: mechanism | measurement | comorbidity | treatment
+
+groups:
+  mechanism:
+    label: Mechanistic evidence flag
+    definition: >
+      A pathophysiological process proposed to produce or sustain orthostatic
+      tachycardia. These are the flags intended to become OMOP-computable
+      phenotype outputs.
+  measurement:
+    label: Objective test or measurement
+    definition: >
+      A procedure or laboratory measurement that supplies objective evidence for
+      one or more mechanism flags. These are what an OMOP phenotype can actually
+      observe, in the Measurement and Procedure domains.
+  comorbidity:
+    label: Comorbidity, etiology or differential
+    definition: >
+      A co-occurring condition, a triggering exposure, or a competing diagnosis
+      that changes the interpretation of a mechanism flag.
+  treatment:
+    label: Treatment whose use implies a phenotype
+    definition: >
+      An intervention whose prescription is itself weak evidence of a clinician's
+      mechanistic hypothesis, usable as a Drug- or Procedure-domain proxy.
+
+facets:
+
+  # ---------------------------------------------------------------- mechanism
+  - id: hyperadrenergic_evidence
+    group: mechanism
+    label: Hyperadrenergic evidence
+    definition: >
+      Excess sympathetic outflow or impaired noradrenaline clearance: upright
+      plasma noradrenaline elevation, marked orthostatic hypertension, tremor and
+      cold sweaty extremities, or a noradrenaline transporter deficiency.
+    pubmed_query: 'hyperadrenergic[tiab] OR "hyper-adrenergic"[tiab] OR ("norepinephrine"[tiab] OR "noradrenaline"[tiab] OR catecholamine*[tiab] OR "sympathetic activation"[tiab] OR "sympathetic overactivity"[tiab] OR "muscle sympathetic nerve activity"[tiab] OR "norepinephrine transporter"[tiab] OR SLC6A2[tiab])'
+    mesh_terms: ['Norepinephrine', 'Catecholamines', 'Sympathetic Nervous System', 'Epinephrine', 'Norepinephrine Plasma Membrane Transport Proteins']
+    concepts:
+      - {vocabulary: SNOMED, search_term: 'increased sympathetic activity', fallback_gap: true}
+      - {vocabulary: SNOMED, search_term: 'orthostatic hypertension', fallback_gap: true}
+      - {vocabulary: SNOMED, search_term: 'standing blood pressure'}
+      - {vocabulary: LOINC,  search_term: 'norepinephrine plasma'}
+      - {vocabulary: LOINC,  search_term: 'norepinephrine standing'}
+    source_refs: [angeli2024, low2009, larsen2025]
+
+  - id: neuropathic_evidence
+    group: mechanism
+    label: Neuropathic evidence
+    definition: >
+      Peripheral autonomic denervation, typically a length-dependent small-fibre
+      and sudomotor deficit producing impaired lower-limb vasoconstriction and
+      venous pooling.
+    pubmed_query: '"small fiber"[tiab] OR "small-fibre"[tiab] OR "small fibre"[tiab] OR neuropathic[tiab] OR neuropathy[tiab] OR denervation[tiab] OR "sudomotor"[tiab] OR "nerve fiber density"[tiab] OR "nerve fibre density"[tiab] OR "venous pooling"[tiab] OR "acral"[tiab]'
+    mesh_terms: ['Peripheral Nervous System Diseases', 'Small Fiber Neuropathy', 'Sweat Glands', 'Nerve Fibers, Unmyelinated', 'Autonomic Nervous System Diseases']
+    concepts:
+      - {vocabulary: SNOMED, search_term: 'small fibre neuropathy'}
+      - {vocabulary: SNOMED, search_term: 'autonomic neuropathy'}
+      - {vocabulary: SNOMED, search_term: 'anhidrosis'}
+    source_refs: [gibbons2013, zhang2022, angeli2024, low2009]
+
+  - id: hypovolemic_evidence
+    group: mechanism
+    label: Hypovolemic evidence
+    definition: >
+      Reduced plasma or red-cell volume, frequently with a paradoxically low
+      plasma renin activity and aldosterone for the degree of volume depletion.
+    pubmed_query: 'hypovolemi*[tiab] OR hypovolaemi*[tiab] OR "plasma volume"[tiab] OR "blood volume"[tiab] OR "red cell volume"[tiab] OR "renin"[tiab] OR "aldosterone"[tiab] OR "angiotensin"[tiab] OR "volume depletion"[tiab] OR "volume expansion"[tiab]'
+    mesh_terms: ['Hypovolemia', 'Plasma Volume', 'Blood Volume', 'Renin', 'Aldosterone', 'Renin-Angiotensin System']
+    concepts:
+      - {vocabulary: SNOMED, search_term: 'hypovolaemia'}
+      - {vocabulary: LOINC,  search_term: 'plasma volume'}
+      - {vocabulary: LOINC,  search_term: 'renin activity plasma'}
+    source_refs: [angeli2024, low2009]
+
+  - id: deconditioning_evidence
+    group: mechanism
+    label: Deconditioning evidence
+    definition: >
+      Reduced cardiac mass and stroke volume with low peak oxygen uptake, whether
+      as primary cause or as a secondary consequence of activity avoidance. Its
+      causal direction is contested, which is exactly why it is a flag and not a
+      subtype.
+    pubmed_query: 'deconditioning[tiab] OR deconditioned[tiab] OR "physical inactivity"[tiab] OR "bed rest"[tiab] OR "exercise capacity"[tiab] OR "peak oxygen"[tiab] OR VO2[tiab] OR "cardiac atrophy"[tiab] OR "stroke volume"[tiab] OR "cardiac mass"[tiab]'
+    mesh_terms: ['Bed Rest', 'Exercise Tolerance', 'Oxygen Consumption', 'Cardiomegaly', 'Sedentary Behavior', 'Stroke Volume']
+    concepts:
+      - {vocabulary: SNOMED, search_term: 'physical deconditioning'}
+      - {vocabulary: LOINC,  search_term: 'oxygen consumption'}
+    source_refs: [low2009, angeli2024]
+
+  - id: autoimmune_evidence
+    group: mechanism
+    label: Autoimmune evidence
+    definition: >
+      Autoantibodies against autonomic targets (ganglionic acetylcholine
+      receptor, adrenergic and muscarinic receptors) or a coexisting systemic
+      autoimmune disease.
+    pubmed_query: 'autoimmun*[tiab] OR autoantibod*[tiab] OR "antibodies"[tiab] OR "acetylcholine receptor"[tiab] OR "adrenergic receptor antibod*"[tiab] OR "muscarinic receptor antibod*"[tiab] OR "ganglionic"[tiab] OR immunotherapy[tiab] OR "molecular mimicry"[tiab]'
+    mesh_terms: ['Autoantibodies', 'Autoimmune Diseases', 'Autoimmunity', 'Receptors, Adrenergic', 'Receptors, Muscarinic', 'Receptors, Nicotinic']
+    concepts:
+      - {vocabulary: SNOMED, search_term: 'autoimmune autonomic ganglionopathy', fallback_gap: true}
+      - {vocabulary: SNOMED, search_term: 'autonomic ganglionopathy'}
+      - {vocabulary: SNOMED, search_term: 'autoimmune disorder of autonomic nervous system'}
+      - {vocabulary: LOINC,  search_term: 'acetylcholine receptor ganglionic antibody'}
+    source_refs: [angeli2024, larsen2025]
+
+  - id: postinfectious_evidence
+    group: mechanism
+    label: Post-infectious evidence
+    definition: >
+      Symptom onset temporally linked to an infection, including SARS-CoV-2,
+      Epstein-Barr virus, influenza and Lyme disease.
+    pubmed_query: 'post-infectious[tiab] OR postinfectious[tiab] OR "post infectious"[tiab] OR postviral[tiab] OR "post-viral"[tiab] OR COVID*[tiab] OR "SARS-CoV-2"[tiab] OR "Epstein-Barr"[tiab] OR mononucleosis[tiab] OR influenza[tiab] OR "Lyme"[tiab] OR sepsis[tiab] OR "viral illness"[tiab]'
+    mesh_terms: ['COVID-19', 'SARS-CoV-2', 'Post-Acute COVID-19 Syndrome', 'Epstein-Barr Virus Infections', 'Virus Diseases', 'Lyme Disease']
+    concepts:
+      - {vocabulary: SNOMED, search_term: 'post-viral syndrome', fallback_gap: true}
+      - {vocabulary: SNOMED, search_term: 'Postviral fatigue syndrome'}
+      - {vocabulary: SNOMED, search_term: 'Chronic post-COVID-19 syndrome'}
+    source_refs: [larsen2025, angeli2024]
+
+  # -------------------------------------------------------------- measurement
+  - id: head_up_tilt_test
+    group: measurement
+    label: Head-up tilt table test
+    definition: >
+      Passive 60-70 degree head-up tilt with continuous heart rate and blood
+      pressure. Supplies the diagnostic heart-rate increment itself.
+    pubmed_query: '"tilt table"[tiab] OR "tilt-table"[tiab] OR "head-up tilt"[tiab] OR "head up tilt"[tiab] OR HUTT[tiab] OR "tilt testing"[tiab] OR "orthostatic challenge"[tiab]'
+    mesh_terms: ['Tilt-Table Test']
+    concepts:
+      - {vocabulary: SNOMED, search_term: 'tilt table test'}
+      - {vocabulary: LOINC,  search_term: 'tilt table study'}
+    source_refs: [angeli2024, low2009, larsen2025]
+
+  - id: active_stand_test
+    group: measurement
+    label: Active stand test
+    definition: >
+      Ten-minute active standing with serial heart rate and blood pressure, the
+      pragmatic clinic alternative to tilt. Yields a different heart-rate
+      increment than tilt, which matters for phenotype threshold portability.
+    pubmed_query: '"active stand"[tiab] OR "standing test"[tiab] OR "stand test"[tiab] OR "10-minute stand"[tiab] OR "orthostatic vital signs"[tiab] OR "NASA lean test"[tiab]'
+    mesh_terms: ['Standing Position', 'Posture']
+    concepts:
+      - {vocabulary: SNOMED, search_term: 'measurement of orthostatic blood pressure'}
+      - {vocabulary: SNOMED, search_term: 'standing blood pressure'}
+      - {vocabulary: LOINC,  search_term: 'heart rate standing'}
+    source_refs: [angeli2024]
+
+  - id: qsart_sudomotor_testing
+    group: measurement
+    label: QSART and sudomotor testing
+    definition: >
+      Quantitative sudomotor axon reflex test and related sympathetic sweat
+      measures. Zhang et al. found reduced sweat output in about a third of 356
+      patients tested.
+    pubmed_query: 'QSART[tiab] OR "quantitative sudomotor"[tiab] OR "sudomotor axon reflex"[tiab] OR "sweat output"[tiab] OR "sympathetic skin response"[tiab] OR sudoscan[tiab] OR "electrochemical skin conductance"[tiab] OR "silastic sweat imprint"[tiab]'
+    mesh_terms: ['Sweating', 'Galvanic Skin Response', 'Sweat Glands']
+    concepts:
+      - {vocabulary: SNOMED, search_term: 'quantitative sudomotor axon reflex test', fallback_gap: true}
+      - {vocabulary: SNOMED, search_term: 'sweat test'}
+      - {vocabulary: SNOMED, search_term: 'sweat measure'}
+    source_refs: [gibbons2013, zhang2022]
+
+  - id: thermoregulatory_sweat_test
+    group: measurement
+    label: Thermoregulatory sweat test
+    definition: >
+      Whole-body sweat distribution under controlled heating, localising
+      anhidrosis and distinguishing pre- from post-ganglionic lesions when read
+      against QSART.
+    pubmed_query: '"thermoregulatory sweat test"[tiab] OR TST[tiab] OR anhidrosis[tiab] OR hypohidrosis[tiab] OR "sweat distribution"[tiab]'
+    mesh_terms: ['Hypohidrosis', 'Body Temperature Regulation']
+    concepts:
+      - {vocabulary: SNOMED, search_term: 'thermoregulatory sweat test', fallback_gap: true}
+      - {vocabulary: SNOMED, search_term: 'sweat measure'}
+      - {vocabulary: SNOMED, search_term: 'sweat test'}
+    source_refs: [gibbons2013, low2009]
+
+  - id: skin_biopsy_ienfd
+    group: measurement
+    label: Skin biopsy and intraepidermal nerve fibre density
+    definition: >
+      Punch biopsy with PGP 9.5 immunostaining and nerve-fibre density
+      quantification, the structural counterpart to sudomotor testing. Zhang et
+      al. reported reduced density in about 24% of those biopsied.
+    pubmed_query: '"skin biopsy"[tiab] OR "punch biopsy"[tiab] OR "intraepidermal nerve fiber"[tiab] OR "intraepidermal nerve fibre"[tiab] OR IENFD[tiab] OR "nerve fiber density"[tiab] OR "PGP 9.5"[tiab] OR "PGP9.5"[tiab] OR "sweat gland nerve fiber density"[tiab]'
+    mesh_terms: ['Biopsy', 'Skin', 'Nerve Fibers', 'Ubiquitin Thiolesterase']
+    concepts:
+      - {vocabulary: SNOMED, search_term: 'skin biopsy'}
+      - {vocabulary: SNOMED, search_term: 'punch biopsy of skin'}
+    source_refs: [gibbons2013, zhang2022]
+
+  - id: plasma_catecholamine_assay
+    group: measurement
+    label: Supine and upright plasma catecholamines
+    definition: >
+      Paired supine and standing noradrenaline and adrenaline. An upright
+      noradrenaline above roughly 600 pg/mL is the most-cited hyperadrenergic
+      criterion, and the paired design is what makes it interpretable.
+    pubmed_query: '"plasma norepinephrine"[tiab] OR "plasma noradrenaline"[tiab] OR "plasma catecholamine*"[tiab] OR "upright norepinephrine"[tiab] OR "standing norepinephrine"[tiab] OR "supine norepinephrine"[tiab] OR "24-hour urinary catecholamine*"[tiab] OR metanephrine*[tiab]'
+    mesh_terms: ['Norepinephrine', 'Catecholamines', 'Epinephrine', 'Metanephrine']
+    concepts:
+      - {vocabulary: LOINC, search_term: 'norepinephrine plasma'}
+      - {vocabulary: LOINC, search_term: 'epinephrine plasma'}
+      - {vocabulary: LOINC, search_term: 'metanephrine plasma'}
+    source_refs: [angeli2024, larsen2025, low2009]
+
+  - id: plasma_blood_volume_assay
+    group: measurement
+    label: Plasma and blood volume measurement
+    definition: >
+      Direct volume quantification by carbon monoxide rebreathing, indocyanine
+      green, or iodinated-albumin dilution. The only way to make the hypovolemic
+      flag objective rather than inferred.
+    pubmed_query: '"plasma volume"[tiab] OR "blood volume"[tiab] OR "red cell mass"[tiab] OR "carbon monoxide rebreathing"[tiab] OR "indocyanine green"[tiab] OR "iodinated albumin"[tiab] OR "volume status"[tiab] OR hematocrit[tiab]'
+    mesh_terms: ['Plasma Volume', 'Blood Volume Determination', 'Blood Volume', 'Hematocrit']
+    concepts:
+      - {vocabulary: LOINC, search_term: 'plasma volume'}
+      - {vocabulary: LOINC, search_term: 'blood volume'}
+      - {vocabulary: LOINC, search_term: 'hematocrit'}
+    source_refs: [angeli2024, low2009]
+
+  - id: cerebral_blood_flow_measurement
+    group: measurement
+    label: Cerebral blood flow velocity
+    definition: >
+      Transcranial Doppler middle-cerebral-artery velocity, near-infrared
+      spectroscopy, or cerebral oximetry during orthostasis. Explains symptoms
+      that the heart-rate criterion does not.
+    pubmed_query: '"cerebral blood flow"[tiab] OR "transcranial Doppler"[tiab] OR "middle cerebral artery"[tiab] OR "cerebral oximetry"[tiab] OR "near-infrared spectroscopy"[tiab] OR "cerebral autoregulation"[tiab] OR "cerebral perfusion"[tiab] OR "cerebral hypoperfusion"[tiab]'
+    mesh_terms: ['Cerebrovascular Circulation', 'Ultrasonography, Doppler, Transcranial', 'Spectroscopy, Near-Infrared', 'Middle Cerebral Artery']
+    concepts:
+      - {vocabulary: SNOMED, search_term: 'transcranial Doppler ultrasonography'}
+      - {vocabulary: SNOMED, search_term: 'cerebral blood flow'}
+    source_refs: [larsen2025]
+
+  - id: heart_rate_variability
+    group: measurement
+    label: Heart rate variability and baroreflex sensitivity
+    definition: >
+      Spectral and time-domain heart-rate variability, deep-breathing
+      respiratory sinus arrhythmia, and baroreflex gain: the cardiovagal side of
+      autonomic testing.
+    pubmed_query: '"heart rate variability"[tiab] OR HRV[tiab] OR baroreflex[tiab] OR "baroreceptor"[tiab] OR "deep breathing"[tiab] OR "respiratory sinus arrhythmia"[tiab] OR "vagal tone"[tiab] OR "cardiovagal"[tiab] OR "spectral analysis"[tiab]'
+    mesh_terms: ['Heart Rate', 'Baroreflex', 'Vagus Nerve', 'Autonomic Nervous System']
+    concepts:
+      - {vocabulary: SNOMED, search_term: 'heart rate variability'}
+      - {vocabulary: LOINC,  search_term: 'heart rate'}
+    source_refs: [gibbons2013, low2009, larsen2025]
+
+  - id: valsalva_maneuver
+    group: measurement
+    label: Valsalva manoeuvre
+    definition: >
+      Valsalva ratio and phase II/IV blood-pressure response, separating
+      adrenergic from cardiovagal failure. Part of the standard autonomic reflex
+      screen alongside deep breathing and QSART.
+    pubmed_query: 'Valsalva[tiab] OR "Valsalva ratio"[tiab] OR "adrenergic baroreflex"[tiab] OR "phase IV"[tiab] OR "composite autonomic severity"[tiab] OR CASS[tiab] OR "autonomic reflex screen"[tiab]'
+    mesh_terms: ['Valsalva Maneuver', 'Blood Pressure']
+    concepts:
+      - {vocabulary: SNOMED, search_term: 'Valsalva manoeuvre'}
+      - {vocabulary: SNOMED, search_term: 'autonomic function studies'}
+    source_refs: [gibbons2013, low2009]
+
+  - id: cardiopulmonary_exercise_test
+    group: measurement
+    label: Cardiopulmonary exercise testing
+    definition: >
+      Peak oxygen uptake, chronotropic response and ventilatory efficiency, the
+      objective substrate for the deconditioning flag and for post-exertional
+      malaise phenotyping.
+    pubmed_query: '"cardiopulmonary exercise"[tiab] OR CPET[tiab] OR "exercise testing"[tiab] OR "peak VO2"[tiab] OR "VO2 max"[tiab] OR "maximal oxygen uptake"[tiab] OR "anaerobic threshold"[tiab] OR "2-day CPET"[tiab] OR "invasive cardiopulmonary"[tiab]'
+    mesh_terms: ['Exercise Test', 'Oxygen Consumption', 'Exercise Tolerance']
+    concepts:
+      - {vocabulary: SNOMED, search_term: 'cardiopulmonary exercise test'}
+      - {vocabulary: LOINC,  search_term: 'oxygen consumption'}
+    source_refs: [low2009, larsen2025]
+
+  - id: autonomic_autoantibody_assay
+    group: measurement
+    label: Autonomic autoantibody assay
+    definition: >
+      Ganglionic acetylcholine receptor antibody, and adrenergic and muscarinic
+      receptor antibody panels including functional cell-based assays.
+    pubmed_query: '"ganglionic acetylcholine receptor"[tiab] OR "alpha-1 adrenergic receptor antibod*"[tiab] OR "beta-1 adrenergic receptor antibod*"[tiab] OR "beta-2 adrenergic"[tiab] OR "muscarinic acetylcholine receptor antibod*"[tiab] OR "angiotensin II type 1 receptor antibod*"[tiab] OR "functional autoantibod*"[tiab] OR "G-protein coupled receptor autoantibod*"[tiab]'
+    mesh_terms: ['Autoantibodies', 'Receptors, Nicotinic', 'Receptors, Adrenergic, beta-1', 'Receptors, Muscarinic']
+    concepts:
+      - {vocabulary: LOINC,  search_term: 'acetylcholine receptor antibody'}
+      - {vocabulary: SNOMED, search_term: 'autoantibody measurement'}
+    source_refs: [angeli2024, larsen2025]
+
+  - id: ambulatory_monitoring
+    group: measurement
+    label: Ambulatory heart rate and blood pressure monitoring
+    definition: >
+      Holter, patch electrocardiography, wearable heart-rate and 24-hour
+      ambulatory blood pressure. The realistic source of a heart-rate criterion
+      in routine electronic health record data, as opposed to a formal lab.
+    pubmed_query: 'Holter[tiab] OR "ambulatory blood pressure"[tiab] OR "ambulatory monitoring"[tiab] OR "wearable"[tiab] OR "24-hour heart rate"[tiab] OR actigraphy[tiab] OR "implantable loop"[tiab] OR "patch monitor"[tiab]'
+    mesh_terms: ['Electrocardiography, Ambulatory', 'Blood Pressure Monitoring, Ambulatory', 'Wearable Electronic Devices', 'Actigraphy']
+    concepts:
+      - {vocabulary: SNOMED, search_term: 'ambulatory electrocardiographic monitoring'}
+      - {vocabulary: SNOMED, search_term: 'electrocardiographic monitoring'}
+      - {vocabulary: SNOMED, search_term: 'ambulatory blood pressure monitoring'}
+    source_refs: [angeli2024]
+
+  - id: genetic_testing
+    group: measurement
+    label: Genetic testing
+    definition: >
+      Variant testing relevant to POTS and its comorbidities: noradrenaline
+      transporter (SLC6A2), mast-cell and tryptase loci, and connective-tissue
+      genes.
+    pubmed_query: '"genetic"[tiab] OR genotyp*[tiab] OR polymorphism*[tiab] OR variant*[tiab] OR SLC6A2[tiab] OR TPSAB1[tiab] OR "whole exome"[tiab] OR "genome-wide"[tiab] OR heritab*[tiab] OR familial[tiab]'
+    mesh_terms: ['Genetic Testing', 'Polymorphism, Single Nucleotide', 'Genetic Predisposition to Disease', 'Exome Sequencing']
+    concepts:
+      - {vocabulary: SNOMED, search_term: 'genetic test'}
+    source_refs: [low2009]
+
+  # -------------------------------------------------------------- comorbidity
+  - id: hypermobility_heds
+    group: comorbidity
+    label: Joint hypermobility and hypermobile Ehlers-Danlos syndrome
+    definition: >
+      Generalised joint hypermobility or hypermobile Ehlers-Danlos syndrome,
+      offered as a mechanism for increased venous compliance and pooling.
+    pubmed_query: '"Ehlers-Danlos"[tiab] OR EDS[tiab] OR hEDS[tiab] OR hypermobil*[tiab] OR "Beighton"[tiab] OR "joint laxity"[tiab] OR "connective tissue disorder"[tiab] OR "hypermobility spectrum"[tiab]'
+    mesh_terms: ['Ehlers-Danlos Syndrome', 'Joint Instability', 'Connective Tissue Diseases']
+    concepts:
+      - {vocabulary: SNOMED, search_term: 'hypermobile Ehlers-Danlos syndrome'}
+      - {vocabulary: SNOMED, search_term: 'joint hypermobility'}
+    source_refs: [angeli2024]
+
+  - id: mast_cell_activation
+    group: comorbidity
+    label: Mast cell activation syndrome
+    definition: >
+      Mast cell activation disorder with flushing, and raised tryptase or urinary
+      methylhistamine, which can mimic or amplify a hyperadrenergic picture.
+    pubmed_query: '"mast cell"[tiab] OR MCAS[tiab] OR mastocytosis[tiab] OR tryptase[tiab] OR "methylhistamine"[tiab] OR flushing[tiab] OR "prostaglandin D2"[tiab] OR histamine[tiab]'
+    mesh_terms: ['Mastocytosis', 'Mast Cells', 'Tryptases', 'Histamine']
+    concepts:
+      - {vocabulary: SNOMED, search_term: 'mast cell activation syndrome'}
+      - {vocabulary: LOINC,  search_term: 'tryptase serum'}
+    source_refs: [angeli2024]
+
+  - id: me_cfs
+    group: comorbidity
+    label: ME/CFS and post-exertional malaise
+    definition: >
+      Myalgic encephalomyelitis / chronic fatigue syndrome, sharing orthostatic
+      intolerance and post-exertional malaise with POTS.
+    pubmed_query: '"chronic fatigue"[tiab] OR "myalgic encephalomyelitis"[tiab] OR ME/CFS[tiab] OR "post-exertional"[tiab] OR "postexertional"[tiab] OR "systemic exertion intolerance"[tiab] OR fatigue[tiab]'
+    mesh_terms: ['Fatigue Syndrome, Chronic', 'Fatigue']
+    concepts:
+      - {vocabulary: SNOMED, search_term: 'chronic fatigue syndrome'}
+      - {vocabulary: SNOMED, search_term: 'post-exertional malaise', fallback_gap: true}
+      - {vocabulary: SNOMED, search_term: 'malaise and fatigue'}
+    source_refs: [larsen2025]
+
+  - id: long_covid
+    group: comorbidity
+    label: Long COVID and post-acute sequelae of SARS-CoV-2
+    definition: >
+      POTS arising after SARS-CoV-2 infection. The subject of the Larsen deep
+      phenotyping study, and the reason the modern incident cohort exists.
+    pubmed_query: '"long COVID"[tiab] OR "long-COVID"[tiab] OR PASC[tiab] OR "post-acute sequelae"[tiab] OR "post COVID"[tiab] OR "post-COVID"[tiab] OR "COVID-19"[tiab] OR "SARS-CoV-2"[tiab]'
+    mesh_terms: ['Post-Acute COVID-19 Syndrome', 'COVID-19', 'SARS-CoV-2']
+    concepts:
+      - {vocabulary: SNOMED, search_term: 'post COVID-19 condition', fallback_gap: true}
+      - {vocabulary: SNOMED, search_term: 'Chronic post-COVID-19 syndrome'}
+    source_refs: [larsen2025]
+
+  - id: post_vaccination_onset
+    group: comorbidity
+    label: Post-vaccination onset
+    definition: >
+      Symptom onset temporally associated with vaccination, principally human
+      papillomavirus and SARS-CoV-2 vaccines. Recorded because it appears in the
+      literature as a claimed trigger and any phenotype must be able to identify
+      and stratify these reports rather than silently absorb them.
+    pubmed_query: 'vaccin*[tiab] OR immunization[tiab] OR immunisation[tiab] OR HPV[tiab] OR Gardasil[tiab] OR "adverse event following immunization"[tiab] OR AEFI[tiab]'
+    mesh_terms: ['Vaccination', 'Papillomavirus Vaccines', 'COVID-19 Vaccines', 'Vaccines']
+    concepts:
+      - {vocabulary: SNOMED, search_term: 'adverse reaction to vaccine'}
+    source_refs: [angeli2024]
+
+  - id: systemic_autoimmune_disease
+    group: comorbidity
+    label: Sjogren and other systemic autoimmune disease
+    definition: >
+      Coexisting systemic autoimmune disease: Sjogren syndrome, systemic lupus
+      erythematosus, coeliac disease, autoimmune thyroiditis.
+    pubmed_query: '"Sjogren"[tiab] OR "Sjögren"[tiab] OR lupus[tiab] OR SLE[tiab] OR "celiac"[tiab] OR "coeliac"[tiab] OR "Hashimoto"[tiab] OR thyroiditis[tiab] OR "rheumatoid"[tiab] OR "antiphospholipid"[tiab] OR "antinuclear antibod*"[tiab]'
+    mesh_terms: ['Sjogren''s Syndrome', 'Lupus Erythematosus, Systemic', 'Celiac Disease', 'Thyroiditis, Autoimmune', 'Autoimmune Diseases']
+    concepts:
+      - {vocabulary: SNOMED, search_term: 'Sjogren syndrome'}
+      - {vocabulary: SNOMED, search_term: 'systemic lupus erythematosus'}
+    source_refs: [angeli2024]
+
+  - id: small_fiber_neuropathy_dx
+    group: comorbidity
+    label: Small fibre neuropathy diagnosis
+    definition: >
+      Small fibre neuropathy as a recorded diagnosis rather than as a test
+      result. Held separately from the neuropathic mechanism flag because in
+      electronic health record data the diagnosis code and the biopsy result are
+      different observations with different reliability.
+    pubmed_query: '"small fiber neuropathy"[tiab] OR "small fibre neuropathy"[tiab] OR SFN[tiab] OR "sensory neuropathy"[tiab] OR "painful neuropathy"[tiab] OR "burning feet"[tiab] OR allodynia[tiab]'
+    mesh_terms: ['Small Fiber Neuropathy', 'Peripheral Nervous System Diseases']
+    concepts:
+      - {vocabulary: SNOMED, search_term: 'small fibre neuropathy'}
+    source_refs: [gibbons2013, zhang2022]
+
+  - id: gi_dysmotility
+    group: comorbidity
+    label: Gastrointestinal dysmotility
+    definition: >
+      Gastroparesis, chronic constipation and rapid gastric emptying, reflecting
+      enteric autonomic involvement.
+    pubmed_query: 'gastroparesis[tiab] OR dysmotility[tiab] OR "gastric emptying"[tiab] OR constipation[tiab] OR "irritable bowel"[tiab] OR nausea[tiab] OR "gastrointestinal symptom*"[tiab] OR "enteric nervous system"[tiab]'
+    mesh_terms: ['Gastroparesis', 'Gastrointestinal Motility', 'Constipation', 'Irritable Bowel Syndrome', 'Enteric Nervous System']
+    concepts:
+      - {vocabulary: SNOMED, search_term: 'gastroparesis'}
+      - {vocabulary: SNOMED, search_term: 'gastrointestinal dysmotility', fallback_gap: true}
+      - {vocabulary: SNOMED, search_term: 'intestinal dysmotility'}
+    source_refs: [angeli2024, low2009]
+
+  - id: chronic_migraine
+    group: comorbidity
+    label: Migraine and chronic headache
+    definition: >
+      Migraine, chronic daily headache and their overlap with orthostatic
+      headache from cerebral hypoperfusion or cerebrospinal fluid leak.
+    pubmed_query: 'migraine[tiab] OR headache*[tiab] OR "orthostatic headache"[tiab] OR "cerebrospinal fluid leak"[tiab] OR "intracranial hypotension"[tiab]'
+    mesh_terms: ['Migraine Disorders', 'Headache', 'Intracranial Hypotension']
+    concepts:
+      - {vocabulary: SNOMED, search_term: 'migraine'}
+    source_refs: [angeli2024]
+
+  - id: differential_syncope_oh
+    group: comorbidity
+    label: Competing orthostatic diagnoses
+    definition: >
+      Vasovagal syncope, neurogenic orthostatic hypotension, inappropriate sinus
+      tachycardia and pure autonomic failure. Exclusion of these is part of the
+      POTS definition, so a computable phenotype needs them explicitly.
+    pubmed_query: '"vasovagal"[tiab] OR "orthostatic hypotension"[tiab] OR "inappropriate sinus tachycardia"[tiab] OR "pure autonomic failure"[tiab] OR "multiple system atrophy"[tiab] OR "neurally mediated syncope"[tiab] OR "reflex syncope"[tiab] OR pheochromocytoma[tiab] OR "adrenal insufficiency"[tiab] OR "thyrotoxicosis"[tiab] OR anemia[tiab]'
+    mesh_terms: ['Syncope, Vasovagal', 'Hypotension, Orthostatic', 'Tachycardia, Sinus', 'Pure Autonomic Failure', 'Multiple System Atrophy', 'Pheochromocytoma']
+    concepts:
+      - {vocabulary: SNOMED, search_term: 'vasovagal syncope'}
+      - {vocabulary: SNOMED, search_term: 'orthostatic hypotension'}
+      - {vocabulary: SNOMED, search_term: 'inappropriate sinus tachycardia'}
+    source_refs: [low2009, angeli2024]
+
+  # ---------------------------------------------------------------- treatment
+  - id: volume_expansion_therapy
+    group: treatment
+    label: Volume expansion therapy
+    definition: >
+      Fludrocortisone, salt and fluid loading, desmopressin, and intravenous
+      saline. Prescription implies a clinician's hypovolemic hypothesis.
+    pubmed_query: 'fludrocortisone[tiab] OR "salt loading"[tiab] OR "sodium chloride"[tiab] OR "salt tablet*"[tiab] OR desmopressin[tiab] OR DDAVP[tiab] OR "intravenous saline"[tiab] OR "IV saline"[tiab] OR "IV fluid*"[tiab] OR "volume loading"[tiab] OR erythropoietin[tiab]'
+    mesh_terms: ['Fludrocortisone', 'Deamino Arginine Vasopressin', 'Sodium Chloride', 'Fluid Therapy', 'Erythropoietin']
+    concepts:
+      - {vocabulary: RxNorm, search_term: 'fludrocortisone'}
+      - {vocabulary: RxNorm, search_term: 'desmopressin'}
+    source_refs: [low2009, angeli2024]
+
+  - id: midodrine_therapy
+    group: treatment
+    label: Midodrine
+    definition: >
+      Alpha-1 agonist vasoconstrictor, used where venous pooling or neuropathic
+      vasoconstrictor failure is suspected.
+    pubmed_query: 'midodrine[tiab] OR "alpha-1 agonist"[tiab] OR "alpha agonist"[tiab] OR ProAmatine[tiab]'
+    mesh_terms: ['Midodrine']
+    concepts:
+      - {vocabulary: RxNorm, search_term: 'midodrine'}
+    source_refs: [low2009]
+
+  - id: droxidopa_therapy
+    group: treatment
+    label: Droxidopa
+    definition: >
+      Noradrenaline prodrug used where a peripheral noradrenergic deficit is
+      suspected.
+    pubmed_query: 'droxidopa[tiab] OR L-DOPS[tiab] OR "L-threo-DOPS"[tiab] OR Northera[tiab]'
+    mesh_terms: ['Droxidopa']
+    concepts:
+      - {vocabulary: RxNorm, search_term: 'droxidopa'}
+    source_refs: [low2009]
+
+  - id: ivabradine_therapy
+    group: treatment
+    label: Ivabradine
+    definition: >
+      Selective sinoatrial funny-current inhibitor, lowering heart rate without
+      lowering blood pressure. Signals a rate-centred rather than volume-centred
+      hypothesis.
+    pubmed_query: 'ivabradine[tiab] OR "I(f) current"[tiab] OR "funny current"[tiab] OR "sinus node"[tiab] OR Corlanor[tiab]'
+    mesh_terms: ['Ivabradine']
+    concepts:
+      - {vocabulary: RxNorm, search_term: 'ivabradine'}
+    source_refs: [angeli2024]
+
+  - id: beta_blocker_therapy
+    group: treatment
+    label: Beta blockade
+    definition: >
+      Propranolol, metoprolol, bisoprolol and related agents, most often given
+      on a hyperadrenergic rationale.
+    pubmed_query: '"beta blocker*"[tiab] OR "beta-blocker*"[tiab] OR "beta-adrenergic block*"[tiab] OR propranolol[tiab] OR metoprolol[tiab] OR bisoprolol[tiab] OR atenolol[tiab] OR nadolol[tiab] OR labetalol[tiab] OR carvedilol[tiab]'
+    mesh_terms: ['Adrenergic beta-Antagonists', 'Propranolol', 'Metoprolol', 'Bisoprolol', 'Atenolol']
+    concepts:
+      - {vocabulary: RxNorm, search_term: 'propranolol'}
+      - {vocabulary: RxNorm, search_term: 'metoprolol'}
+    source_refs: [low2009, angeli2024]
+
+  - id: pyridostigmine_therapy
+    group: treatment
+    label: Pyridostigmine
+    definition: >
+      Peripheral acetylcholinesterase inhibitor enhancing ganglionic
+      transmission, used on a neuropathic or autoimmune rationale.
+    pubmed_query: 'pyridostigmine[tiab] OR "acetylcholinesterase inhibitor"[tiab] OR "cholinesterase inhibitor"[tiab] OR Mestinon[tiab]'
+    mesh_terms: ['Pyridostigmine Bromide', 'Cholinesterase Inhibitors']
+    concepts:
+      - {vocabulary: RxNorm, search_term: 'pyridostigmine'}
+    source_refs: [low2009, gibbons2013]
+
+  - id: central_sympatholytic_therapy
+    group: treatment
+    label: Central sympatholytics
+    definition: >
+      Clonidine and methyldopa, reserved almost exclusively for a
+      hyperadrenergic presentation and therefore an unusually specific proxy.
+    pubmed_query: 'clonidine[tiab] OR methyldopa[tiab] OR guanfacine[tiab] OR "central sympatholytic"[tiab] OR "alpha-2 agonist"[tiab]'
+    mesh_terms: ['Clonidine', 'Methyldopa', 'Guanfacine', 'Sympatholytics']
+    concepts:
+      - {vocabulary: RxNorm, search_term: 'clonidine'}
+      - {vocabulary: RxNorm, search_term: 'methyldopa'}
+    source_refs: [low2009, angeli2024]
+
+  - id: immunomodulatory_therapy
+    group: treatment
+    label: Immunomodulation
+    definition: >
+      Intravenous immunoglobulin, rituximab, plasma exchange and corticosteroids
+      given for a presumed autoimmune mechanism.
+    pubmed_query: '"intravenous immunoglobulin"[tiab] OR IVIG[tiab] OR IVIg[tiab] OR rituximab[tiab] OR "plasma exchange"[tiab] OR plasmapheresis[tiab] OR "immunoadsorption"[tiab] OR immunosuppress*[tiab] OR immunomodulat*[tiab] OR corticosteroid*[tiab]'
+    mesh_terms: ['Immunoglobulins, Intravenous', 'Rituximab', 'Plasma Exchange', 'Immunomodulating Agents', 'Immunosuppressive Agents']
+    concepts:
+      - {vocabulary: RxNorm, search_term: 'immune globulin'}
+      - {vocabulary: RxNorm, search_term: 'rituximab'}
+    source_refs: [angeli2024, larsen2025]
+
+  - id: exercise_reconditioning
+    group: treatment
+    label: Exercise reconditioning
+    definition: >
+      Structured recumbent-to-upright exercise programmes such as the Levine and
+      CHOP protocols, prescribed against a deconditioning hypothesis.
+    pubmed_query: '"exercise training"[tiab] OR "exercise program*"[tiab] OR reconditioning[tiab] OR rehabilitation[tiab] OR "recumbent"[tiab] OR "Levine protocol"[tiab] OR "CHOP protocol"[tiab] OR "physical therapy"[tiab] OR "aerobic training"[tiab]'
+    mesh_terms: ['Exercise Therapy', 'Exercise', 'Physical Therapy Modalities', 'Rehabilitation']
+    concepts:
+      - {vocabulary: SNOMED, search_term: 'exercise therapy'}
+      - {vocabulary: SNOMED, search_term: 'cardiac rehabilitation'}
+    source_refs: [low2009, angeli2024]
+
+  - id: compression_therapy
+    group: treatment
+    label: Compression garments
+    definition: >
+      Abdominal binders and lower-limb compression that mechanically oppose
+      venous pooling, targeting the neuropathic and hypovolemic flags.
+    pubmed_query: 'compression[tiab] OR "compression stocking*"[tiab] OR "abdominal binder"[tiab] OR "abdominal compression"[tiab] OR "waist-high"[tiab] OR "counter-manoeuvre*"[tiab] OR "countermaneuver*"[tiab]'
+    mesh_terms: ['Stockings, Compression', 'Compression Bandages']
+    concepts:
+      - {vocabulary: SNOMED, search_term: 'compression stockings'}
+    source_refs: [low2009]
+
+  - id: serotonergic_therapy
+    group: treatment
+    label: Serotonergic and other central agents
+    definition: >
+      Serotonin reuptake inhibitors, serotonin-noradrenaline reuptake
+      inhibitors and modafinil. Deliberately kept as a low-specificity facet,
+      since these are also prescribed for coexisting depression, anxiety and
+      fatigue rather than for any orthostatic mechanism.
+    pubmed_query: 'SSRI[tiab] OR SNRI[tiab] OR fluoxetine[tiab] OR sertraline[tiab] OR venlafaxine[tiab] OR duloxetine[tiab] OR modafinil[tiab] OR "serotonin reuptake"[tiab] OR "tricyclic"[tiab]'
+    mesh_terms: ['Selective Serotonin Reuptake Inhibitors', 'Modafinil', 'Serotonin and Noradrenaline Reuptake Inhibitors']
+    concepts:
+      - {vocabulary: RxNorm, search_term: 'sertraline'}
+      - {vocabulary: RxNorm, search_term: 'venlafaxine'}
+    source_refs: [low2009]
+
+# Seed references, used by the validation report to check that the corpus
+# actually contains the papers the vocabulary was built from.
+# Resolution is by title match, not by taking esearch's first hit: PubMed treats
+# an unquoted [Title] search as a bag of words ordered by relevance, so the first
+# hit for a title query is regularly a different paper. expected_pmid is checked
+# independently against the corpus, so a drifting lookup query is detected
+# without the check becoming circular.
+seed_references:
+  angeli2024:
+    citation: 'Angeli et al. Symptom presentation by phenotype of postural orthostatic tachycardia syndrome. Scientific Reports, 2024.'
+    pubmed_lookup: 'Angeli[Author] AND "postural orthostatic tachycardia"[Title] AND 2024[PDAT]'
+    expected_title: 'Symptom presentation by phenotype of postural orthostatic tachycardia syndrome.'
+    expected_pmid: '38168762'
+  gibbons2013:
+    citation: 'Gibbons et al. Structural and functional small fiber abnormalities in the neuropathic postural tachycardia syndrome. PLoS ONE, 2013.'
+    pubmed_lookup: 'small fiber abnormalities in the neuropathic postural tachycardia syndrome[Title]'
+    expected_title: 'Structural and functional small fiber abnormalities in the neuropathic postural tachycardia syndrome.'
+    expected_pmid: '24386408'
+  zhang2022:
+    citation: 'Zhang et al. Skin biopsy and QSART testing in patients with postural orthostatic tachycardia syndrome. Cureus, 2022.'
+    pubmed_lookup: 'Skin Biopsy and Quantitative Sudomotor Axon Reflex Testing[Title]'
+    expected_title: 'Skin Biopsy and Quantitative Sudomotor Axon Reflex Testing in Patients With Postural Orthostatic Tachycardia Syndrome.'
+    expected_pmid: '36349067'
+  larsen2025:
+    citation: 'Larsen et al. Long-COVID POTS: a deep phenotyping study. medRxiv preprint, 2025.'
+    pubmed_lookup: 'long COVID postural orthostatic tachycardia deep phenotyping[Title/Abstract]'
+    note: >
+      medRxiv preprint. PubMed does not index medRxiv, so this seed is expected
+      to be absent from a PubMed-only corpus. The validation report treats its
+      absence as expected rather than as a defect.
+  low2009:
+    citation: 'Low et al. Postural tachycardia syndrome (POTS). Journal of Cardiovascular Electrophysiology / review, 2009.'
+    pubmed_lookup: 'Postural tachycardia syndrome (POTS)[Title] AND Low PA[Author]'
+    expected_title: 'Postural tachycardia syndrome (POTS).'
+    expected_pmid: '19207771'

@@ -1,0 +1,114 @@
+subject_id	predicate	object_id	provenance	source
+chronic_migraine	associated_with	pots	angeli2024; low2009: overrepresentation of migraine	curated
+gi_dysmotility	associated_with	pots	low2009: nausea and bloating common	curated
+hypermobility_heds	associated_with	pots	angeli2024	curated
+me_cfs	associated_with	pots	low2009: 40% of chronic fatigue syndrome patients have POTS; gibbons2013	curated
+small_fiber_neuropathy_dx	associated_with	neuropathic_evidence	gibbons2013; zhang2022	curated
+systemic_autoimmune_disease	associated_with	autoimmune_evidence	zhang2022: autoimmune disease trend with abnormal testing	curated
+differential_syncope_oh	differential_diagnosis_of	pots	low2009: exclusion is part of the definition	curated
+autonomic_autoantibody_assay	evidence_for	autoimmune_evidence	low2009: A3 acetylcholine receptor antibodies in 1 in 7	curated
+cardiopulmonary_exercise_test	evidence_for	deconditioning_evidence	low2009: reduced stroke volume and poor exercise tolerance	curated
+head_up_tilt_test	evidence_for	hyperadrenergic_evidence	angeli2024; low2009: systolic BP rise on tilt	curated
+plasma_blood_volume_assay	evidence_for	hypovolemic_evidence	angeli2024	curated
+plasma_catecholamine_assay	evidence_for	hyperadrenergic_evidence	angeli2024: upright NE threshold	curated
+qsart_sudomotor_testing	evidence_for	neuropathic_evidence	zhang2022: reduced sweat output ~33%	curated
+skin_biopsy_ienfd	evidence_for	neuropathic_evidence	gibbons2013; zhang2022: reduced IENFD ~24%	curated
+thermoregulatory_sweat_test	evidence_for	neuropathic_evidence	gibbons2013; angeli2024: abnormal TST sweat pattern defines neuropathic	curated
+valsalva_maneuver	evidence_for	neuropathic_evidence	gibbons2013: lower phase 4 overshoot; zhang2022: reduced phase II response	curated
+beta_blocker_therapy	indicates	hyperadrenergic_evidence	low2009; angeli2024	curated
+central_sympatholytic_therapy	indicates	hyperadrenergic_evidence	low2009: clonidine for unstable hypertensive responses to tilt	curated
+compression_therapy	indicates	neuropathic_evidence	low2009: opposes venous pooling	curated
+compression_therapy	indicates	hypovolemic_evidence	low2009	curated
+exercise_reconditioning	indicates	deconditioning_evidence	low2009	curated
+midodrine_therapy	indicates	neuropathic_evidence	low2009: vasoconstrictor failure and pooling	curated
+pyridostigmine_therapy	indicates	neuropathic_evidence	angeli2024: vasoconstriction in neuropathic POTS	curated
+volume_expansion_therapy	indicates	hypovolemic_evidence	low2009: first-line for volume depletion	curated
+active_stand_test	is_a	orthostatic_challenge_testing	taxonomy	curated
+ambulatory_monitoring	is_a	objective_evidence	taxonomy	curated
+autoimmune_evidence	is_a	mechanistic_phenotype	low2009: autoimmune attack of autonomic nerves	curated
+autonomic_autoantibody_assay	is_a	immunological_assessment	taxonomy	curated
+autonomic_function_testing	is_a	objective_evidence	taxonomy	curated
+autonomic_reflex_screen	is_a	autonomic_function_testing	taxonomy	curated
+beta_blocker_therapy	is_a	negative_chronotrope	taxonomy	curated
+beta_blocker_therapy	is_a	sympatholytic_agent	taxonomy: poly-hierarchy is intentional	curated
+cardiopulmonary_exercise_test	is_a	objective_evidence	taxonomy	curated
+central_sympatholytic_therapy	is_a	sympatholytic_agent	taxonomy	curated
+cerebral_blood_flow_measurement	is_a	cerebrovascular_assessment	larsen2025	curated
+cerebrovascular_assessment	is_a	objective_evidence	taxonomy	curated
+cholinergic_agent	is_a	therapeutic_proxy	taxonomy	curated
+chronic_migraine	is_a	clinical_context	taxonomy	curated
+clinical_context	is_a	pots_phenotype_axis	taxonomy	curated
+compression_therapy	is_a	nonpharmacologic_intervention	taxonomy	curated
+deconditioning_evidence	is_a	mechanistic_phenotype	low2009	curated
+differential_syncope_oh	is_a	clinical_context	taxonomy	curated
+droxidopa_therapy	is_a	vasoconstrictor_agent	taxonomy	curated
+exercise_reconditioning	is_a	nonpharmacologic_intervention	taxonomy	curated
+genetic_testing	is_a	objective_evidence	taxonomy	curated
+gi_dysmotility	is_a	clinical_context	taxonomy	curated
+head_up_tilt_test	is_a	orthostatic_challenge_testing	taxonomy	curated
+heart_rate_variability	is_a	autonomic_function_testing	taxonomy	curated
+hyperadrenergic_evidence	is_a	mechanistic_phenotype	angeli2024; low2009	curated
+hypermobility_heds	is_a	clinical_context	taxonomy	curated
+hypovolemic_evidence	is_a	mechanistic_phenotype	angeli2024; low2009	curated
+immunological_assessment	is_a	objective_evidence	taxonomy	curated
+immunomodulator	is_a	therapeutic_proxy	taxonomy	curated
+immunomodulatory_therapy	is_a	immunomodulator	taxonomy	curated
+ivabradine_therapy	is_a	negative_chronotrope	taxonomy	curated
+long_covid	is_a	clinical_context	taxonomy	curated
+mast_cell_activation	is_a	clinical_context	taxonomy	curated
+me_cfs	is_a	clinical_context	taxonomy	curated
+mechanistic_phenotype	is_a	pots_phenotype_axis	taxonomy	curated
+midodrine_therapy	is_a	vasoconstrictor_agent	taxonomy	curated
+negative_chronotrope	is_a	therapeutic_proxy	taxonomy	curated
+neurochemical_assessment	is_a	objective_evidence	taxonomy	curated
+neuropathic_evidence	is_a	mechanistic_phenotype	angeli2024; gibbons2013	curated
+nonpharmacologic_intervention	is_a	therapeutic_proxy	taxonomy	curated
+objective_evidence	is_a	pots_phenotype_axis	taxonomy	curated
+orthostatic_challenge_testing	is_a	autonomic_function_testing	taxonomy	curated
+plasma_blood_volume_assay	is_a	volume_assessment	taxonomy	curated
+plasma_catecholamine_assay	is_a	neurochemical_assessment	taxonomy	curated
+post_vaccination_onset	is_a	clinical_context	taxonomy	curated
+postinfectious_evidence	is_a	mechanistic_phenotype	larsen2025	curated
+pyridostigmine_therapy	is_a	cholinergic_agent	taxonomy	curated
+qsart_sudomotor_testing	is_a	sudomotor_assessment	taxonomy	curated
+serotonergic_therapy	is_a	therapeutic_proxy	taxonomy	curated
+skin_biopsy_ienfd	is_a	structural_nerve_assessment	gibbons2013	curated
+small_fiber_neuropathy_dx	is_a	clinical_context	taxonomy	curated
+structural_nerve_assessment	is_a	objective_evidence	taxonomy	curated
+sudomotor_assessment	is_a	autonomic_function_testing	taxonomy	curated
+sympatholytic_agent	is_a	therapeutic_proxy	taxonomy	curated
+systemic_autoimmune_disease	is_a	clinical_context	taxonomy	curated
+therapeutic_proxy	is_a	pots_phenotype_axis	taxonomy	curated
+thermoregulatory_sweat_test	is_a	sudomotor_assessment	taxonomy	curated
+valsalva_maneuver	is_a	autonomic_function_testing	taxonomy	curated
+vasoconstrictor_agent	is_a	therapeutic_proxy	taxonomy	curated
+volume_assessment	is_a	objective_evidence	taxonomy	curated
+volume_expander	is_a	therapeutic_proxy	taxonomy	curated
+volume_expansion_therapy	is_a	volume_expander	taxonomy	curated
+active_stand_test	measures	orthostatic_heart_rate_increment	low2009: HR increment >=30 defines POTS	curated
+ambulatory_monitoring	measures	orthostatic_heart_rate_increment	low2009: ambulatory heart rate assessment	curated
+cardiopulmonary_exercise_test	measures	aerobic_capacity	low2009: exercise testing listed	curated
+cerebral_blood_flow_measurement	measures	cerebral_perfusion	larsen2025	curated
+head_up_tilt_test	measures	orthostatic_heart_rate_increment	low2009: HR increment >=30 defines POTS	curated
+plasma_blood_volume_assay	measures	intravascular_volume	angeli2024	curated
+plasma_catecholamine_assay	measures	upright_plasma_norepinephrine	angeli2024	curated
+qsart_sudomotor_testing	measures	sweat_output	zhang2022	curated
+skin_biopsy_ienfd	measures	nerve_fiber_density	gibbons2013; zhang2022	curated
+thermoregulatory_sweat_test	measures	sweat_output	gibbons2013; angeli2024: abnormal sweat pattern on TST	curated
+head_up_tilt_test	part_of	autonomic_reflex_screen	angeli2024: screen includes HUTT	curated
+heart_rate_variability	part_of	autonomic_reflex_screen	angeli2024: screen includes heart rate response to deep breathing	curated
+qsart_sudomotor_testing	part_of	autonomic_reflex_screen	angeli2024: screen includes QSART	curated
+valsalva_maneuver	part_of	autonomic_reflex_screen	gibbons2013: autonomic battery included Valsalva	curated
+autoimmune_evidence	proposed_mechanism_of	pots	low2009: autoimmune attack of autonomic nerves	curated
+deconditioning_evidence	proposed_mechanism_of	pots	low2009: causal direction contested	curated
+hyperadrenergic_evidence	proposed_mechanism_of	pots	angeli2024: overlapping, not exclusive	curated
+hypermobility_heds	proposed_mechanism_of	hypovolemic_evidence	angeli2024: compliant connective tissue, venous pooling	curated
+hypovolemic_evidence	proposed_mechanism_of	pots	angeli2024; low2009	curated
+neuropathic_evidence	proposed_mechanism_of	pots	angeli2024; gibbons2013	curated
+postinfectious_evidence	proposed_mechanism_of	pots	larsen2025	curated
+beta_blocker_therapy	treats	pots	low2009	curated
+exercise_reconditioning	treats	pots	low2009	curated
+ivabradine_therapy	treats	pots	angeli2024	curated
+midodrine_therapy	treats	pots	low2009	curated
+volume_expansion_therapy	treats	pots	low2009	curated
+long_covid	trigger_of	postinfectious_evidence	larsen2025	curated

@@ -1,0 +1,899 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>POTS Evidence Map</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.30.2/cytoscape.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.5/dagre.min.js"></script>
+<style>
+:root {
+  color-scheme: light;
+  --page: #f9f9f7; --surface: #ffffff; --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+  --line: #e1e0d9; --edge: #d3d2cb; --border: rgba(11,11,11,0.10); --wash: rgba(11,11,11,0.04);
+  --c-mechanism: #2a78d6; --c-measurement: #1baf7a; --c-treatment: #eb6834; --c-comorbidity: #898781;
+  --c-pots: #0b0b0b; --on-pots: #ffffff; --note: #fff6e0; --note-ink: #6b4e00;
+  --s-good: #0ca30c; --s-warning: #fab219; --s-serious: #ec835a; --s-critical: #d03b3b;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7; --muted: #898781;
+    --line: #2c2c2a; --edge: #3d3d3a; --border: rgba(255,255,255,0.10); --wash: rgba(255,255,255,0.05);
+    --c-mechanism: #3987e5; --c-measurement: #199e70; --c-treatment: #d95926; --c-comorbidity: #a8a79f;
+    --c-pots: #ffffff; --on-pots: #0b0b0b; --note: #2a2414; --note-ink: #e8c66a;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7; --muted: #898781;
+  --line: #2c2c2a; --edge: #3d3d3a; --border: rgba(255,255,255,0.10); --wash: rgba(255,255,255,0.05);
+  --c-mechanism: #3987e5; --c-measurement: #199e70; --c-treatment: #d95926; --c-comorbidity: #a8a79f;
+  --c-pots: #ffffff; --on-pots: #0b0b0b; --note: #2a2414; --note-ink: #e8c66a;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--page); color: var(--ink); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+  display: flex; flex-direction: column; }
+a { color: inherit; }
+
+header { padding: 18px 20px 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+.title h1 { font-size: 20px; margin: 0; font-weight: 650; letter-spacing: -0.01em; }
+.title p { margin: 2px 0 0; color: var(--ink-2); font-size: 14px; }
+.tools { margin-left: auto; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.seg { display: inline-flex; background: var(--wash); border: 1px solid var(--border); border-radius: 10px; padding: 3px; }
+.seg button { border: 0; background: transparent; padding: 6px 12px; border-radius: 7px; font: inherit; font-size: 14px; color: var(--ink-2); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+input[type="search"], select {
+  font: inherit; font-size: 14px; color: var(--ink); background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 7px 12px; width: 230px; max-width: 100%;
+}
+.btn { font: inherit; font-size: 14px; color: var(--ink); background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 7px 12px; cursor: pointer; }
+.btn:hover, .seg button:hover { background: var(--wash); }
+:focus-visible { outline: 2px solid var(--c-mechanism); outline-offset: 2px; }
+.note { margin: 0 20px 12px; padding: 8px 12px; border-radius: 10px; background: var(--note); color: var(--note-ink); font-size: 13.5px; }
+
+main { flex: 1; min-height: 0; display: flex; gap: 16px; padding: 0 20px 20px; }
+.view { display: none; flex: 1; min-width: 0; }
+.view.on { display: flex; gap: 16px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; }
+
+/* map */
+#mapWrap { position: relative; flex: 1; min-width: 0; min-height: 420px; overflow: hidden; }
+#cy { position: absolute; inset: 0; }
+#panel { width: 340px; flex: none; padding: 18px; overflow: auto; }
+#panel h2 { font-size: 18px; margin: 0 0 6px; line-height: 1.3; }
+#panel h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 18px 0 6px; font-weight: 600; }
+#panel p { margin: 6px 0; color: var(--ink-2); font-size: 14px; }
+.pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--ink-2);
+  border: 1px solid var(--border); border-radius: 999px; padding: 2px 9px; }
+.dot { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.legend { display: grid; gap: 8px; margin-top: 8px; font-size: 14px; }
+.legend div { display: flex; align-items: center; gap: 10px; }
+.legend .sw { width: 28px; height: 14px; border-radius: 4px; border: 1.5px solid; flex: none; }
+.legend .ln { width: 28px; border-top: 2px solid var(--muted); flex: none; }
+.legend .ln.dash { border-top-style: dashed; }
+.conn { padding: 9px 0; border-top: 1px solid var(--line); font-size: 14px; }
+.conn:first-of-type { border-top: 0; }
+.conn .rel { color: var(--ink-2); }
+a.n { font-weight: 600; text-decoration: none; border-bottom: 1px solid var(--line); cursor: pointer; }
+a.n:hover { border-bottom-color: var(--ink-2); }
+.src { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+.src a { color: var(--ink-2); }
+/* excerpts */
+.ex { margin-top: 8px; }
+.quote { margin: 4px 0 0; padding: 6px 10px; border-left: 3px solid var(--line); background: var(--wash);
+  border-radius: 0 8px 8px 0; font-size: 13.5px; color: var(--ink); font-style: italic; }
+.quote.supports { border-left-color: var(--s-good); }
+.quote.partial { border-left-color: var(--s-warning); }
+.quote.contradicts { border-left-color: var(--s-critical); }
+.exmeta { font-size: 12px; color: var(--muted); margin-top: 3px; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; }
+.exnote { font-size: 12.5px; color: var(--ink-2); margin-top: 3px; }
+.vb { display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; font-weight: 600; color: var(--ink);
+  border: 1px solid var(--border); border-radius: 999px; padding: 0 7px; white-space: nowrap; font-style: normal; }
+.vb i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+details.more { margin-top: 6px; font-size: 13px; }
+details.more summary { cursor: pointer; color: var(--ink-2); }
+.warn { color: var(--note-ink); background: var(--note); border-radius: 6px; padding: 0 6px; font-size: 12px; }
+.zoom { position: absolute; right: 12px; bottom: 12px; display: flex; gap: 6px; }
+.zoom .btn { padding: 4px 10px; }
+#tip { position: fixed; z-index: 10; pointer-events: none; display: none; max-width: 300px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; font-size: 13px; box-shadow: 0 6px 18px rgba(0,0,0,.14); }
+#tip .s { color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+/* hierarchy */
+#treeWrap { flex: 1; min-width: 0; overflow: auto; padding: 14px 16px; }
+#treePanel, #dagPanel { width: 380px; flex: none; padding: 18px; overflow: auto; }
+#dagWrap { flex: 1; min-width: 0; position: relative; display: flex; flex-direction: column; overflow: hidden; }
+#dagCy { flex: 1; min-height: 420px; }
+.dlegend { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; padding: 8px 12px;
+  border-bottom: 1px solid var(--line); font-size: 12.5px; color: var(--ink-2); }
+.dlegend div { display: flex; align-items: center; gap: 8px; }
+.dlegend .lt { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; }
+.dlegend .sw { width: 24px; height: 12px; border-radius: 4px; border: 1.5px solid; flex: none; }
+.dlegend .sw.tint { background: color-mix(in srgb, var(--c) 14%, transparent); border-color: var(--c); }
+.dlegend .ln { width: 24px; border-top: 2px solid var(--muted); flex: none; }
+.dlegend .ln.dash { border-top-style: dashed; }
+.dlegend .lnote { color: var(--muted); font-size: 12px; }
+.dtbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+.dtbar .cnt { color: var(--muted); font-size: 13px; }
+#dagPanel h2 { font-size: 18px; margin: 0 0 6px; line-height: 1.3; }
+#dagPanel h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 18px 0 6px; font-weight: 600; }
+#dagPanel p { margin: 6px 0; color: var(--ink-2); font-size: 14px; }
+#treePanel h2 { font-size: 18px; margin: 0 0 6px; line-height: 1.3; }
+#treePanel h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 18px 0 6px; font-weight: 600; }
+#treePanel p { margin: 6px 0; color: var(--ink-2); font-size: 14px; }
+.tree details { margin-left: 16px; border-left: 1px solid var(--line); padding-left: 10px; }
+.tree > details { margin-left: 0; border-left: 0; padding-left: 0; }
+.tree summary { cursor: pointer; padding: 4px 0; font-weight: 600; font-size: 14px; list-style: none; display: flex; gap: 8px; align-items: center; }
+.tree summary::-webkit-details-marker { display: none; }
+.tree summary::before { content: "▸"; color: var(--muted); font-size: 11px; width: 10px; transition: transform .12s; }
+.tree details[open] > summary::before { transform: rotate(90deg); }
+.tree > details > summary { font-size: 13px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-2); margin-top: 8px; }
+.tree .cnt { color: var(--muted); font-weight: 400; font-size: 12.5px; text-transform: none; letter-spacing: 0; }
+.leaf { display: flex; gap: 8px; align-items: center; margin-left: 26px; padding: 3px 6px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+.leaf:hover, .leaf.on, .tree summary.on { background: var(--wash); }
+.leaf .lc { color: var(--muted); font-size: 12px; margin-left: auto; white-space: nowrap; }
+.leaf.orph { opacity: .55; }
+.tree summary .lc { margin-left: auto; color: var(--muted); font-weight: 400; font-size: 12px; }
+.tree .ohead { margin: 8px 0 2px 26px; font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; }
+.tree summary.node-sum { font-weight: 600; text-transform: none; letter-spacing: 0; font-size: 14px; color: var(--ink); }
+.tree > details.root > summary { font-size: 16px; }
+.tree > details.aside { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 8px; }
+.parts { margin-left: 26px; font-size: 12.5px; color: var(--muted); padding: 2px 0 4px; }
+/* by cause */
+#causes { flex: 1; overflow: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; align-content: start; }
+.cause { padding: 16px 18px; border-top: 4px solid var(--c-mechanism); }
+.cause.pots { border-top-color: var(--c-pots); }
+.cause h2 { margin: 0; font-size: 17px; }
+.cause > p { margin: 4px 0 8px; color: var(--ink-2); font-size: 13.5px; }
+.cause h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 14px 0 2px; font-weight: 600; }
+.item { padding: 6px 0; border-top: 1px solid var(--line); font-size: 14px; display: flex; gap: 8px; }
+.item:first-of-type { border-top: 0; }
+.item .dot { margin-top: 6px; }
+.empty { color: var(--muted); font-size: 13.5px; padding: 4px 0; }
+
+/* table */
+#tableWrap { flex: 1; overflow: auto; }
+.tbar { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; border-bottom: 1px solid var(--line); align-items: center; }
+.tbar .count { color: var(--muted); font-size: 13px; margin-left: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { position: sticky; top: 0; background: var(--surface); color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; font-weight: 600; }
+td.rel { color: var(--ink-2); }
+
+@media (max-width: 900px) {
+  main { padding: 0 16px 16px; }
+  header { padding: 16px; }
+  .note { margin: 0 16px 12px; }
+  .view.on { flex-direction: column; }
+  #mapWrap { min-height: 70vh; }
+  #panel, #treePanel, #dagPanel { width: auto; }
+  #dagWrap { min-height: 70vh; }
+  .tools { margin-left: 0; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="title">
+    <h1>POTS evidence map</h1>
+    <p>How tests, treatments and other conditions point to the six possible causes of POTS.</p>
+  </div>
+  <div class="tools">
+    <div class="seg" role="group" aria-label="View">
+      <button data-view="dag" aria-pressed="true">DAG</button>
+      <button data-view="map" aria-pressed="false">Map</button>
+      <button data-view="tree" aria-pressed="false">Outline</button>
+      <button data-view="causes" aria-pressed="false">By cause</button>
+      <button data-view="table" aria-pressed="false">All links</button>
+    </div>
+    <input type="search" id="q" list="names" placeholder="Find a test, drug, condition…" aria-label="Find">
+    <datalist id="names"></datalist>
+  </div>
+</header>
+<div class="note">Draft for review: every link here was written by an AI assistant (Claude) from five papers and has not yet been checked by a clinician.</div>
+
+<main>
+  <section class="view" id="v-map">
+    <div class="card" id="mapWrap">
+      <div id="cy" aria-label="Map of links between tests, causes, treatments and conditions"></div>
+      <div class="zoom"><button class="btn" id="fit">Reset view</button></div>
+    </div>
+    <aside class="card" id="panel" aria-live="polite"></aside>
+  </section>
+  <section class="view on" id="v-dag">
+    <div class="card" id="dagWrap">
+      <div class="dtbar"><button class="btn" id="dagFit">Reset view</button>
+        <label class="btn"><input type="checkbox" id="dagLabels"> Name every relationship</label>
+        <span class="cnt">POTS is the root; arrows point toward it.</span></div>
+      <div class="dlegend" aria-label="Legend">
+        <div class="lt">Legend</div>
+        <div><span class="sw" style="background:var(--c-pots);border-color:var(--c-pots)"></span>POTS (root)</div>
+        <div><span class="sw" style="background:var(--c-mechanism);border-color:var(--c-mechanism)"></span>Possible cause</div>
+        <div><span class="sw tint" style="--c:var(--c-measurement)"></span>Test</div>
+        <div><span class="sw tint" style="--c:var(--c-treatment)"></span>Treatment</div>
+        <div><span class="sw tint" style="--c:var(--c-comorbidity)"></span>Condition</div>
+        <div><span class="ln"></span>Supported by the cited paper</div>
+        <div><span class="ln dash"></span>Only partly supported</div>
+        <div class="lnote">Arrows point toward POTS. Columns: steps from POTS.</div>
+      </div>
+      <div id="dagCy" aria-label="DAG of supported links rooted at POTS"></div>
+    </div>
+    <aside class="card" id="dagPanel" aria-live="polite"></aside>
+  </section>
+  <section class="view" id="v-tree">
+    <div class="card" id="treeWrap" aria-label="Hierarchy of topics"></div>
+    <aside class="card" id="treePanel" aria-live="polite"></aside>
+  </section>
+  <section class="view" id="v-causes"><div id="causes"></div></section>
+  <section class="view" id="v-table">
+    <div class="card" id="tableWrap">
+      <div class="tbar">
+        <select id="relFilter" aria-label="Relationship"></select>
+        <select id="basisFilter" aria-label="Source">
+          <option value="">Any source</option>
+          <option value="paper">Cites a paper</option>
+          <option value="reasoning">Reasoning note only</option>
+          <option value="taxonomy">Grouping only</option>
+        </select>
+        <select id="verdictFilter" aria-label="Check">
+          <option value="">Any check result</option>
+          <option value="supports">Supports</option>
+          <option value="partial">Partly supports</option>
+          <option value="not_found">Not found in paper</option>
+          <option value="contradicts">Contradicts</option>
+          <option value="none">No paper cited</option>
+        </select>
+        <button class="btn" id="csv">Download review sheet (CSV)</button>
+        <span class="count" id="tcount"></span>
+      </div>
+      <details class="more" id="removedBox" style="padding:12px;border-bottom:1px solid var(--line);margin:0"></details>
+      <table>
+        <thead><tr><th>From</th><th>Relationship</th><th>To</th><th>Source</th><th>What the paper says</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+<div id="tip" role="tooltip"></div>
+
+<script>
+const DATA = {"nodes": [{"id": "clinical_context", "label": "Clinical context", "short": "Clinical context", "kind": "class", "group": "class", "definition": ""}, {"id": "mechanistic_phenotype", "label": "Mechanistic phenotype", "short": "Mechanistic phenotype", "kind": "class", "group": "class", "definition": ""}, {"id": "objective_evidence", "label": "Objective evidence source", "short": "Objective evidence source", "kind": "class", "group": "class", "definition": ""}, {"id": "therapeutic_proxy", "label": "Therapeutic proxy", "short": "Therapeutic proxy", "kind": "class", "group": "class", "definition": ""}, {"id": "pots", "label": "Postural orthostatic tachycardia syndrome", "short": "POTS", "kind": "disorder", "group": "pots", "definition": ""}, {"id": "cholinergic_agent", "label": "Cholinergic agent", "short": "Cholinergic agent", "kind": "drug_class", "group": "class", "definition": ""}, {"id": "immunomodulator", "label": "Immunomodulatory agent", "short": "Immunomodulatory agent", "kind": "drug_class", "group": "class", "definition": ""}, {"id": "negative_chronotrope", "label": "Negative chronotropic agent", "short": "Negative chronotropic agent", "kind": "drug_class", "group": "class", "definition": ""}, {"id": "sympatholytic_agent", "label": "Sympatholytic agent", "short": "Sympatholytic agent", "kind": "drug_class", "group": "class", "definition": ""}, {"id": "vasoconstrictor_agent", "label": "Vasoconstrictor agent", "short": "Vasoconstrictor agent", "kind": "drug_class", "group": "class", "definition": ""}, {"id": "volume_expander", "label": "Volume expanding agent", "short": "Volume expanding agent", "kind": "drug_class", "group": "class", "definition": ""}, {"id": "active_stand_test", "label": "Active stand test", "short": "Active stand test", "kind": "facet", "group": "measurement", "definition": "Ten-minute active standing with serial heart rate and blood pressure, the pragmatic clinic alternative to tilt. Yields a different heart-rate increment than tilt, which matters for phenotype threshold portability."}, {"id": "ambulatory_monitoring", "label": "Ambulatory heart rate and blood pressure monitoring", "short": "Ambulatory HR/BP monitoring", "kind": "facet", "group": "measurement", "definition": "Holter, patch electrocardiography, wearable heart-rate and 24-hour ambulatory blood pressure. The realistic source of a heart-rate criterion in routine electronic health record data, as opposed to a formal lab."}, {"id": "autoimmune_evidence", "label": "Autoimmune evidence", "short": "Autoimmune", "kind": "facet", "group": "mechanism", "definition": "Autoantibodies against autonomic targets (ganglionic acetylcholine receptor, adrenergic and muscarinic receptors) or a coexisting systemic autoimmune disease."}, {"id": "autonomic_autoantibody_assay", "label": "Autonomic autoantibody assay", "short": "Autoantibody test", "kind": "facet", "group": "measurement", "definition": "Ganglionic acetylcholine receptor antibody, and adrenergic and muscarinic receptor antibody panels including functional cell-based assays."}, {"id": "beta_blocker_therapy", "label": "Beta blockade", "short": "Beta blocker", "kind": "facet", "group": "treatment", "definition": "Propranolol, metoprolol, bisoprolol and related agents, most often given on a hyperadrenergic rationale."}, {"id": "cardiopulmonary_exercise_test", "label": "Cardiopulmonary exercise testing", "short": "Exercise test (CPET)", "kind": "facet", "group": "measurement", "definition": "Peak oxygen uptake, chronotropic response and ventilatory efficiency, the objective substrate for the deconditioning flag and for post-exertional malaise phenotyping."}, {"id": "central_sympatholytic_therapy", "label": "Central sympatholytics", "short": "Central sympatholytic", "kind": "facet", "group": "treatment", "definition": "Clonidine and methyldopa, reserved almost exclusively for a hyperadrenergic presentation and therefore an unusually specific proxy."}, {"id": "cerebral_blood_flow_measurement", "label": "Cerebral blood flow velocity", "short": "Brain blood flow", "kind": "facet", "group": "measurement", "definition": "Transcranial Doppler middle-cerebral-artery velocity, near-infrared spectroscopy, or cerebral oximetry during orthostasis. Explains symptoms that the heart-rate criterion does not."}, {"id": "chronic_migraine", "label": "Migraine and chronic headache", "short": "Migraine", "kind": "facet", "group": "comorbidity", "definition": "Migraine, chronic daily headache and their overlap with orthostatic headache from cerebral hypoperfusion or cerebrospinal fluid leak."}, {"id": "compression_therapy", "label": "Compression garments", "short": "Compression garments", "kind": "facet", "group": "treatment", "definition": "Abdominal binders and lower-limb compression that mechanically oppose venous pooling, targeting the neuropathic and hypovolemic flags."}, {"id": "deconditioning_evidence", "label": "Deconditioning evidence", "short": "Deconditioning", "kind": "facet", "group": "mechanism", "definition": "Reduced cardiac mass and stroke volume with low peak oxygen uptake, whether as primary cause or as a secondary consequence of activity avoidance. Its causal direction is contested, which is exactly why it is a flag and not a subtype."}, {"id": "differential_syncope_oh", "label": "Competing orthostatic diagnoses", "short": "Fainting / low BP (rule out)", "kind": "facet", "group": "comorbidity", "definition": "Vasovagal syncope, neurogenic orthostatic hypotension, inappropriate sinus tachycardia and pure autonomic failure. Exclusion of these is part of the POTS definition, so a computable phenotype needs them explicitly."}, {"id": "droxidopa_therapy", "label": "Droxidopa", "short": "Droxidopa", "kind": "facet", "group": "treatment", "definition": "Noradrenaline prodrug used where a peripheral noradrenergic deficit is suspected."}, {"id": "exercise_reconditioning", "label": "Exercise reconditioning", "short": "Exercise programme", "kind": "facet", "group": "treatment", "definition": "Structured recumbent-to-upright exercise programmes such as the Levine and CHOP protocols, prescribed against a deconditioning hypothesis."}, {"id": "genetic_testing", "label": "Genetic testing", "short": "Genetic testing", "kind": "facet", "group": "measurement", "definition": "Variant testing relevant to POTS and its comorbidities: noradrenaline transporter (SLC6A2), mast-cell and tryptase loci, and connective-tissue genes."}, {"id": "gi_dysmotility", "label": "Gastrointestinal dysmotility", "short": "Gut dysmotility", "kind": "facet", "group": "comorbidity", "definition": "Gastroparesis, chronic constipation and rapid gastric emptying, reflecting enteric autonomic involvement."}, {"id": "head_up_tilt_test", "label": "Head-up tilt table test", "short": "Tilt table test", "kind": "facet", "group": "measurement", "definition": "Passive 60-70 degree head-up tilt with continuous heart rate and blood pressure. Supplies the diagnostic heart-rate increment itself."}, {"id": "heart_rate_variability", "label": "Heart rate variability and baroreflex sensitivity", "short": "Heart rate variability", "kind": "facet", "group": "measurement", "definition": "Spectral and time-domain heart-rate variability, deep-breathing respiratory sinus arrhythmia, and baroreflex gain: the cardiovagal side of autonomic testing."}, {"id": "hyperadrenergic_evidence", "label": "Hyperadrenergic evidence", "short": "Hyperadrenergic", "kind": "facet", "group": "mechanism", "definition": "Excess sympathetic outflow or impaired noradrenaline clearance: upright plasma noradrenaline elevation, marked orthostatic hypertension, tremor and cold sweaty extremities, or a noradrenaline transporter deficiency."}, {"id": "hypermobility_heds", "label": "Joint hypermobility and hypermobile Ehlers-Danlos syndrome", "short": "Hypermobility / hEDS", "kind": "facet", "group": "comorbidity", "definition": "Generalised joint hypermobility or hypermobile Ehlers-Danlos syndrome, offered as a mechanism for increased venous compliance and pooling."}, {"id": "hypovolemic_evidence", "label": "Hypovolemic evidence", "short": "Hypovolemic", "kind": "facet", "group": "mechanism", "definition": "Reduced plasma or red-cell volume, frequently with a paradoxically low plasma renin activity and aldosterone for the degree of volume depletion."}, {"id": "immunomodulatory_therapy", "label": "Immunomodulation", "short": "Immune therapy", "kind": "facet", "group": "treatment", "definition": "Intravenous immunoglobulin, rituximab, plasma exchange and corticosteroids given for a presumed autoimmune mechanism."}, {"id": "ivabradine_therapy", "label": "Ivabradine", "short": "Ivabradine", "kind": "facet", "group": "treatment", "definition": "Selective sinoatrial funny-current inhibitor, lowering heart rate without lowering blood pressure. Signals a rate-centred rather than volume-centred hypothesis."}, {"id": "long_covid", "label": "Long COVID and post-acute sequelae of SARS-CoV-2", "short": "Long COVID", "kind": "facet", "group": "comorbidity", "definition": "POTS arising after SARS-CoV-2 infection. The subject of the Larsen deep phenotyping study, and the reason the modern incident cohort exists."}, {"id": "mast_cell_activation", "label": "Mast cell activation syndrome", "short": "Mast cell activation", "kind": "facet", "group": "comorbidity", "definition": "Mast cell activation disorder with flushing, and raised tryptase or urinary methylhistamine, which can mimic or amplify a hyperadrenergic picture."}, {"id": "me_cfs", "label": "ME/CFS and post-exertional malaise", "short": "ME/CFS", "kind": "facet", "group": "comorbidity", "definition": "Myalgic encephalomyelitis / chronic fatigue syndrome, sharing orthostatic intolerance and post-exertional malaise with POTS."}, {"id": "midodrine_therapy", "label": "Midodrine", "short": "Midodrine", "kind": "facet", "group": "treatment", "definition": "Alpha-1 agonist vasoconstrictor, used where venous pooling or neuropathic vasoconstrictor failure is suspected."}, {"id": "neuropathic_evidence", "label": "Neuropathic evidence", "short": "Neuropathic", "kind": "facet", "group": "mechanism", "definition": "Peripheral autonomic denervation, typically a length-dependent small-fibre and sudomotor deficit producing impaired lower-limb vasoconstriction and venous pooling."}, {"id": "plasma_blood_volume_assay", "label": "Plasma and blood volume measurement", "short": "Blood volume test", "kind": "facet", "group": "measurement", "definition": "Direct volume quantification by carbon monoxide rebreathing, indocyanine green, or iodinated-albumin dilution. The only way to make the hypovolemic flag objective rather than inferred."}, {"id": "plasma_catecholamine_assay", "label": "Supine and upright plasma catecholamines", "short": "Noradrenaline blood test", "kind": "facet", "group": "measurement", "definition": "Paired supine and standing noradrenaline and adrenaline. An upright noradrenaline above roughly 600 pg/mL is the most-cited hyperadrenergic criterion, and the paired design is what makes it interpretable."}, {"id": "post_vaccination_onset", "label": "Post-vaccination onset", "short": "After vaccination", "kind": "facet", "group": "comorbidity", "definition": "Symptom onset temporally associated with vaccination, principally human papillomavirus and SARS-CoV-2 vaccines. Recorded because it appears in the literature as a claimed trigger and any phenotype must be able to identify and stratify these reports rather than silently absorb them."}, {"id": "postinfectious_evidence", "label": "Post-infectious evidence", "short": "Post-infectious", "kind": "facet", "group": "mechanism", "definition": "Symptom onset temporally linked to an infection, including SARS-CoV-2, Epstein-Barr virus, influenza and Lyme disease."}, {"id": "pyridostigmine_therapy", "label": "Pyridostigmine", "short": "Pyridostigmine", "kind": "facet", "group": "treatment", "definition": "Peripheral acetylcholinesterase inhibitor enhancing ganglionic transmission, used on a neuropathic or autoimmune rationale."}, {"id": "qsart_sudomotor_testing", "label": "QSART and sudomotor testing", "short": "Sweat nerve test (QSART)", "kind": "facet", "group": "measurement", "definition": "Quantitative sudomotor axon reflex test and related sympathetic sweat measures. Zhang et al. found reduced sweat output in about a third of 356 patients tested."}, {"id": "serotonergic_therapy", "label": "Serotonergic and other central agents", "short": "SSRI / central agents", "kind": "facet", "group": "treatment", "definition": "Serotonin reuptake inhibitors, serotonin-noradrenaline reuptake inhibitors and modafinil. Deliberately kept as a low-specificity facet, since these are also prescribed for coexisting depression, anxiety and fatigue rather than for any orthostatic mechanism."}, {"id": "skin_biopsy_ienfd", "label": "Skin biopsy and intraepidermal nerve fibre density", "short": "Skin biopsy (nerve fibres)", "kind": "facet", "group": "measurement", "definition": "Punch biopsy with PGP 9.5 immunostaining and nerve-fibre density quantification, the structural counterpart to sudomotor testing. Zhang et al. reported reduced density in about 24% of those biopsied."}, {"id": "small_fiber_neuropathy_dx", "label": "Small fibre neuropathy diagnosis", "short": "Small fibre neuropathy", "kind": "facet", "group": "comorbidity", "definition": "Small fibre neuropathy as a recorded diagnosis rather than as a test result. Held separately from the neuropathic mechanism flag because in electronic health record data the diagnosis code and the biopsy result are different observations with different reliability."}, {"id": "systemic_autoimmune_disease", "label": "Sjogren and other systemic autoimmune disease", "short": "Sjogren / autoimmune disease", "kind": "facet", "group": "comorbidity", "definition": "Coexisting systemic autoimmune disease: Sjogren syndrome, systemic lupus erythematosus, coeliac disease, autoimmune thyroiditis."}, {"id": "thermoregulatory_sweat_test", "label": "Thermoregulatory sweat test", "short": "Thermoregulatory sweat test", "kind": "facet", "group": "measurement", "definition": "Whole-body sweat distribution under controlled heating, localising anhidrosis and distinguishing pre- from post-ganglionic lesions when read against QSART."}, {"id": "valsalva_maneuver", "label": "Valsalva manoeuvre", "short": "Valsalva manoeuvre", "kind": "facet", "group": "measurement", "definition": "Valsalva ratio and phase II/IV blood-pressure response, separating adrenergic from cardiovagal failure. Part of the standard autonomic reflex screen alongside deep breathing and QSART."}, {"id": "volume_expansion_therapy", "label": "Volume expansion therapy", "short": "Fluids and salt", "kind": "facet", "group": "treatment", "definition": "Fludrocortisone, salt and fluid loading, desmopressin, and intravenous saline. Prescription implies a clinician's hypovolemic hypothesis."}, {"id": "nonpharmacologic_intervention", "label": "Non-pharmacological intervention", "short": "Non-pharmacological intervention", "kind": "intervention_class", "group": "class", "definition": ""}, {"id": "autonomic_function_testing", "label": "Autonomic function testing", "short": "Autonomic function testing", "kind": "procedure_class", "group": "class", "definition": ""}, {"id": "cerebrovascular_assessment", "label": "Cerebrovascular assessment", "short": "Cerebrovascular assessment", "kind": "procedure_class", "group": "class", "definition": ""}, {"id": "immunological_assessment", "label": "Immunological assessment", "short": "Immunological assessment", "kind": "procedure_class", "group": "class", "definition": ""}, {"id": "neurochemical_assessment", "label": "Sympathetic neurochemical assessment", "short": "Sympathetic neurochemical assessment", "kind": "procedure_class", "group": "class", "definition": ""}, {"id": "structural_nerve_assessment", "label": "Structural peripheral nerve assessment", "short": "Structural peripheral nerve assessment", "kind": "procedure_class", "group": "class", "definition": ""}, {"id": "sudomotor_assessment", "label": "Sudomotor assessment", "short": "Sudomotor assessment", "kind": "procedure_class", "group": "class", "definition": ""}, {"id": "volume_assessment", "label": "Intravascular volume assessment", "short": "Intravascular volume assessment", "kind": "procedure_class", "group": "class", "definition": ""}, {"id": "aerobic_capacity", "label": "Aerobic capacity", "short": "Aerobic capacity", "kind": "quantity", "group": "class", "definition": ""}, {"id": "cerebral_perfusion", "label": "Cerebral perfusion", "short": "Cerebral perfusion", "kind": "quantity", "group": "class", "definition": ""}, {"id": "intravascular_volume", "label": "Intravascular volume", "short": "Intravascular volume", "kind": "quantity", "group": "class", "definition": ""}, {"id": "nerve_fiber_density", "label": "Intraepidermal nerve fibre density", "short": "Intraepidermal nerve fibre density", "kind": "quantity", "group": "class", "definition": ""}, {"id": "orthostatic_heart_rate_increment", "label": "Orthostatic heart rate increment", "short": "Orthostatic heart rate increment", "kind": "quantity", "group": "class", "definition": ""}, {"id": "sweat_output", "label": "Sweat output", "short": "Sweat output", "kind": "quantity", "group": "class", "definition": ""}, {"id": "upright_plasma_norepinephrine", "label": "Upright plasma norepinephrine", "short": "Upright plasma norepinephrine", "kind": "quantity", "group": "class", "definition": ""}, {"id": "pots_phenotype_axis", "label": "POTS phenotyping axis", "short": "POTS phenotyping axis", "kind": "root", "group": "class", "definition": ""}, {"id": "autonomic_reflex_screen", "label": "Autonomic reflex screen", "short": "Autonomic reflex screen", "kind": "test_battery", "group": "class", "definition": ""}, {"id": "orthostatic_challenge_testing", "label": "Orthostatic challenge testing", "short": "Orthostatic challenge testing", "kind": "test_battery", "group": "class", "definition": ""}], "edges": [{"id": "e0", "source": "chronic_migraine", "target": "pots", "predicate": "associated_with", "provenance": "angeli2024; low2009: overrepresentation of migraine", "basis": "paper", "seeds": ["angeli2024", "low2009"], "excerpts": [{"paper": "angeli2024", "cited": true, "verdict": "partial", "section": "Results", "quote": "Other common chronic symptoms reported include headaches (60.3%, 228/378)", "note": "Headache as a symptom, not migraine as a diagnosis."}, {"paper": "low2009", "cited": true, "verdict": "supports", "section": "Introduction", "quote": "There may be an overrepresentation of migraine, sleep disorders, and fatigue, and fibromyalgia is sometimes associated."}]}, {"id": "e1", "source": "gi_dysmotility", "target": "pots", "predicate": "associated_with", "provenance": "low2009: nausea and bloating common", "basis": "paper", "seeds": ["low2009"], "excerpts": [{"paper": "low2009", "cited": true, "verdict": "partial", "section": "Table 2, Orthostatic Symptoms as Frequency (%) in Patients with POTS", "quote": "Nausea 59 39 Bloating 36 24 Diarrhea 27 18 Constipation 23 15", "note": "Gastrointestinal symptom frequencies (n, %). The provenance note 'enteric autonomic involvement' is not stated."}]}, {"id": "e2", "source": "hypermobility_heds", "target": "pots", "predicate": "associated_with", "provenance": "angeli2024", "basis": "paper", "seeds": ["angeli2024"], "excerpts": [{"paper": "angeli2024", "cited": true, "verdict": "supports", "section": "Introduction", "quote": "Other medical conditions, such as joint hypermobility, have been hypothesized to produce physiologies that can mimic or contribute to these phenotypes."}]}, {"id": "e3", "source": "me_cfs", "target": "pots", "predicate": "associated_with", "provenance": "low2009: 40% of chronic fatigue syndrome patients have POTS; gibbons2013", "basis": "paper", "seeds": ["gibbons2013", "low2009"], "excerpts": [{"paper": "larsen2025", "cited": false, "verdict": "not_found", "note": "Not in the Larsen abstract; full text unavailable."}, {"paper": "low2009", "cited": true, "verdict": "supports", "section": "Introduction", "quote": "This is based on the investigators’ documentation that 40% of patients with chronic fatigue syndrome have POTS."}, {"paper": "gibbons2013", "cited": true, "verdict": "supports", "section": "Discussion", "quote": "These data confirm the well-established overlap between the POTS and chronic fatigue syndrome."}]}, {"id": "e4", "source": "small_fiber_neuropathy_dx", "target": "neuropathic_evidence", "predicate": "associated_with", "provenance": "gibbons2013; zhang2022", "basis": "paper", "seeds": ["gibbons2013", "zhang2022"], "excerpts": [{"paper": "gibbons2013", "cited": true, "verdict": "supports", "section": "Discussion", "quote": "Consistent with the notion that neuropathic POTS represents a distal autonomic and small fiber neuropathy, our diagnostic criteria included distal small fiber pathology, impaired distal sensory function and impaired distal sudomotor function."}, {"paper": "zhang2022", "cited": true, "verdict": "supports", "section": "Discussion", "quote": "In the absence of formal criteria for neuropathic POTS, skin biopsy and QSART are routinely used to assess for associated SFN in patients with POTS."}]}, {"id": "e5", "source": "systemic_autoimmune_disease", "target": "autoimmune_evidence", "predicate": "associated_with", "provenance": "zhang2022: autoimmune disease trend with abnormal testing", "basis": "paper", "seeds": ["zhang2022"], "excerpts": [{"paper": "angeli2024", "cited": false, "verdict": "not_found", "note": "Angeli 2024 does not discuss autoimmune disease."}, {"paper": "zhang2022", "cited": true, "verdict": "partial", "section": "Discussion", "quote": "Patients with systemic autoimmune diseases may be at slightly increased risk for developing a neuropathic POTS phenotype - for instance, Sjogren’s syndrome is diagnosed at higher rates among POTS patients who have reduced IENFD.", "note": "Links autoimmune disease to the neuropathic flag, not the autoimmune flag."}]}, {"id": "e6", "source": "differential_syncope_oh", "target": "pots", "predicate": "differential_diagnosis_of", "provenance": "low2009: exclusion is part of the definition", "basis": "paper", "seeds": ["low2009"], "excerpts": [{"paper": "low2009", "cited": true, "verdict": "supports", "section": "Abstract", "quote": "POTS is defined as the development of orthostatic symptoms associated with a heart rate (HR) increment ≥30, usually to ≥120 bpm without orthostatic hypotension."}]}, {"id": "e7", "source": "autonomic_autoantibody_assay", "target": "autoimmune_evidence", "predicate": "evidence_for", "provenance": "low2009: A3 acetylcholine receptor antibodies in 1 in 7", "basis": "paper", "seeds": ["low2009"], "excerpts": [{"paper": "angeli2024", "cited": false, "verdict": "not_found", "note": "Angeli 2024 does not mention autoantibodies."}, {"paper": "low2009", "cited": true, "verdict": "partial", "section": "Introduction", "quote": "Support for the notion of neuropathic POTS comes also from the 1 in 7 patients who have low titer of A3 acetylcholine receptor antibodies, a finding that suggests an autoimmune attach of autonomic nerves.", "note": "Low frames the antibody as support for neuropathic POTS, via an autoimmune attack."}]}, {"id": "e8", "source": "cardiopulmonary_exercise_test", "target": "deconditioning_evidence", "predicate": "evidence_for", "provenance": "low2009: reduced stroke volume and poor exercise tolerance", "basis": "paper", "seeds": ["low2009"], "excerpts": [{"paper": "low2009", "cited": true, "verdict": "partial", "section": "Introduction", "quote": "Exercise was associated with a greater elevation in HR in POTS patients, especially while upright, was secondary to reduced stroke volume, and was associated with poor exercise tolerance.", "note": "The provenance note 'reduced peak VO2' is not in Low 2009; VO2 is never mentioned."}]}, {"id": "e9", "source": "head_up_tilt_test", "target": "hyperadrenergic_evidence", "predicate": "evidence_for", "provenance": "angeli2024; low2009: systolic BP rise on tilt", "basis": "paper", "seeds": ["angeli2024", "low2009"], "excerpts": [{"paper": "angeli2024", "cited": true, "verdict": "supports", "section": "Introduction", "quote": "Hyperadrenergic POTS is characterized by high central sympathetic drive, evident by an increase in systolic blood pressure (SBP) on HUTT and a standing plasma norepinephrine level of 600 pg/mL or more."}, {"paper": "low2009", "cited": true, "verdict": "supports", "section": "Introduction", "quote": "Hyperadrenergic POTS is defined as POTS associated with a systolic BP increment ≥10 mmHg during 10 minutes of HUT, and an orthostatic plasma norepinephrine ≥600 pg/mL (Fig. 1)."}]}, {"id": "e10", "source": "plasma_blood_volume_assay", "target": "hypovolemic_evidence", "predicate": "evidence_for", "provenance": "angeli2024", "basis": "paper", "seeds": ["angeli2024"], "excerpts": [{"paper": "angeli2024", "cited": true, "verdict": "partial", "section": "Introduction", "quote": "Hypovolemic POTS is due to dysfunction of the renin–angiotensin–aldosterone system resulting in low plasma blood volume and may be identified with 24-h urine sodium concentration less than 100 mmol/L.", "note": "Angeli identifies hypovolemia by 24-h urine sodium, not by a blood volume assay."}]}, {"id": "e11", "source": "plasma_catecholamine_assay", "target": "hyperadrenergic_evidence", "predicate": "evidence_for", "provenance": "angeli2024: upright NE threshold", "basis": "paper", "seeds": ["angeli2024"], "excerpts": [{"paper": "angeli2024", "cited": true, "verdict": "supports", "section": "Introduction", "quote": "Hyperadrenergic POTS is characterized by high central sympathetic drive, evident by an increase in systolic blood pressure (SBP) on HUTT and a standing plasma norepinephrine level of 600 pg/mL or more."}, {"paper": "angeli2024", "cited": true, "verdict": "partial", "section": "Discussion", "quote": "For example, the current serum standing norepinephrine cut-off of 600 pg/mL may serve better to rule-out hyperadrenergic POTS based on the means and standard deviations identified in this study (Fig. 1).", "note": "Qualifies the 600 pg/mL threshold: better for ruling out than ruling in."}]}, {"id": "e12", "source": "qsart_sudomotor_testing", "target": "neuropathic_evidence", "predicate": "evidence_for", "provenance": "zhang2022: reduced sweat output ~33%", "basis": "paper", "seeds": ["zhang2022"], "excerpts": [{"paper": "zhang2022", "cited": true, "verdict": "supports", "section": "Abstract", "quote": "Of 211 patients who underwent quantitative sudomotor axon reflex testing, 70 (33%) demonstrated reduced sweat output."}, {"paper": "zhang2022", "cited": true, "verdict": "supports", "section": "Conclusions", "quote": "Skin biopsy and QSART are commonly used tests for neuropathic POTS that are not correlated with each other and may not be typically length-dependent."}]}, {"id": "e13", "source": "skin_biopsy_ienfd", "target": "neuropathic_evidence", "predicate": "evidence_for", "provenance": "gibbons2013; zhang2022: reduced IENFD ~24%", "basis": "paper", "seeds": ["gibbons2013", "zhang2022"], "excerpts": [{"paper": "gibbons2013", "cited": true, "verdict": "supports", "section": "Abstract", "quote": "Subjects were divided into neuropathic and non-neuropathic POTS, defined by abnormal IENFD and abnormal small fiber and sudomotor function."}, {"paper": "zhang2022", "cited": true, "verdict": "supports", "section": "Results", "quote": "Of the 80 patients who underwent skin biopsy, 19 (24%) demonstrated reduced IENFD at least in one site."}]}, {"id": "e14", "source": "thermoregulatory_sweat_test", "target": "neuropathic_evidence", "predicate": "evidence_for", "provenance": "gibbons2013; angeli2024: abnormal TST sweat pattern defines neuropathic", "basis": "paper", "seeds": ["angeli2024", "gibbons2013"], "excerpts": [{"paper": "gibbons2013", "cited": true, "verdict": "partial", "section": "Discussion", "quote": "Similar observations have been made by other investigators studying thermoregulatory and axon-mediated sweating in POTS.", "note": "Gibbons measured axon-reflex sweating, not the thermoregulatory sweat test; TST appears only in this reference to other work."}, {"paper": "angeli2024", "cited": true, "verdict": "supports", "section": "Methods", "quote": "neuropathic for abnormal sudomotor response or abnormal sweat pattern on TST"}]}, {"id": "e15", "source": "valsalva_maneuver", "target": "neuropathic_evidence", "predicate": "evidence_for", "provenance": "gibbons2013: lower phase 4 overshoot; zhang2022: reduced phase II response", "basis": "paper", "seeds": ["gibbons2013", "zhang2022"], "excerpts": [{"paper": "gibbons2013", "cited": true, "verdict": "supports", "section": "Abstract", "quote": "Nine of 24 subjects had neuropathic POTS and had significantly lower resting and tilted heart rates; reduced parasympathetic function; and lower phase 4 valsalva maneuver overshoot compared with those with non-neuropathic POTS (P<0.05)."}, {"paper": "zhang2022", "cited": true, "verdict": "supports", "section": "Discussion", "quote": "In this cohort, a reduced blood pressure response to phase II of the Valsalva maneuver was associated with reduced sweat output on QSART."}]}, {"id": "e16", "source": "beta_blocker_therapy", "target": "hyperadrenergic_evidence", "predicate": "indicates", "provenance": "low2009; angeli2024", "basis": "paper", "seeds": ["angeli2024", "low2009"], "excerpts": [{"paper": "angeli2024", "cited": true, "verdict": "supports", "section": "Introduction", "quote": "Lastly, in hyperadrenergic POTS, measures are directed at dampening sympathetic output including avoidance of sympathetic agents such as serotonin-norepinephrine reuptake inhibitors, as well as utilizing pharmacotherapy such as beta-blockers."}, {"paper": "low2009", "cited": true, "verdict": "partial", "section": "Table 5, Approach to Treatment of Common Types of POTS", "quote": "Volume expansion and reduce sympathetic action (central/peripheral)", "note": "Usual main approach for the hyperadrenergic row; beta blockers are not named in the row."}]}, {"id": "e17", "source": "central_sympatholytic_therapy", "target": "hyperadrenergic_evidence", "predicate": "indicates", "provenance": "low2009: clonidine for unstable hypertensive responses to tilt", "basis": "paper", "seeds": ["low2009"], "excerpts": [{"paper": "low2009", "cited": true, "verdict": "partial", "section": "Discussion", "quote": "A paticularly difficult subset of patients has unstable hypertensive responses to tilt.", "note": "Clonidine is offered two sentences later for this subset ('An alternative treatment is clonidine or another α2 agonist.'). The paper does not say clonidine is reserved for hyperadrenergic POTS."}]}, {"id": "e18", "source": "compression_therapy", "target": "neuropathic_evidence", "predicate": "indicates", "provenance": "low2009: opposes venous pooling", "basis": "paper", "seeds": ["low2009"], "excerpts": [{"paper": "low2009", "cited": true, "verdict": "supports", "section": "Table 5, Approach to Treatment of Common Types of POTS", "quote": "Low-dose midodrine, with some volume expansion and compression", "note": "Usual main approach for the neuropathic row."}, {"paper": "angeli2024", "cited": false, "verdict": "supports", "section": "Introduction", "quote": "In neuropathic POTS, treatments target increasing venous return either by external compression such as compression stockings or lower extremity countermaneuvers or by pharmacologic vasoconstriction such as with midodrine."}]}, {"id": "e19", "source": "compression_therapy", "target": "hypovolemic_evidence", "predicate": "indicates", "provenance": "low2009", "basis": "paper", "seeds": ["low2009"], "excerpts": [{"paper": "low2009", "cited": true, "verdict": "supports", "section": "Discussion", "quote": "This reduces splanchnic-mesenteric venous capacity and is especially helpful in patients with poor venomotor tone or are hypovolemic.", "note": "Refers to the abdominal binder."}]}, {"id": "e20", "source": "exercise_reconditioning", "target": "deconditioning_evidence", "predicate": "indicates", "provenance": "low2009", "basis": "paper", "seeds": ["low2009"], "excerpts": [{"paper": "low2009", "cited": true, "verdict": "supports", "section": "Conclusions", "quote": "Exercise training and reconditioning is emerging as a very important strategy in the deconditioned subject."}]}, {"id": "e21", "source": "midodrine_therapy", "target": "neuropathic_evidence", "predicate": "indicates", "provenance": "low2009: vasoconstrictor failure and pooling", "basis": "paper", "seeds": ["low2009"], "excerpts": [{"paper": "low2009", "cited": true, "verdict": "supports", "section": "Table 5, Approach to Treatment of Common Types of POTS", "quote": "Low-dose midodrine, with some volume expansion and compression", "note": "Usual main approach for the neuropathic row."}, {"paper": "angeli2024", "cited": false, "verdict": "supports", "section": "Discussion", "quote": "In neuropathic POTS, pharmacotherapy targets vasoconstriction with agents such as pyridostigmine and midodrine."}]}, {"id": "e22", "source": "pyridostigmine_therapy", "target": "neuropathic_evidence", "predicate": "indicates", "provenance": "angeli2024: vasoconstriction in neuropathic POTS", "basis": "paper", "seeds": ["angeli2024"], "excerpts": [{"paper": "gibbons2013", "cited": false, "verdict": "not_found", "note": "Gibbons 2013 does not mention pyridostigmine."}, {"paper": "angeli2024", "cited": true, "verdict": "supports", "section": "Discussion", "quote": "In neuropathic POTS, pharmacotherapy targets vasoconstriction with agents such as pyridostigmine and midodrine."}]}, {"id": "e23", "source": "volume_expansion_therapy", "target": "hypovolemic_evidence", "predicate": "indicates", "provenance": "low2009: first-line for volume depletion", "basis": "paper", "seeds": ["low2009"], "excerpts": [{"paper": "low2009", "cited": true, "verdict": "supports", "section": "Discussion", "quote": "The hypovolemic patient will do well with expanding plasma volume with generous salt intake and fludrocortisone."}]}, {"id": "e24", "source": "active_stand_test", "target": "orthostatic_challenge_testing", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e25", "source": "ambulatory_monitoring", "target": "objective_evidence", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e26", "source": "autoimmune_evidence", "target": "mechanistic_phenotype", "predicate": "is_a", "provenance": "low2009: autoimmune attack of autonomic nerves", "basis": "paper", "seeds": ["low2009"], "excerpts": [{"paper": "low2009", "cited": true, "verdict": "partial", "section": "Introduction", "quote": "Support for the notion of neuropathic POTS comes also from the 1 in 7 patients who have low titer of A3 acetylcholine receptor antibodies, a finding that suggests an autoimmune attach of autonomic nerves.", "note": "The only seed-paper passage that frames an autoimmune mechanism; Low places it under neuropathic POTS."}, {"paper": "angeli2024", "cited": false, "verdict": "not_found", "note": "Angeli defines three phenotypes (neuropathic, hypovolemic, hyperadrenergic); autoimmune is not one of them."}]}, {"id": "e27", "source": "autonomic_autoantibody_assay", "target": "immunological_assessment", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e28", "source": "autonomic_function_testing", "target": "objective_evidence", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e29", "source": "autonomic_reflex_screen", "target": "autonomic_function_testing", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e30", "source": "beta_blocker_therapy", "target": "negative_chronotrope", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e31", "source": "beta_blocker_therapy", "target": "sympatholytic_agent", "predicate": "is_a", "provenance": "taxonomy: poly-hierarchy is intentional", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e32", "source": "cardiopulmonary_exercise_test", "target": "objective_evidence", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e33", "source": "central_sympatholytic_therapy", "target": "sympatholytic_agent", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e34", "source": "cerebral_blood_flow_measurement", "target": "cerebrovascular_assessment", "predicate": "is_a", "provenance": "larsen2025", "basis": "paper", "seeds": ["larsen2025"], "excerpts": [{"paper": "larsen2025", "cited": true, "verdict": "supports", "section": "Abstract", "quote": "head-up tilt (HUT) with transcranial Doppler measures of cerebral blood flow velocity (CBFv)"}]}, {"id": "e35", "source": "cerebrovascular_assessment", "target": "objective_evidence", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e36", "source": "cholinergic_agent", "target": "therapeutic_proxy", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e37", "source": "chronic_migraine", "target": "clinical_context", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e38", "source": "clinical_context", "target": "pots_phenotype_axis", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e39", "source": "compression_therapy", "target": "nonpharmacologic_intervention", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e40", "source": "deconditioning_evidence", "target": "mechanistic_phenotype", "predicate": "is_a", "provenance": "low2009", "basis": "paper", "seeds": ["low2009"], "excerpts": [{"paper": "low2009", "cited": true, "verdict": "supports", "section": "Abstract", "quote": "Major mechanisms are denervation, hypovolemia, deconditioning, and hyperadrenergic state."}]}, {"id": "e41", "source": "differential_syncope_oh", "target": "clinical_context", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e42", "source": "droxidopa_therapy", "target": "vasoconstrictor_agent", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e43", "source": "exercise_reconditioning", "target": "nonpharmacologic_intervention", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e44", "source": "genetic_testing", "target": "objective_evidence", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e45", "source": "gi_dysmotility", "target": "clinical_context", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e46", "source": "head_up_tilt_test", "target": "orthostatic_challenge_testing", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e47", "source": "heart_rate_variability", "target": "autonomic_function_testing", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e48", "source": "hyperadrenergic_evidence", "target": "mechanistic_phenotype", "predicate": "is_a", "provenance": "angeli2024; low2009", "basis": "paper", "seeds": ["angeli2024", "low2009"], "excerpts": [{"paper": "angeli2024", "cited": true, "verdict": "supports", "section": "Introduction", "quote": "POTS may be classified into phenotypes—neuropathic, hypovolemic, and hyperadrenergic—based on suspected pathophysiologic mechanism."}, {"paper": "low2009", "cited": true, "verdict": "supports", "section": "Abstract", "quote": "Major mechanisms are denervation, hypovolemia, deconditioning, and hyperadrenergic state."}]}, {"id": "e49", "source": "hypermobility_heds", "target": "clinical_context", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e50", "source": "hypovolemic_evidence", "target": "mechanistic_phenotype", "predicate": "is_a", "provenance": "angeli2024; low2009", "basis": "paper", "seeds": ["angeli2024", "low2009"], "excerpts": [{"paper": "angeli2024", "cited": true, "verdict": "supports", "section": "Introduction", "quote": "POTS may be classified into phenotypes—neuropathic, hypovolemic, and hyperadrenergic—based on suspected pathophysiologic mechanism."}, {"paper": "low2009", "cited": true, "verdict": "supports", "section": "Abstract", "quote": "Major mechanisms are denervation, hypovolemia, deconditioning, and hyperadrenergic state."}]}, {"id": "e51", "source": "immunological_assessment", "target": "objective_evidence", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e52", "source": "immunomodulator", "target": "therapeutic_proxy", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e53", "source": "immunomodulatory_therapy", "target": "immunomodulator", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e54", "source": "ivabradine_therapy", "target": "negative_chronotrope", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e55", "source": "long_covid", "target": "clinical_context", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e56", "source": "mast_cell_activation", "target": "clinical_context", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e57", "source": "me_cfs", "target": "clinical_context", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e58", "source": "mechanistic_phenotype", "target": "pots_phenotype_axis", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e59", "source": "midodrine_therapy", "target": "vasoconstrictor_agent", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e60", "source": "negative_chronotrope", "target": "therapeutic_proxy", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e61", "source": "neurochemical_assessment", "target": "objective_evidence", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e62", "source": "neuropathic_evidence", "target": "mechanistic_phenotype", "predicate": "is_a", "provenance": "angeli2024; gibbons2013", "basis": "paper", "seeds": ["angeli2024", "gibbons2013"], "excerpts": [{"paper": "angeli2024", "cited": true, "verdict": "supports", "section": "Introduction", "quote": "POTS may be classified into phenotypes—neuropathic, hypovolemic, and hyperadrenergic—based on suspected pathophysiologic mechanism."}, {"paper": "gibbons2013", "cited": true, "verdict": "supports", "section": "Abstract", "quote": "POTS subtypes may be distinguished using small fiber and autonomic structural and functional criteria."}]}, {"id": "e63", "source": "nonpharmacologic_intervention", "target": "therapeutic_proxy", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e64", "source": "objective_evidence", "target": "pots_phenotype_axis", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e65", "source": "orthostatic_challenge_testing", "target": "autonomic_function_testing", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e66", "source": "plasma_blood_volume_assay", "target": "volume_assessment", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e67", "source": "plasma_catecholamine_assay", "target": "neurochemical_assessment", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e68", "source": "post_vaccination_onset", "target": "clinical_context", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e69", "source": "postinfectious_evidence", "target": "mechanistic_phenotype", "predicate": "is_a", "provenance": "larsen2025", "basis": "paper", "seeds": ["larsen2025"], "excerpts": [{"paper": "larsen2025", "cited": true, "verdict": "partial", "section": "Abstract", "quote": "Long COVID postural tachycardia syndrome (LC-POTS) is increasingly recognized as a manifestation of post-viral autonomic dysfunction following SARS-CoV-2 infection, however its pathogenic mechanisms remain incompletely understood."}]}, {"id": "e70", "source": "pyridostigmine_therapy", "target": "cholinergic_agent", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e71", "source": "qsart_sudomotor_testing", "target": "sudomotor_assessment", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e72", "source": "serotonergic_therapy", "target": "therapeutic_proxy", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e73", "source": "skin_biopsy_ienfd", "target": "structural_nerve_assessment", "predicate": "is_a", "provenance": "gibbons2013", "basis": "paper", "seeds": ["gibbons2013"], "excerpts": [{"paper": "gibbons2013", "cited": true, "verdict": "supports", "section": "Discussion", "quote": "Our definition thus has a structural small fiber criterion (intra-epidermal nerve fiber density), a functional small fiber criterion (quantitative sensory testing) and a functional autonomic criterion (quantitative sudomotor function testing)."}]}, {"id": "e74", "source": "small_fiber_neuropathy_dx", "target": "clinical_context", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e75", "source": "structural_nerve_assessment", "target": "objective_evidence", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e76", "source": "sudomotor_assessment", "target": "autonomic_function_testing", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e77", "source": "sympatholytic_agent", "target": "therapeutic_proxy", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e78", "source": "systemic_autoimmune_disease", "target": "clinical_context", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e79", "source": "therapeutic_proxy", "target": "pots_phenotype_axis", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e80", "source": "thermoregulatory_sweat_test", "target": "sudomotor_assessment", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e81", "source": "valsalva_maneuver", "target": "autonomic_function_testing", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e82", "source": "vasoconstrictor_agent", "target": "therapeutic_proxy", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e83", "source": "volume_assessment", "target": "objective_evidence", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e84", "source": "volume_expander", "target": "therapeutic_proxy", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e85", "source": "volume_expansion_therapy", "target": "volume_expander", "predicate": "is_a", "provenance": "taxonomy", "basis": "taxonomy", "seeds": [], "excerpts": []}, {"id": "e86", "source": "active_stand_test", "target": "orthostatic_heart_rate_increment", "predicate": "measures", "provenance": "low2009: HR increment >=30 defines POTS", "basis": "paper", "seeds": ["low2009"], "excerpts": [{"paper": "low2009", "cited": true, "verdict": "partial", "section": "Abstract", "quote": "POTS is defined as the development of orthostatic symptoms associated with a heart rate (HR) increment ≥30, usually to ≥120 bpm without orthostatic hypotension.", "note": "Defines the increment; does not name the active stand test."}]}, {"id": "e87", "source": "ambulatory_monitoring", "target": "orthostatic_heart_rate_increment", "predicate": "measures", "provenance": "low2009: ambulatory heart rate assessment", "basis": "paper", "seeds": ["low2009"], "excerpts": [{"paper": "low2009", "cited": true, "verdict": "partial", "section": "Discussion", "quote": "Additional heart rate assessment could be considered on an elective basis, including an ambulatory event loop recorder to correlation heart rate to symptoms and treadmill exercise test to assess heart rate response to activity."}]}, {"id": "e88", "source": "cardiopulmonary_exercise_test", "target": "aerobic_capacity", "predicate": "measures", "provenance": "low2009: exercise testing listed", "basis": "paper", "seeds": ["low2009"], "excerpts": [{"paper": "low2009", "cited": true, "verdict": "partial", "section": "Table 3, Evaluation of Suspected POTS", "quote": "Exercise testing", "note": "Listed among additional tests; aerobic capacity and VO2 are not mentioned."}]}, {"id": "e89", "source": "cerebral_blood_flow_measurement", "target": "cerebral_perfusion", "predicate": "measures", "provenance": "larsen2025", "basis": "paper", "seeds": ["larsen2025"], "excerpts": [{"paper": "larsen2025", "cited": true, "verdict": "supports", "section": "Abstract", "quote": "Measures of cerebral perfusion and oxygen extraction (vCBF, NIRS), were also similar."}]}, {"id": "e90", "source": "head_up_tilt_test", "target": "orthostatic_heart_rate_increment", "predicate": "measures", "provenance": "low2009: HR increment >=30 defines POTS", "basis": "paper", "seeds": ["low2009"], "excerpts": [{"paper": "low2009", "cited": true, "verdict": "partial", "section": "Abstract", "quote": "POTS is defined as the development of orthostatic symptoms associated with a heart rate (HR) increment ≥30, usually to ≥120 bpm without orthostatic hypotension."}]}, {"id": "e91", "source": "plasma_blood_volume_assay", "target": "intravascular_volume", "predicate": "measures", "provenance": "angeli2024", "basis": "paper", "seeds": ["angeli2024"], "excerpts": [{"paper": "angeli2024", "cited": true, "verdict": "partial", "section": "Introduction", "quote": "Hypovolemic POTS is due to dysfunction of the renin–angiotensin–aldosterone system resulting in low plasma blood volume and may be identified with 24-h urine sodium concentration less than 100 mmol/L.", "note": "Names low plasma blood volume, but no blood volume assay."}]}, {"id": "e92", "source": "plasma_catecholamine_assay", "target": "upright_plasma_norepinephrine", "predicate": "measures", "provenance": "angeli2024", "basis": "paper", "seeds": ["angeli2024"], "excerpts": [{"paper": "angeli2024", "cited": true, "verdict": "supports", "section": "Methods", "quote": "hyperadrenergic for standing norepinephrine > 600 pg/mL or an increase in either systolic or diastolic blood pressure of ≥ 10 mm Hg on HUTT"}]}, {"id": "e93", "source": "qsart_sudomotor_testing", "target": "sweat_output", "predicate": "measures", "provenance": "zhang2022", "basis": "paper", "seeds": ["zhang2022"], "excerpts": [{"paper": "zhang2022", "cited": true, "verdict": "supports", "section": "Methods", "quote": "These included IENFD from skin biopsy, sweat output from QSART, heart rate variability and blood pressure response measures from cardiovascular autonomic function testing, and serum antibody studies."}]}, {"id": "e94", "source": "skin_biopsy_ienfd", "target": "nerve_fiber_density", "predicate": "measures", "provenance": "gibbons2013; zhang2022", "basis": "paper", "seeds": ["gibbons2013", "zhang2022"], "excerpts": [{"paper": "gibbons2013", "cited": true, "verdict": "supports", "section": "Abstract", "quote": "Twenty-four subjects with POTS and 10 healthy control subjects had skin biopsy analysis of intra-epidermal nerve fiber density (IENFD), quantitative sensory testing (QST) and autonomic testing."}, {"paper": "zhang2022", "cited": true, "verdict": "supports", "section": "Methods", "quote": "These included IENFD from skin biopsy, sweat output from QSART, heart rate variability and blood pressure response measures from cardiovascular autonomic function testing, and serum antibody studies."}]}, {"id": "e95", "source": "thermoregulatory_sweat_test", "target": "sweat_output", "predicate": "measures", "provenance": "gibbons2013; angeli2024: abnormal sweat pattern on TST", "basis": "paper", "seeds": ["angeli2024", "gibbons2013"], "excerpts": [{"paper": "angeli2024", "cited": true, "verdict": "supports", "section": "Methods", "quote": "neuropathic for abnormal sudomotor response or abnormal sweat pattern on TST"}, {"paper": "gibbons2013", "cited": true, "verdict": "partial", "section": "Discussion", "quote": "Similar observations have been made by other investigators studying thermoregulatory and axon-mediated sweating in POTS.", "note": "Gibbons did not perform the thermoregulatory sweat test."}]}, {"id": "e96", "source": "head_up_tilt_test", "target": "autonomic_reflex_screen", "predicate": "part_of", "provenance": "angeli2024: screen includes HUTT", "basis": "paper", "seeds": ["angeli2024"], "excerpts": [{"paper": "angeli2024", "cited": true, "verdict": "supports", "section": "Methods", "quote": "All patients underwent our autonomic reflex screen which includes Quantitative Sudomotor Axon Reflex Testing (QSART), heart rate response to deep breathing, and HUTT."}, {"paper": "low2009", "cited": false, "verdict": "not_found", "note": "Low names the autonomic reflex screen but never lists its components or a CASS subscore."}]}, {"id": "e97", "source": "heart_rate_variability", "target": "autonomic_reflex_screen", "predicate": "part_of", "provenance": "angeli2024: screen includes heart rate response to deep breathing", "basis": "paper", "seeds": ["angeli2024"], "excerpts": [{"paper": "angeli2024", "cited": true, "verdict": "supports", "section": "Methods", "quote": "All patients underwent our autonomic reflex screen which includes Quantitative Sudomotor Axon Reflex Testing (QSART), heart rate response to deep breathing, and HUTT.", "note": "Heart rate response to deep breathing is the cardiovagal heart rate variability test."}, {"paper": "low2009", "cited": false, "verdict": "not_found", "note": "As above: no components or CASS subscores in Low 2009."}]}, {"id": "e98", "source": "qsart_sudomotor_testing", "target": "autonomic_reflex_screen", "predicate": "part_of", "provenance": "angeli2024: screen includes QSART", "basis": "paper", "seeds": ["angeli2024"], "excerpts": [{"paper": "angeli2024", "cited": true, "verdict": "supports", "section": "Methods", "quote": "All patients underwent our autonomic reflex screen which includes Quantitative Sudomotor Axon Reflex Testing (QSART), heart rate response to deep breathing, and HUTT."}, {"paper": "low2009", "cited": false, "verdict": "not_found", "note": "As above: no components or CASS subscores in Low 2009."}]}, {"id": "e99", "source": "valsalva_maneuver", "target": "autonomic_reflex_screen", "predicate": "part_of", "provenance": "gibbons2013: autonomic battery included Valsalva", "basis": "paper", "seeds": ["gibbons2013"], "excerpts": [{"paper": "gibbons2013", "cited": true, "verdict": "partial", "section": "Methods", "quote": "On day 2, subjects underwent autonomic tests that included heart rate variability to deep breathing, blood pressure and heart rate response to a Valsalva maneuver and 10-minute tilt-table test.", "note": "Valsalva is part of the autonomic test battery, which Gibbons does not call the autonomic reflex screen."}, {"paper": "low2009", "cited": false, "verdict": "not_found", "note": "As above: no components or CASS subscores in Low 2009."}]}, {"id": "e100", "source": "autoimmune_evidence", "target": "pots", "predicate": "proposed_mechanism_of", "provenance": "low2009: autoimmune attack of autonomic nerves", "basis": "paper", "seeds": ["low2009"], "excerpts": [{"paper": "angeli2024", "cited": false, "verdict": "not_found", "note": "Angeli 2024 does not discuss an autoimmune mechanism."}, {"paper": "low2009", "cited": true, "verdict": "partial", "section": "Introduction", "quote": "Support for the notion of neuropathic POTS comes also from the 1 in 7 patients who have low titer of A3 acetylcholine receptor antibodies, a finding that suggests an autoimmune attach of autonomic nerves."}]}, {"id": "e101", "source": "deconditioning_evidence", "target": "pots", "predicate": "proposed_mechanism_of", "provenance": "low2009: causal direction contested", "basis": "paper", "seeds": ["low2009"], "excerpts": [{"paper": "low2009", "cited": true, "verdict": "supports", "section": "Abstract", "quote": "Major mechanisms are denervation, hypovolemia, deconditioning, and hyperadrenergic state."}, {"paper": "low2009", "cited": true, "verdict": "supports", "section": "Discussion", "quote": "The concept that at least some of the chronic symptoms in POTS are due in part to secondary deconditioning raises the possibility that a “life-hardening” exercise training program might have utility in this condition.", "note": "Backs the provenance note that the causal direction is contested."}]}, {"id": "e102", "source": "hyperadrenergic_evidence", "target": "pots", "predicate": "proposed_mechanism_of", "provenance": "angeli2024: overlapping, not exclusive", "basis": "paper", "seeds": ["angeli2024"], "excerpts": [{"paper": "angeli2024", "cited": true, "verdict": "supports", "section": "Results", "quote": "These were not mutually exclusive, and many patients had a combination of phenotypes with 41.7% (147/352) having two phenotypes, and 11.4% (40/352) with a contribution from all three Table 2."}]}, {"id": "e103", "source": "hypermobility_heds", "target": "hypovolemic_evidence", "predicate": "proposed_mechanism_of", "provenance": "angeli2024: compliant connective tissue, venous pooling", "basis": "paper", "seeds": ["angeli2024"], "excerpts": [{"paper": "angeli2024", "cited": true, "verdict": "supports", "section": "Introduction", "quote": "For example, more compliant connective tissue in joint hypermobility syndromes may result in more venous pooling in the lower extremities and low effective intrathoracic volume."}]}, {"id": "e104", "source": "hypovolemic_evidence", "target": "pots", "predicate": "proposed_mechanism_of", "provenance": "angeli2024; low2009", "basis": "paper", "seeds": ["angeli2024", "low2009"], "excerpts": [{"paper": "angeli2024", "cited": true, "verdict": "supports", "section": "Introduction", "quote": "Hypovolemic POTS is due to dysfunction of the renin–angiotensin–aldosterone system resulting in low plasma blood volume and may be identified with 24-h urine sodium concentration less than 100 mmol/L."}, {"paper": "low2009", "cited": true, "verdict": "supports", "section": "Abstract", "quote": "Major mechanisms are denervation, hypovolemia, deconditioning, and hyperadrenergic state."}]}, {"id": "e105", "source": "neuropathic_evidence", "target": "pots", "predicate": "proposed_mechanism_of", "provenance": "angeli2024; gibbons2013", "basis": "paper", "seeds": ["angeli2024", "gibbons2013"], "excerpts": [{"paper": "angeli2024", "cited": true, "verdict": "supports", "section": "Introduction", "quote": "Neuropathic POTS involves impaired peripheral vasoconstriction and excessive blood pooling below the waist via impaired small fiber nerve function."}, {"paper": "gibbons2013", "cited": true, "verdict": "supports", "section": "Abstract", "quote": "These findings suggest different pathophysiological processes underlie the postural tachycardia in neuropathic and non-neuropathic POTS patients."}]}, {"id": "e106", "source": "postinfectious_evidence", "target": "pots", "predicate": "proposed_mechanism_of", "provenance": "larsen2025", "basis": "paper", "seeds": ["larsen2025"], "excerpts": [{"paper": "larsen2025", "cited": true, "verdict": "supports", "section": "Abstract", "quote": "Long COVID postural tachycardia syndrome (LC-POTS) is increasingly recognized as a manifestation of post-viral autonomic dysfunction following SARS-CoV-2 infection, however its pathogenic mechanisms remain incompletely understood."}, {"paper": "low2009", "cited": false, "verdict": "partial", "section": "Introduction", "quote": "Early studies suggested that approximately one-half of patients have an antecedent presumed viral illness, although recent experience suggests that this is less common."}]}, {"id": "e107", "source": "beta_blocker_therapy", "target": "pots", "predicate": "treats", "provenance": "low2009", "basis": "paper", "seeds": ["low2009"], "excerpts": [{"paper": "low2009", "cited": true, "verdict": "supports", "section": "Conclusions", "quote": "Medications that are commonly used include beta blockers, midodrine, and fludrocortisones."}]}, {"id": "e108", "source": "exercise_reconditioning", "target": "pots", "predicate": "treats", "provenance": "low2009", "basis": "paper", "seeds": ["low2009"], "excerpts": [{"paper": "low2009", "cited": true, "verdict": "supports", "section": "Discussion", "quote": "An exercise program, provided it is sustained and adequate for several months, can be very helpful."}]}, {"id": "e109", "source": "ivabradine_therapy", "target": "pots", "predicate": "treats", "provenance": "angeli2024", "basis": "paper", "seeds": ["angeli2024"], "excerpts": [{"paper": "angeli2024", "cited": true, "verdict": "supports", "section": "Discussion", "quote": "For example, for hyperadrenergic POTS, the sympathetic output is blocked via beta-blockers, or sympathetic symptoms such as tachycardia may be combated by pharmacotherapies such ivabradine which inhibits I(f) channels."}]}, {"id": "e110", "source": "midodrine_therapy", "target": "pots", "predicate": "treats", "provenance": "low2009", "basis": "paper", "seeds": ["low2009"], "excerpts": [{"paper": "low2009", "cited": true, "verdict": "supports", "section": "Conclusions", "quote": "Medications that are commonly used include beta blockers, midodrine, and fludrocortisones."}]}, {"id": "e111", "source": "volume_expansion_therapy", "target": "pots", "predicate": "treats", "provenance": "low2009", "basis": "paper", "seeds": ["low2009"], "excerpts": [{"paper": "low2009", "cited": true, "verdict": "supports", "section": "Abstract", "quote": "All patients with POTS require a high salt diet, copious fluids, and postural training."}]}, {"id": "e112", "source": "long_covid", "target": "postinfectious_evidence", "predicate": "trigger_of", "provenance": "larsen2025", "basis": "paper", "seeds": ["larsen2025"], "excerpts": [{"paper": "larsen2025", "cited": true, "verdict": "supports", "section": "Abstract", "quote": "Long COVID postural tachycardia syndrome (LC-POTS) is increasingly recognized as a manifestation of post-viral autonomic dysfunction following SARS-CoV-2 infection, however its pathogenic mechanisms remain incompletely understood."}]}], "predicates": {"is_a": "Subsumption: X is a kind of Y. Transitive.", "part_of": "X is a component of the composite test or battery Y. Transitive, but not is_a.", "evidence_for": "Test X supplies objective evidence for mechanism flag Y.", "indicates": "Prescribing X is weak evidence that a clinician suspected mechanism Y.", "treats": "X is a treatment aimed at Y.", "measures": "Test X quantifies the physiological quantity Y.", "associated_with": "X and Y co-occur; no causal claim.", "proposed_mechanism_of": "Mechanism X is proposed to produce Y.", "trigger_of": "Exposure X precedes onset of Y.", "differential_diagnosis_of": "X must be excluded before Y can be diagnosed.", "mimics": "X resembles Y without sharing its mechanism."}, "phrases": {"is_a": "is a type of", "part_of": "is part of", "evidence_for": "is evidence for", "indicates": "when prescribed, suggests", "treats": "treats", "measures": "measures", "associated_with": "often occurs with", "proposed_mechanism_of": "is a proposed cause of", "trigger_of": "can trigger", "differential_diagnosis_of": "must be ruled out before diagnosing", "mimics": "can look like"}, "seeds": {"angeli2024": {"citation": "Angeli et al. Symptom presentation by phenotype of postural orthostatic tachycardia syndrome. Scientific Reports, 2024.", "pmid": "38168762", "short": "Angeli 2024"}, "gibbons2013": {"citation": "Gibbons et al. Structural and functional small fiber abnormalities in the neuropathic postural tachycardia syndrome. PLoS ONE, 2013.", "pmid": "24386408", "short": "Gibbons 2013"}, "zhang2022": {"citation": "Zhang et al. Skin biopsy and QSART testing in patients with postural orthostatic tachycardia syndrome. Cureus, 2022.", "pmid": "36349067", "short": "Zhang 2022"}, "larsen2025": {"citation": "Larsen et al. Long-COVID POTS: a deep phenotyping study. medRxiv preprint, 2025.", "pmid": null, "short": "Larsen 2025"}, "low2009": {"citation": "Low et al. Postural tachycardia syndrome (POTS). Journal of Cardiovascular Electrophysiology / review, 2009.", "pmid": "19207771", "short": "Low 2009"}}, "removed": [{"edge": ["heart_rate_variability", "evidence_for", "hyperadrenergic_evidence"], "old_provenance": "sympathovagal balance", "reason": "No paper cited and none of the five seed papers supports it."}, {"edge": ["mast_cell_activation", "mimics", "hyperadrenergic_evidence"], "old_provenance": "flushing and tachycardia without sympathetic excess", "reason": "No paper cited and none of the five seed papers mentions mast cell activation."}, {"edge": ["post_vaccination_onset", "trigger_of", "pots"], "old_provenance": "reported temporal association; contested", "reason": "No paper cited and none of the five seed papers supports it."}, {"edge": ["genetic_testing", "evidence_for", "hyperadrenergic_evidence"], "old_provenance": "low2009: SLC6A2 NET deficiency", "reason": "Cited Low 2009, which does not mention genetics or SLC6A2.", "evidence": [{"paper": "low2009", "cited": true, "verdict": "not_found", "note": "Low 2009 does not mention genetics, SLC6A2 or the norepinephrine transporter."}]}, {"edge": ["cerebral_blood_flow_measurement", "evidence_for", "pots"], "old_provenance": "larsen2025: symptom correlate independent of HR", "reason": "Contradicted: Larsen 2025 reports cerebrovascular measures failed to correlate with symptoms.", "evidence": [{"paper": "larsen2025", "cited": true, "verdict": "contradicts", "section": "Abstract", "quote": "Measures of cerebrovascular changes during orthostatic challenge were also similar and failed to correlate with symptoms of orthostatic intolerance.", "note": "The provenance note claims a symptom correlate independent of HR; the abstract reports no correlation."}]}, {"edge": ["droxidopa_therapy", "indicates", "neuropathic_evidence"], "old_provenance": "low2009: peripheral noradrenergic deficit", "reason": "Cited Low 2009, which does not mention droxidopa.", "evidence": [{"paper": "low2009", "cited": true, "verdict": "not_found", "note": "Low 2009 does not mention droxidopa."}]}, {"edge": ["pyridostigmine_therapy", "indicates", "autoimmune_evidence"], "old_provenance": "angeli2024", "reason": "Cited Angeli 2024, which lists pyridostigmine only under neuropathic POTS.", "evidence": [{"paper": "angeli2024", "cited": true, "verdict": "not_found", "note": "Angeli lists pyridostigmine only under neuropathic POTS."}]}, {"edge": ["immunomodulatory_therapy", "indicates", "autoimmune_evidence"], "old_provenance": "angeli2024", "reason": "Cited Angeli 2024, which does not mention immunotherapy.", "evidence": [{"paper": "angeli2024", "cited": true, "verdict": "not_found", "note": "Angeli 2024 does not mention immunotherapy."}]}, {"edge": ["mast_cell_activation", "associated_with", "pots"], "old_provenance": "angeli2024", "reason": "Cited Angeli 2024, which does not mention mast cell activation.", "evidence": [{"paper": "angeli2024", "cited": true, "verdict": "not_found", "note": "Angeli 2024 does not mention mast cell activation."}]}]};
+
+const GROUP = {
+  mechanism:   { name: "Possible cause" },
+  measurement: { name: "Test" },
+  treatment:   { name: "Treatment" },
+  comorbidity: { name: "Linked condition" },
+  pots:        { name: "The disorder" },
+  class:       { name: "Grouping class" },
+};
+const MECH_ORDER = ["hyperadrenergic_evidence", "neuropathic_evidence", "hypovolemic_evidence",
+                    "deconditioning_evidence", "autoimmune_evidence", "postinfectious_evidence"];
+
+const byId = Object.fromEntries(DATA.nodes.map(n => [n.id, n]));
+const isMain = id => byId[id].kind === "facet" || id === "pots";
+const mainEdges = DATA.edges.filter(e => isMain(e.source) && isMain(e.target));
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const color = id => css(`--c-${byId[id].group}`);
+
+// ---------- sources in plain words ----------
+function sourceHTML(e) {
+  if (e.basis === "taxonomy") return `Grouping only, no paper cited`;
+  const parts = e.provenance.split(";").map(s => s.trim()).filter(Boolean);
+  const out = [];
+  for (const p of parts) {
+    const m = p.match(/^(angeli2024|gibbons2013|zhang2022|larsen2025|low2009)(?::\s*(.*))?$/);
+    if (m) {
+      const s = DATA.seeds[m[1]];
+      const ref = s.pmid
+        ? `<a href="https://pubmed.ncbi.nlm.nih.gov/${s.pmid}/" target="_blank" rel="noopener" title="${esc(s.citation)}">${s.short}</a>`
+        : `<span title="${esc(s.citation)}">${s.short} (preprint)</span>`;
+      out.push(m[2] ? `${ref}: “${esc(m[2])}”` : ref);
+    } else out.push(`“${esc(p)}”`);
+  }
+  return (e.basis === "reasoning" ? `<span class="warn">no paper cited</span> ` : "Source: ") + out.join(" · ");
+}
+const sentence = (e, linkNodes = true) => {
+  const n = id => linkNodes ? `<a class="n" data-id="${id}">${esc(byId[id].short)}</a>` : `<b>${esc(byId[id].short)}</b>`;
+  return `${n(e.source)} <span class="rel">${DATA.phrases[e.predicate]}</span> ${n(e.target)}`;
+};
+
+// ---------- excerpts ----------
+const VERDICT = {
+  supports:    { label: "Supports", icon: "✓", color: "var(--s-good)" },
+  partial:     { label: "Partly supports", icon: "◐", color: "var(--s-warning)" },
+  not_found:   { label: "Not found in paper", icon: "✕", color: "var(--s-serious)" },
+  contradicts: { label: "Contradicts", icon: "!", color: "var(--s-critical)" },
+};
+const RANK = { supports: 0, partial: 1, contradicts: 2, not_found: 3 };
+const vbadge = v => `<span class="vb" title="${VERDICT[v].label}"><i style="background:${VERDICT[v].color}"></i>${VERDICT[v].icon} ${VERDICT[v].label}</span>`;
+// The best verdict among the papers the link itself cites; null when it cites none.
+function verdictOf(e) {
+  const vs = e.excerpts.filter(x => x.cited).map(x => x.verdict);
+  return vs.length ? vs.sort((a, b) => RANK[a] - RANK[b])[0] : null;
+}
+function paperRef(k) {
+  const s = DATA.seeds[k];
+  return s && s.pmid ? `<a href="https://pubmed.ncbi.nlm.nih.gov/${s.pmid}/" target="_blank" rel="noopener">${s.short}</a>` : `${s ? s.short : k} (preprint)`;
+}
+function oneExcerpt(x) {
+  return `<div class="ex">
+    ${x.quote ? `<blockquote class="quote ${x.verdict}">“${esc(x.quote)}”</blockquote>` : ""}
+    <div class="exmeta">${vbadge(x.verdict)}<span>${paperRef(x.paper)}${x.section ? ", " + esc(x.section) : ""}</span>${x.cited ? "" : "<span>· not cited by this link</span>"}</div>
+    ${x.note ? `<div class="exnote">${esc(x.note)}</div>` : ""}</div>`;
+}
+function excerptHTML(e, { compact = false } = {}) {
+  if (!e.excerpts.length) return e.basis === "taxonomy" ? "" : `<div class="exnote">No excerpt: no paper is cited for this link.</div>`;
+  const cited = e.excerpts.filter(x => x.cited), other = e.excerpts.filter(x => !x.cited);
+  if (compact) {
+    const first = cited.find(x => x.quote) || other.find(x => x.quote);
+    const rest = e.excerpts.filter(x => x !== first);
+    return (first ? oneExcerpt(first) : cited.map(oneExcerpt).join("")) +
+      (rest.length && first ? `<details class="more"><summary>${rest.length} more excerpt${rest.length > 1 ? "s" : ""}</summary>${rest.map(oneExcerpt).join("")}</details>` : "");
+  }
+  return cited.map(oneExcerpt).join("") +
+    (other.length ? `<details class="more" open><summary>Also found in papers this link does not cite (${other.length})</summary>${other.map(oneExcerpt).join("")}</details>` : "");
+}
+
+// One verdict per (link, cited paper): the best among that paper's quotes.
+const CHECK = (() => {
+  const c = { total: 0 };
+  DATA.edges.forEach(e => {
+    const best = {};
+    e.excerpts.filter(x => x.cited).forEach(x => { if (!(x.paper in best) || RANK[x.verdict] < RANK[best[x.paper]]) best[x.paper] = x.verdict; });
+    Object.values(best).forEach(v => { c[v] = (c[v] || 0) + 1; c.total++; });
+  });
+  return c;
+})();
+
+// ---------- hierarchy: the is_a taxonomy drawn as nested boxes ----------
+// Each facet sits inside the class it is_a member of, and each class inside its own parent,
+// so the map shows the hierarchy directly: Tests > Autonomic function testing > Orthostatic
+// challenge testing > Tilt table test. Facets with two parents are drawn under one of them.
+const PRIMARY_PARENT = { beta_blocker_therapy: "sympatholytic_agent" };
+const COLUMN_LABEL = {
+  objective_evidence: "TESTS", mechanistic_phenotype: "POSSIBLE CAUSES OF POTS",
+  therapeutic_proxy: "TREATMENTS", clinical_context: "CONDITIONS LINKED TO POTS",
+};
+const parentOf = {}, kids = {};
+DATA.edges.filter(e => e.predicate === "is_a").forEach(e => {
+  if (parentOf[e.source] && PRIMARY_PARENT[e.source] !== e.target) return;
+  parentOf[e.source] = e.target;
+});
+Object.entries(parentOf).forEach(([c, p]) => (kids[p] = kids[p] || []).push(c));
+const isClass = id => byId[id].kind !== "facet" && id !== "pots";
+const ancestors = id => { const out = []; let c = parentOf[id]; while (c && c !== "pots_phenotype_axis") { out.push(c); c = parentOf[c]; } return out; };
+const leavesUnder = id => (kids[id] || []).flatMap(k => isClass(k) ? leavesUnder(k) : [k]);
+const boxId = id => "box:" + id;
+
+function positions() {
+  const pos = {}, W = 420, mechY = {};
+  const LEAF = 44, HEAD = 34, PAD = 16, GAP = 12;
+  // causes first: their heights anchor the ordering of everything else
+  const bary = id => {
+    const ys = mainEdges.filter(e => (e.source === id && mechY[e.target] != null) || (e.target === id && mechY[e.source] != null))
+      .map(e => mechY[e.source] ?? mechY[e.target]);
+    return ys.length ? ys.reduce((a, b) => a + b) / ys.length : 1e4;
+  };
+  const baryAll = id => { const ls = isClass(id) ? leavesUnder(id) : [id]; const b = ls.map(bary).filter(v => v < 1e4);
+    return b.length ? b.reduce((a, c) => a + c) / b.length : 1e4; };
+  function stack(id, x, y) {
+    if (!isClass(id)) { pos[id] = { x, y: y + LEAF / 2 }; return y + LEAF; }
+    let cy0 = y + HEAD;
+    (kids[id] || []).slice().sort((a, b) => baryAll(a) - baryAll(b) || (isClass(a) - isClass(b))).forEach(k => {
+      cy0 = stack(k, x, cy0) + (isClass(k) ? GAP : 0);
+    });
+    return cy0 + PAD;
+  }
+  // the six causes are spread to the height of the tests column, so arrows stay short
+  MECH_ORDER.forEach((id, i) => mechY[id] = i);           // provisional order for the barycentres
+  const testsBottom = stack("objective_evidence", 0, 0);
+  const step = Math.max(80, (testsBottom - 120) / MECH_ORDER.length);
+  MECH_ORDER.forEach((id, i) => { mechY[id] = 80 + i * step; pos[id] = { x: W, y: mechY[id] }; });
+  const testsBottom2 = stack("objective_evidence", 0, 0);  // re-stack against the real heights
+  const treatBottom = stack("therapeutic_proxy", 2 * W, 0);
+  const bottom = Math.max(testsBottom2, treatBottom, mechY[MECH_ORDER.at(-1)] + 60);
+  pos.pots = { x: W, y: bottom + 70 };
+  const cond = leavesUnder("clinical_context").sort((a, b) => bary(a) - bary(b));
+  cond.forEach((id, i) => pos[id] = { x: (i % 5) * (2 * W / 4), y: bottom + 200 + Math.floor(i / 5) * LEAF });
+  return pos;
+}
+
+const P = positions();
+const shownClasses = new Set(DATA.nodes.filter(n => isMain(n.id)).flatMap(n => ancestors(n.id)));
+const cy = cytoscape({
+  container: document.getElementById("cy"),
+  elements: [
+    ...[...shownClasses].map(c => ({
+      data: { id: boxId(c), cls: c, label: COLUMN_LABEL[c] || byId[c].label, depth: ancestors(c).length,
+              hasSub: (kids[c] || []).some(k => shownClasses.has(k)),
+              parent: parentOf[c] && parentOf[c] !== "pots_phenotype_axis" ? boxId(parentOf[c]) : undefined },
+      classes: COLUMN_LABEL[c] ? "box col" : "box" })),
+    ...DATA.nodes.filter(n => isMain(n.id)).map(n => ({
+      data: { ...n, label: n.short, parent: parentOf[n.id] && parentOf[n.id] !== "pots_phenotype_axis" ? boxId(parentOf[n.id]) : undefined },
+      position: P[n.id] })),
+    // Every cause links to POTS the same way; drawing six identical arrows would only add clutter.
+    ...mainEdges.filter(e => !(e.predicate === "proposed_mechanism_of" && e.target === "pots" && byId[e.source].group === "mechanism"))
+      .map(e => {
+        // Condition-to-cause links would otherwise run straight through the column of causes; bow them outward.
+        const cross = byId[e.source].group === "comorbidity" && byId[e.target].group === "mechanism";
+        if (!cross) return { data: { ...e } };
+        const dx = P[e.target].x - P[e.source].x;
+        return { data: { ...e, bend: dx >= 0 ? -160 : 160 }, classes: "bend" };
+      }),
+  ],
+  layout: { name: "preset" },
+  minZoom: 0.25, maxZoom: 2.5, wheelSensitivity: 0.2, autoungrabify: true,
+});
+
+function restyle() {
+  const ink = css("--ink"), ink2 = css("--ink-2"), muted = css("--muted"), edge = css("--edge"), line = css("--line"), wash = css("--wash"), surface = css("--surface");
+  cy.style([
+    { selector: "node", style: {
+        "shape": "round-rectangle", "width": 196, "height": 34, "label": "data(label)",
+        "font-family": "system-ui, -apple-system, sans-serif", "font-size": 13, "color": ink,
+        "text-valign": "center", "text-halign": "center", "text-wrap": "ellipsis", "text-max-width": 182,
+        "background-color": ele => ele.hasClass("box") ? surface : color(ele.id()), "background-opacity": 0.12,
+        "border-width": 1.5, "border-color": ele => ele.hasClass("box") ? line : color(ele.id()),
+        "transition-property": "opacity", "transition-duration": "120ms" } },
+    { selector: "node.box", style: {
+        "background-color": ink, "background-opacity": ele => 0.025 + 0.02 * ele.data("depth"),
+        "border-color": line, "border-width": 1, "padding": ele => ele.data("hasSub") ? 26 : 10,
+        "text-valign": "top", "text-halign": "center", "text-margin-y": -3, "text-wrap": "none",
+        "font-size": 11, "font-weight": "bold", "color": ink2, "corner-radius": 10 } },
+    { selector: "node.box.col", style: {
+        "background-opacity": 0, "border-width": 0, "padding": 28, "font-size": 12.5, "font-weight": "bold", "color": muted,
+        "text-margin-y": 0 } },
+    { selector: 'node[group = "mechanism"]', style: {
+        "background-opacity": 1, "color": "#ffffff", "font-weight": "bold", "font-size": 14, "height": 44, "width": 210 } },
+    { selector: 'node[group = "pots"]', style: {
+        "background-color": css("--c-pots"), "background-opacity": 1, "border-width": 0,
+        "color": css("--on-pots"), "font-weight": "bold", "font-size": 16, "width": 120, "height": 46 } },
+    { selector: "edge", style: {
+        "width": 1.5, "line-color": edge, "curve-style": "bezier", "target-arrow-shape": "triangle",
+        "target-arrow-color": edge, "arrow-scale": 0.7,
+        "line-style": ele => verdictOf(ele.data()) === "partial" ? "dashed" : "solid",
+        "transition-property": "opacity", "transition-duration": "120ms" } },
+    { selector: "edge.bend", style: {
+        "curve-style": "unbundled-bezier", "control-point-distances": ele => ele.data("bend"), "control-point-weights": 0.5 } },
+    { selector: "edge.hl", style: {
+        "width": 2.5, "line-color": ele => color(ele.data("source")), "target-arrow-color": ele => color(ele.data("source")),
+        "z-index": 9, "label": ele => DATA.phrases[ele.data("predicate")], "font-size": 11, "font-style": "italic",
+        "color": css("--ink-2"), "text-rotation": "autorotate", "text-margin-y": -8,
+        "text-background-color": css("--surface"), "text-background-opacity": 0.9, "text-background-padding": 2,
+        "text-background-shape": "roundrectangle" } },
+    { selector: "node.orphan", style: { "opacity": 0.45, "border-style": "dashed" } },
+    { selector: ".dim", style: { "opacity": 0.12 } },
+    { selector: "node.box.dim", style: { "opacity": 0.35 } },
+    { selector: "node.sel", style: { "border-width": 3, "border-color": ink } },
+  ]);
+}
+restyle();
+// Facets left with no supported link after the 2026-10-01 refinement stay on the map, faded.
+cy.nodes().forEach(n => { if (!n.hasClass("box") && n.id() !== "pots" && n.connectedEdges().empty()) n.addClass("orphan"); });
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", restyle);
+const fit = () => cy.fit(cy.elements(), 24);
+fit();
+
+// ---------- highlight & select ----------
+let selected = null;
+function focusOn(id) {
+  const n = cy.getElementById(id);
+  cy.elements().addClass("dim").removeClass("hl");
+  const keep = n.closedNeighborhood();
+  keep.removeClass("dim"); keep.nodes().ancestors().removeClass("dim");
+  n.connectedEdges().addClass("hl");
+}
+function unfocus() { cy.elements().removeClass("dim hl"); }
+function clearSel() { selected = null; cy.nodes().removeClass("sel"); unfocus(); intro(); }
+addEventListener("resize", () => { cy.resize(); if (!selected) fit(); });
+document.getElementById("fit").onclick = () => { clearSel(); fit(); };
+
+cy.on("mouseover", "node", ev => { if (!selected && !ev.target.hasClass("box")) focusOn(ev.target.id()); });
+cy.on("mouseout", "node", () => { if (!selected) unfocus(); });
+cy.on("tap", "node", ev => ev.target.hasClass("box") ? select(ev.target.data("cls")) : select(ev.target.id()));
+cy.on("tap", "edge", ev => showEdge(ev.target.data()));
+cy.on("tap", ev => { if (ev.target === cy) clearSel(); });
+
+const tip = document.getElementById("tip");
+cy.on("mouseover", "edge", ev => {
+  const e = ev.target.data();
+  const v = verdictOf(e), q = (e.excerpts.find(x => x.cited && x.quote) || {}).quote;
+  tip.innerHTML = `${sentence(e, false)}<div class="s">${sourceHTML(e)}</div>` +
+    (v ? `<div class="s" style="margin-top:4px">${vbadge(v)}</div>` : "") +
+    (q ? `<div class="s" style="font-style:italic;color:var(--ink-2)">“${esc(q.length > 180 ? q.slice(0, 177) + "…" : q)}”</div>` : "");
+  tip.style.display = "block";
+});
+cy.on("mouseout", "edge", () => tip.style.display = "none");
+cy.on("mousemove", ev => {
+  const o = ev.originalEvent; if (!o || tip.style.display === "none") return;
+  tip.style.left = Math.min(o.clientX + 14, innerWidth - tip.offsetWidth - 8) + "px";
+  tip.style.top = Math.min(o.clientY + 14, innerHeight - tip.offsetHeight - 8) + "px";
+});
+
+// ---------- side panel ----------
+const panel = document.getElementById("panel");
+function intro() {
+  const sw = g => `<span class="sw" style="background:color-mix(in srgb, var(--c-${g}) 14%, transparent);border-color:var(--c-${g})"></span>`;
+  panel.innerHTML = `
+    <h2>How to read the map</h2>
+    <p>Each box is a topic we tag papers with. Each arrow is one claim, such as
+    “Skin biopsy <i>is evidence for</i> Neuropathic”.</p>
+    <div class="legend">
+      <div><span class="sw" style="background:var(--c-mechanism);border-color:var(--c-mechanism)"></span>Possible cause of POTS</div>
+      <div>${sw("measurement")}Test that can show a cause</div>
+      <div>${sw("treatment")}Treatment that hints at a cause</div>
+      <div>${sw("comorbidity")}Condition linked to POTS</div>
+      <div><span class="ln"></span>Claim the cited paper supports</div>
+      <div><span class="ln dash"></span>Claim the paper only partly supports</div>
+      <div><span class="sw" style="border-style:dashed;border-color:var(--muted);opacity:.6"></span>Topic with no supported link</div>
+      <div><span class="sw" style="background:var(--wash);border-color:var(--line);border-width:1px"></span>Group: topics of the same kind, nested by type</div>
+    </div>
+    <h3>Checked against the papers</h3>
+    <p>Each cited paper was searched for the sentence behind each claim. Of ${CHECK.total} citations:</p>
+    <div class="legend">${["supports", "partial"].map(v => `<div>${vbadge(v)}<span>${CHECK[v] || 0}</span></div>`).join("")}</div>
+    <p>${DATA.removed.length} links with no supporting passage, or contradicted by their source, were removed. They are listed at the bottom of <b>All links</b>.</p>
+    <h3>Try this</h3>
+    <p>Hover a box to see its links. Click it to read each claim and its source; click a grey group to see what it holds.
+    <b>Hierarchy</b> lists the same grouping as an outline.
+    Use <b>By cause</b> for a plain list, or <b>All links</b> to review and download every claim.</p>`;
+}
+function wireLinks(root = panel, go = select) { root.querySelectorAll("a.n").forEach(a => a.onclick = () => go(a.dataset.id)); }
+const parentsOf = id => DATA.edges.filter(e => e.source === id && e.predicate === "is_a").map(e => e.target);
+const pathOf = id => { const out = []; let c = parentOf[id]; while (c) { out.unshift(c); c = parentOf[c]; } return out; };
+const crumb = id => pathOf(id).filter(c => c !== "pots_phenotype_axis").map(c => `<a class="n" data-id="${c}">${esc(byId[c].label)}</a>`).join(" › ");
+const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+// Batteries such as the autonomic reflex screen hold their tests by part_of, not is_a.
+const groupSize = id => {
+  const n = leavesUnder(id).length, p = DATA.edges.filter(e => e.predicate === "part_of" && e.target === id).length;
+  return n ? plural(n, "topic") : p ? plural(p, "component") : "";
+};
+const linkCount = id => mainEdges.filter(e => e.source === id || e.target === id).length;
+function nodeDetailHTML(id) {
+  const n = byId[id];
+  if (isClass(id)) {
+    const sub = (kids[id] || []).slice().sort((a, b) => isClass(b) - isClass(a) || byId[a].label.localeCompare(byId[b].label));
+    const also = DATA.edges.filter(e => e.source !== id && e.target === id && e.predicate === "is_a" && parentOf[e.source] !== id);
+    const parts = DATA.edges.filter(e => e.target === id && e.predicate === "part_of");
+    const measuredBy = DATA.edges.filter(e => e.target === id && e.predicate === "measures");
+    const leaves = leavesUnder(id);
+    return `
+      <span class="pill">Grouping class · ${esc(n.kind.replace("_", " "))}</span>
+      <h2 style="margin-top:8px">${esc(n.label)}</h2>
+      ${crumb(id) ? `<p>Inside: ${crumb(id)}</p>` : ""}
+      ${leaves.length ? `<p>${plural(leaves.length, "topic")} in this group, with ${leaves.reduce((a, l) => a + linkCount(l), 0)} supported links between them and other topics.</p>` : ""}
+      ${sub.length ? `<h3>Contains (${sub.length})</h3>${sub.map(k => `<div class="conn"><span class="dot" style="display:inline-block;margin-right:6px;background:${isClass(k) ? "var(--line)" : `var(--c-${byId[k].group})`}"></span><a class="n" data-id="${k}">${esc(isClass(k) ? byId[k].label : byId[k].short)}</a>${isClass(k) ? ` <span class="src">${groupSize(k)}</span>` : ""}</div>`).join("")}` : ""}
+      ${also.length ? `<h3>Also contains (second parent)</h3>${also.map(e => `<div class="conn"><a class="n" data-id="${e.source}">${esc(byId[e.source].short)}</a></div>`).join("")}` : ""}
+      ${parts.length ? `<h3>Components (part of this study)</h3>${parts.map(e => `<div class="conn"><a class="n" data-id="${e.source}">${esc(byId[e.source].short)}</a><div class="src">${sourceHTML(e)}</div>${excerptHTML(e, { compact: true })}</div>`).join("")}` : ""}
+      ${measuredBy.length ? `<h3>Measured by</h3>${measuredBy.map(e => `<div class="conn"><a class="n" data-id="${e.source}">${esc(byId[e.source].short)}</a><div class="src">${sourceHTML(e)}</div>${excerptHTML(e, { compact: true })}</div>`).join("")}` : ""}`;
+  }
+  const links = mainEdges.filter(e => e.source === id || e.target === id);
+  const other = DATA.edges.filter(e => e.source === id && ["part_of", "measures"].includes(e.predicate));
+  const ps = parentsOf(id);
+  return `
+    <span class="pill"><span class="dot" style="background:var(--c-${n.group})"></span>${GROUP[n.group].name}</span>
+    <h2 style="margin-top:8px">${esc(n.label)}</h2>
+    ${crumb(id) ? `<p>Inside: ${crumb(id)}</p>` : ""}
+    ${n.definition ? `<p>${esc(n.definition)}</p>` : ""}
+    <h3>Links (${links.length})</h3>
+    ${links.map(e => `<div class="conn">${sentence(e)}<div class="src">${sourceHTML(e)}</div>${excerptHTML(e, { compact: true })}</div>`).join("")
+      || `<p>No supported link to another topic; it stays as a tagging topic.</p>`}
+    ${other.length ? `<h3>Also</h3>${other.map(e => `<div class="conn"><span class="rel">${DATA.phrases[e.predicate]}</span> <a class="n" data-id="${e.target}">${esc(byId[e.target].label)}</a><div class="src">${sourceHTML(e)}</div>${excerptHTML(e, { compact: true })}</div>`).join("")}` : ""}
+    ${ps.length > 1 ? `<h3>Also a type of</h3><p>${ps.filter(p => p !== parentOf[id]).map(p => `<a class="n" data-id="${p}">${esc(byId[p].label)}</a>`).join(", ")}</p>` : ""}`;
+}
+function select(id) {
+  selected = id;
+  cy.nodes().removeClass("sel");
+  if (isClass(id)) {
+    const box = cy.getElementById(boxId(id));
+    cy.elements().addClass("dim").removeClass("hl");
+    if (box.nonempty()) {
+      box.addClass("sel");
+      const inside = box.union(box.descendants()).union(box.ancestors());
+      inside.removeClass("dim");
+      const es = box.descendants().connectedEdges();
+      es.removeClass("dim").addClass("hl"); es.connectedNodes().removeClass("dim"); es.connectedNodes().ancestors().removeClass("dim");
+    } else unfocus();
+  } else {
+    cy.getElementById(id).addClass("sel");
+    focusOn(id);
+  }
+  panel.innerHTML = nodeDetailHTML(id);
+  wireLinks();
+  panel.scrollTop = 0;
+}
+function showEdge(e) {
+  selected = e.id;
+  cy.nodes().removeClass("sel");
+  cy.elements().addClass("dim").removeClass("hl");
+  const ed = cy.getElementById(e.id); ed.removeClass("dim").addClass("hl");
+  ed.connectedNodes().removeClass("dim"); ed.connectedNodes().ancestors().removeClass("dim");
+  panel.innerHTML = `
+    <span class="pill">One claim</span>
+    <h2 style="margin-top:8px">${sentence(e)}</h2>
+    <h3>Source</h3><p>${sourceHTML(e)}</p>
+    <h3>What the paper says</h3>${excerptHTML(e) || '<p>Grouping link; no paper cited.</p>'}
+    <h3>What this kind of link means</h3><p>${esc(DATA.predicates[e.predicate])}</p>`;
+  wireLinks();
+}
+intro();
+
+// ---------- hierarchy view ----------
+const treePanel = document.getElementById("treePanel");
+function treeSelect(id) {
+  document.querySelectorAll(".tree .on").forEach(x => x.classList.remove("on"));
+  document.querySelectorAll(`.tree [data-id="${id}"]`).forEach(x => {
+    x.classList.add("on");
+    for (let d = x.closest("details"); d; d = d.parentElement.closest("details")) d.open = true;
+  });
+  const first = document.querySelector(`.tree [data-id="${id}"]`);
+  if (first) first.scrollIntoView({ block: "nearest" });
+  treePanel.innerHTML = nodeDetailHTML(id);
+  wireLinks(treePanel, treeSelect);
+  treePanel.scrollTop = 0;
+}
+// POTS-rooted outline: each topic lists what points into it, grouped by the kind of link,
+// the same structure as the DAG read top-down. A topic reached by two paths appears twice.
+const HEADING = (e) => ({
+  proposed_mechanism_of: byId[e.source].group === "mechanism" ? "Possible causes" : "Conditions proposed to cause it",
+  evidence_for: "Tests that can show it", indicates: "Treatments that hint at it", treats: "Treatments",
+  associated_with: "Linked conditions", trigger_of: "Triggers", differential_diagnosis_of: "Must be ruled out first",
+}[e.predicate] || DATA.phrases[e.predicate]);
+const HEADING_ORDER = ["Possible causes", "Tests that can show it", "Treatments that hint at it", "Treatments",
+  "Linked conditions", "Conditions proposed to cause it", "Triggers", "Must be ruled out first"];
+function outlineRow(e, depth) {
+  const id = e.source, inc = mainEdges.filter(x => x.target === id);
+  const v = verdictOf(e);
+  const row = `<span class="dot" style="background:var(--c-${byId[id].group})"></span><span>${esc(byId[id].short)}</span>
+    <span class="lc">${v === "partial" ? "partly supported" : ""}</span>`;
+  if (!inc.length || depth > 4) return `<div class="leaf" data-id="${id}">${row}</div>`;
+  return `<details ${depth < 2 ? "open" : ""}><summary data-id="${id}" class="node-sum">${row}</summary>${outlineChildren(id, depth + 1)}</details>`;
+}
+function outlineChildren(id, depth) {
+  const groups = {};
+  mainEdges.filter(e => e.target === id).forEach(e => (groups[HEADING(e)] = groups[HEADING(e)] || []).push(e));
+  return Object.keys(groups).sort((a, b) => HEADING_ORDER.indexOf(a) - HEADING_ORDER.indexOf(b)).map(h =>
+    `<div class="ohead">${h} <span class="cnt">${groups[h].length}</span></div>` +
+    groups[h].sort((a, b) => byId[a.source].short.localeCompare(byId[b.source].short)).map(e => outlineRow(e, depth)).join("")
+  ).join("");
+}
+// the is_a grouping, kept below as a secondary way to browse
+function typeHTML(id, depth) {
+  const children = DATA.edges.filter(e => e.predicate === "is_a" && e.target === id).map(e => e.source)
+    .sort((a, b) => isClass(b) - isClass(a) || byId[a].label.localeCompare(byId[b].label));
+  const inner = children.map(k => isClass(k) ? typeHTML(k, depth + 1)
+    : `<div class="leaf${linkCount(k) ? "" : " orph"}" data-id="${k}"><span class="dot" style="background:var(--c-${byId[k].group})"></span><span>${esc(byId[k].short)}</span><span class="lc">${linkCount(k) ? plural(linkCount(k), "link") : "no supported link"}</span></div>`).join("");
+  return `<details><summary data-id="${id}">${esc(byId[id].label)} <span class="cnt">${groupSize(id)}</span></summary>${inner}</details>`;
+}
+function buildTree() {
+  const wrap = document.getElementById("treeWrap");
+  const orphans = DATA.nodes.filter(n => n.kind === "facet" && !linkCount(n.id));
+  wrap.innerHTML = `<div class="tree">
+    <p style="margin:0 0 6px;color:var(--ink-2);font-size:14px">POTS at the top; under each topic, what points to it. Click a name for its claims and sources.</p>
+    <details open class="root"><summary data-id="pots" class="node-sum"><span class="dot" style="background:var(--c-pots)"></span><span>POTS</span></summary>
+      ${outlineChildren("pots", 1)}
+    </details>
+    <details class="aside"><summary>No supported link <span class="cnt">${orphans.length}</span></summary>
+      ${orphans.map(n => `<div class="leaf orph" data-id="${n.id}"><span class="dot" style="background:var(--c-${n.group})"></span><span>${esc(n.short)}</span></div>`).join("")}</details>
+    <details class="aside"><summary>Browse by type (grouping) <span class="cnt">is_a</span></summary>
+      ${["mechanistic_phenotype", "objective_evidence", "therapeutic_proxy", "clinical_context"].map(r => typeHTML(r, 1)).join("")}</details>
+  </div>`;
+  wrap.querySelectorAll(".leaf").forEach(el => el.onclick = () => treeSelect(el.dataset.id));
+  wrap.querySelectorAll("summary[data-id]").forEach(el => el.addEventListener("click", () => treeSelect(el.dataset.id)));
+  treePanel.innerHTML = `<h2>Outline</h2><p>The same structure as the DAG, read from the top: POTS first, then the possible
+    causes and the conditions and treatments linked to it directly, then what points to each cause. A topic reached by two
+    paths, such as compression garments, appears under both.</p><p>The grouping by type is under <b>Browse by type</b>.</p>`;
+}
+buildTree();
+
+// ---------- DAG rooted at POTS ----------
+// The supported links form a directed acyclic graph that converges on POTS: tests and
+// treatments point to causes, causes and conditions point to POTS. Laid out with POTS as
+// the root on the left and each topic placed by its distance from POTS (dagre). A topic with
+// two outgoing links (compression -> neuropathic and hypovolemic) keeps both, so this is a
+// DAG, not a tree. Arrows keep their real direction, toward POTS.
+const dagPanel = document.getElementById("dagPanel");
+let dag = null, dagSelected = null;
+function dagInit() {
+  const ids = [...new Set(mainEdges.flatMap(e => [e.source, e.target]))];
+  const g = new dagre.graphlib.Graph();
+  g.setGraph({ rankdir: "LR", nodesep: 10, ranksep: 150, edgesep: 6, marginx: 20, marginy: 20 });
+  g.setDefaultEdgeLabel(() => ({}));
+  const W = id => byId[id].group === "mechanism" ? 190 : id === "pots" ? 110 : 186;
+  const H = id => byId[id].group === "mechanism" || id === "pots" ? 42 : 30;
+  ids.forEach(id => g.setNode(id, { width: W(id), height: H(id) }));
+  // reversed for layout only, so POTS ranks first
+  mainEdges.forEach(e => g.setEdge(e.target, e.source));
+  dagre.layout(g);
+  const RANK_LABEL = ["POTS", "Directly linked to POTS", "Linked through a cause"];
+  dag = cytoscape({
+    container: document.getElementById("dagCy"),
+    elements: [
+      ...ids.map(id => ({ data: { ...byId[id], label: byId[id].short }, position: { x: g.node(id).x, y: g.node(id).y } })),
+      ...mainEdges.map(e => {
+        // follow dagre's route: its bend points become bezier control points, so long links
+        // pass between nodes instead of through them
+        const S = g.node(e.source), T = g.node(e.target);
+        const pts = g.edge(e.target, e.source).points.slice(1, -1).reverse();
+        const dx = T.x - S.x, dy = T.y - S.y, L2 = dx * dx + dy * dy || 1, L = Math.sqrt(L2);
+        const w = pts.map(p => Math.min(0.98, Math.max(0.02, ((p.x - S.x) * dx + (p.y - S.y) * dy) / L2)));
+        const d = pts.map(p => (dx * (p.y - S.y) - dy * (p.x - S.x)) / L);
+        return pts.length ? { data: { ...e, cpw: w, cpd: d }, classes: "routed" } : { data: { ...e } };
+      }),
+    ],
+    layout: { name: "preset" }, minZoom: 0.25, maxZoom: 2.5, autoungrabify: true,
+  });
+  dagStyle();
+  dag.fit(undefined, 24);
+  dag.on("mouseover", "node", ev => { if (!dagSelected) dagFocus(ev.target.id()); });
+  dag.on("mouseout", "node", () => { if (!dagSelected) dag.elements().removeClass("dim hl"); });
+  dag.on("tap", "node", ev => dagSelect(ev.target.id()));
+  dag.on("tap", "edge", ev => {
+    const e = ev.target.data(); dagSelected = e.id;
+    dag.elements().addClass("dim").removeClass("hl sel");
+    ev.target.removeClass("dim").addClass("hl"); ev.target.connectedNodes().removeClass("dim");
+    dagPanel.innerHTML = `<span class="pill">One claim</span><h2 style="margin-top:8px">${sentence(e)}</h2>
+      <h3>Source</h3><p>${sourceHTML(e)}</p><h3>What the paper says</h3>${excerptHTML(e)}`;
+    wireLinks(dagPanel, dagSelect);
+  });
+  dag.on("tap", ev => { if (ev.target === dag) { dagSelected = null; dag.elements().removeClass("dim hl sel"); dagIntro(); } });
+  document.getElementById("dagLabels").onchange = ev => dag.edges().toggleClass("cap", ev.target.checked);
+  document.getElementById("dagFit").onclick = () => { dagSelected = null; dag.elements().removeClass("dim hl sel"); dag.fit(undefined, 24); dagIntro(); };
+  dagIntro();
+}
+function dagStyle() {
+  if (!dag) return;
+  const ink = css("--ink"), ink2 = css("--ink-2"), edge = css("--edge"), surface = css("--surface");
+  const cap = { "label": ele => DATA.phrases[ele.data("predicate")], "font-size": 10.5, "font-style": "italic", "color": ink2,
+    "text-rotation": "autorotate", "text-background-color": surface, "text-background-opacity": 0.9,
+    "text-background-padding": 2, "text-background-shape": "roundrectangle" };
+  dag.style([
+    { selector: "node", style: {
+        "shape": "round-rectangle", "width": 186, "height": 30, "label": "data(label)", "font-size": 12.5, "color": ink,
+        "font-family": "system-ui, -apple-system, sans-serif", "text-valign": "center", "text-halign": "center",
+        "text-wrap": "ellipsis", "text-max-width": 174, "background-color": ele => color(ele.id()), "background-opacity": 0.12,
+        "border-width": 1.5, "border-color": ele => color(ele.id()) } },
+    { selector: 'node[group = "mechanism"]', style: { "background-opacity": 1, "color": "#ffffff", "font-weight": "bold", "width": 190, "height": 42, "font-size": 13.5 } },
+    { selector: 'node[group = "pots"]', style: { "background-color": css("--c-pots"), "background-opacity": 1, "border-width": 0,
+        "color": css("--on-pots"), "font-weight": "bold", "font-size": 16, "width": 110, "height": 42 } },
+    { selector: "edge", style: {
+        "width": 1.5, "line-color": edge, "target-arrow-color": edge, "target-arrow-shape": "triangle", "arrow-scale": 0.7,
+        "curve-style": "bezier", "line-style": ele => verdictOf(ele.data()) === "partial" ? "dashed" : "solid" } },
+    { selector: "edge.routed", style: { "curve-style": "unbundled-bezier",
+        "control-point-weights": ele => ele.data("cpw"), "control-point-distances": ele => ele.data("cpd") } },
+    { selector: "edge.cap", style: cap },
+    { selector: "edge.hl", style: { ...cap, "width": 2.5, "z-index": 9,
+        "line-color": ele => color(ele.data("source")), "target-arrow-color": ele => color(ele.data("source")) } },
+    { selector: ".dim", style: { "opacity": 0.12 } },
+    { selector: "node.sel", style: { "border-width": 3, "border-color": ink } },
+  ]);
+}
+// highlight the node, every path from it up to POTS, and everything that feeds into it
+function dagFocus(id) {
+  const n = dag.getElementById(id);
+  const keep = n.union(n.successors()).union(n.predecessors());
+  dag.elements().addClass("dim").removeClass("hl");
+  keep.removeClass("dim");
+  keep.edges().addClass("hl");
+}
+function dagSelect(id) {
+  dagSelected = id;
+  dag.nodes().removeClass("sel");
+  const n = dag.getElementById(id);
+  if (n.nonempty()) { n.addClass("sel"); dagFocus(id); }
+  dagPanel.innerHTML = nodeDetailHTML(id);
+  wireLinks(dagPanel, dagSelect);
+  dagPanel.scrollTop = 0;
+}
+function dagIntro() {
+  const orphans = DATA.nodes.filter(n => n.kind === "facet" && !linkCount(n.id)).map(n => n.short);
+  dagPanel.innerHTML = `<h2>DAG rooted at POTS</h2>
+    <p>Every supported link points toward POTS: tests and treatments point to a possible cause, and causes and
+    conditions point to POTS. POTS is the root on the left; each topic sits as many steps away as its longest path to POTS.</p>
+    <p>It is a DAG rather than a tree because a topic can feed more than one cause, e.g. compression garments point to both
+    Neuropathic and Hypovolemic, and beta blockers point to Hyperadrenergic and treat POTS directly.</p>
+    <p>Hover or click a topic to trace its paths to POTS and see each relationship named on the arrows.</p>
+    <h3>Not in the DAG (${orphans.length})</h3><p>${orphans.map(esc).join(", ")}: no supported link.</p>`;
+}
+let dagReady = false;
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", dagStyle);
+
+// ---------- by cause ----------
+function causeCards() {
+  const item = e => `<div class="item"><span class="dot" style="background:var(--c-${byId[e.source].group})"></span>
+      <div><b>${esc(byId[e.source].short)}</b> <span style="color:var(--ink-2)">${DATA.phrases[e.predicate]} it</span>
+      <div class="src">${sourceHTML(e)}</div>${excerptHTML(e, { compact: true })}</div></div>`;
+  const section = (title, list) => `<h3>${title}</h3>${list.length ? list.map(item).join("") : '<div class="empty">None listed</div>'}`;
+  const into = id => mainEdges.filter(e => e.target === id);
+  const cards = MECH_ORDER.map(id => {
+    const inc = into(id);
+    return `<article class="card cause">
+      <h2>${esc(byId[id].short)}</h2><p>${esc(byId[id].definition)}</p>
+      ${section("Tests that can show it", inc.filter(e => byId[e.source].group === "measurement"))}
+      ${section("Treatments that hint at it", inc.filter(e => byId[e.source].group === "treatment"))}
+      ${section("Linked conditions", inc.filter(e => byId[e.source].group === "comorbidity"))}
+    </article>`;
+  });
+  const pin = into("pots");
+  cards.push(`<article class="card cause pots">
+    <h2>POTS overall</h2><p>Links that point at POTS itself rather than at one cause.</p>
+    ${section("Linked conditions", pin.filter(e => byId[e.source].group === "comorbidity"))}
+    ${section("Treatments", pin.filter(e => byId[e.source].group === "treatment"))}
+    ${section("Tests", pin.filter(e => byId[e.source].group === "measurement"))}
+  </article>`);
+  document.getElementById("causes").innerHTML = cards.join("");
+}
+causeCards();
+
+// ---------- all links ----------
+const relSel = document.getElementById("relFilter");
+const counts = {}; DATA.edges.forEach(e => counts[e.predicate] = (counts[e.predicate] || 0) + 1);
+relSel.innerHTML = `<option value="">Every relationship (${DATA.edges.length})</option>` +
+  Object.keys(counts).sort((a, b) => counts[b] - counts[a]).map(p => `<option value="${p}">${DATA.phrases[p]} (${counts[p]})</option>`).join("");
+const qEl = document.getElementById("q");
+function tableRows() {
+  const q = qEl.value.trim().toLowerCase(), rel = relSel.value, b = document.getElementById("basisFilter").value;
+  const vf = document.getElementById("verdictFilter").value;
+  return DATA.edges.filter(e => (!rel || e.predicate === rel) && (!b || e.basis === b) &&
+    (!vf || (vf === "none" ? verdictOf(e) === null : verdictOf(e) === vf)) &&
+    (!q || [byId[e.source].label, byId[e.target].label, byId[e.source].short, byId[e.target].short, e.provenance,
+            ...e.excerpts.map(x => x.quote || "")].join(" ").toLowerCase().includes(q)));
+}
+function renderTable() {
+  const rows = tableRows();
+  document.getElementById("tcount").textContent = `${rows.length} of ${DATA.edges.length} links`;
+  document.getElementById("tbody").innerHTML = rows.map(e => `<tr>
+    <td>${esc(byId[e.source].label)}</td><td class="rel">${DATA.phrases[e.predicate]}</td>
+    <td>${esc(byId[e.target].label)}</td><td class="src">${sourceHTML(e)}</td>
+    <td style="min-width:280px">${excerptHTML(e, { compact: true })}</td></tr>`).join("");
+}
+relSel.onchange = renderTable;
+document.getElementById("basisFilter").onchange = renderTable;
+document.getElementById("verdictFilter").onchange = renderTable;
+document.getElementById("csv").onclick = () => {
+  const q = v => `"${String(v).replace(/"/g, '""')}"`;
+  const head = ["from", "relationship", "to", "source as written", "backed by", "check result", "excerpt", "excerpt paper", "excerpt section",
+                "agree? (yes/no)", "change to", "reviewer note"];
+  const word = { paper: "a seed paper", reasoning: "reasoning note only", taxonomy: "grouping only" };
+  const lines = [head.map(q).join(",")].concat(tableRows().map(e =>
+    (e.excerpts.length ? e.excerpts : [null]).map(x =>
+      [byId[e.source].label, DATA.phrases[e.predicate], byId[e.target].label, e.provenance, word[e.basis],
+       x ? VERDICT[x.verdict].label + (x.cited ? "" : " (paper not cited by this link)") : "",
+       x ? x.quote || x.note || "" : "", x ? DATA.seeds[x.paper].short : "", x ? x.section || "" : "", "", "", ""].map(q).join(","))
+    ).flat());
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([lines.join("\n")], { type: "text/csv" }));
+  a.download = "pots_links_review.csv"; a.click();
+};
+renderTable();
+document.getElementById("removedBox").innerHTML =
+  `<summary>${DATA.removed.length} links removed on 2026-10-01 for lack of support</summary>` +
+  DATA.removed.map(r => `<div class="conn"><b>${esc(byId[r.edge[0]].short)}</b> <span class="rel">${DATA.phrases[r.edge[1]] || r.edge[1]}</span> <b>${esc(byId[r.edge[2]].short)}</b>
+    <div class="src">Was cited as: ${esc(r.old_provenance)}</div><div class="exnote">${esc(r.reason)}</div>
+    ${(r.evidence || []).filter(x => x.quote).map(oneExcerpt).join("")}</div>`).join("");
+
+// ---------- search & views ----------
+document.getElementById("names").innerHTML = DATA.nodes.filter(n => isMain(n.id))
+  .map(n => `<option value="${esc(n.short)}">${esc(n.label)}</option>`).join("");
+let current = "dag";
+dagReady = true; dagInit();
+qEl.addEventListener("input", () => {
+  renderTable();
+  const v = qEl.value.trim().toLowerCase(); if (!v) return;
+  const hit = DATA.nodes.find(n => isMain(n.id) && (n.short.toLowerCase() === v || n.label.toLowerCase() === v));
+  if (hit && current === "map") { select(hit.id); cy.animate({ center: { eles: cy.getElementById(hit.id) }, duration: 250 }); }
+});
+document.querySelectorAll(".seg button").forEach(b => b.onclick = () => {
+  current = b.dataset.view;
+  document.querySelectorAll(".seg button").forEach(x => x.setAttribute("aria-pressed", x === b));
+  document.querySelectorAll(".view").forEach(v => v.classList.toggle("on", v.id === "v-" + current));
+  if (current === "map") { cy.resize(); fit(); }
+  if (current === "dag") { if (!dagReady) { dagReady = true; dagInit(); } else { dag.resize(); dag.fit(undefined, 24); } }
+});
+</script>
+</body>
+</html>

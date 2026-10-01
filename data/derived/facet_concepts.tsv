@@ -1,0 +1,196 @@
+facet_id	vocabulary_id	search_term	concept_code	concept_name	concept_id	domain_id	match_rank	label_match	resolver	mapping_status
+active_stand_test	LOINC	heart rate standing	69001-6	Heart rate --standing		Measurement	1	exact	nlm_clinical_tables	unreviewed
+active_stand_test	SNOMED	measurement of orthostatic blood pressure	57401000087101	Measurement of orthostatic blood pressure			1	exact	ols4	unreviewed
+active_stand_test	SNOMED	standing blood pressure	163034007	Standing blood pressure			1	exact	ols4	unreviewed
+active_stand_test	SNOMED	standing blood pressure	400974009	Standing systolic blood pressure			2	contains	ols4	unreviewed
+active_stand_test	SNOMED	standing blood pressure	400975005	Standing diastolic blood pressure			3	contains	ols4	unreviewed
+ambulatory_monitoring	SNOMED	ambulatory blood pressure monitoring	725956001	Ambulatory blood pressure monitoring report			1	contains	ols4	unreviewed
+ambulatory_monitoring	SNOMED	ambulatory electrocardiographic monitoring	35171000087106	7 day ambulatory electrocardiographic monitoring			1	contains	ols4	unreviewed
+ambulatory_monitoring	SNOMED	electrocardiographic monitoring	46825001	Electrocardiographic monitoring			1	exact	ols4	unreviewed
+ambulatory_monitoring	SNOMED	ambulatory blood pressure monitoring	448489007	Removal of ambulatory blood pressure monitor			2	loose	ols4	unreviewed
+ambulatory_monitoring	SNOMED	ambulatory electrocardiographic monitoring	35161000087102	14 day ambulatory electrocardiographic monitoring			2	contains	ols4	unreviewed
+ambulatory_monitoring	SNOMED	electrocardiographic monitoring	468281001	Electrocardiographic monitor			2	loose	ols4	unreviewed
+ambulatory_monitoring	SNOMED	ambulatory blood pressure monitoring	448678005	Application of ambulatory blood pressure monitor			3	loose	ols4	unreviewed
+ambulatory_monitoring	SNOMED	ambulatory electrocardiographic monitoring	427446001	48 hour ambulatory electrocardiographic monitoring			3	contains	ols4	unreviewed
+ambulatory_monitoring	SNOMED	electrocardiographic monitoring	425529000	Cardiomemo electrocardiographic monitoring			3	contains	ols4	unreviewed
+autoimmune_evidence	LOINC	acetylcholine receptor ganglionic antibody	97559-9	Acetylcholine receptor ganglionic neuronal IgG+IgM Ab [Moles/volume] in Serum by Immunoassay		Measurement	1	contains	nlm_clinical_tables	unreviewed
+autoimmune_evidence	LOINC	acetylcholine receptor ganglionic antibody	42233-7	Acetylcholine receptor ganglionic neuronal Ab [Moles/volume] in Serum		Measurement	2	contains	nlm_clinical_tables	unreviewed
+autoimmune_evidence	LOINC	acetylcholine receptor ganglionic antibody	94694-7	Acetylcholine receptor ganglionic neuronal Ab [Moles/volume] in Serum by Immunoassay		Measurement	3	contains	nlm_clinical_tables	unreviewed
+autoimmune_evidence	SNOMED	autoimmune disorder of autonomic nervous system	1259090001	Autoimmune disorder of autonomic nervous system			1	exact	ols4	unreviewed
+autoimmune_evidence	SNOMED	autonomic ganglionopathy	838321000	Autonomic ganglionopathy			1	exact	ols4	unreviewed
+autoimmune_evidence	SNOMED	autoimmune disorder of autonomic nervous system	1259067006	Autonomic disorder due to autoimmune encephalitis			2	loose	ols4	unreviewed
+autonomic_autoantibody_assay	LOINC	acetylcholine receptor antibody	106787-5	Acetylcholine receptor Ab [Presence] in Serum by Immunoassay		Measurement	1	contains	nlm_clinical_tables	unreviewed
+autonomic_autoantibody_assay	LOINC	acetylcholine receptor antibody	110022-1	Acetylcholine receptor binding Ab [Measurement] in Serum		Measurement	2	contains	nlm_clinical_tables	unreviewed
+autonomic_autoantibody_assay	LOINC	acetylcholine receptor antibody	43624-6	Acetylcholine receptor binding Ab [Presence] in Serum		Measurement	3	contains	nlm_clinical_tables	unreviewed
+autonomic_autoantibody_assay	SNOMED	autoantibody measurement	314067002	Autoantibody measurement			1	exact	ols4	unreviewed
+autonomic_autoantibody_assay	SNOMED	autoantibody measurement	165848009	Autoantibody titer measurement (procedure)			2	contains	ols4	unreviewed
+autonomic_autoantibody_assay	SNOMED	autoantibody measurement	165881005	Kidney autoantibody measurement			3	contains	ols4	unreviewed
+beta_blocker_therapy	RxNorm	metoprolol	221124	metoprolol succinate		Drug	1	contains	rxnav	unreviewed
+beta_blocker_therapy	RxNorm	propranolol	82084	propranolol hydrochloride		Drug	1	contains	rxnav	unreviewed
+beta_blocker_therapy	RxNorm	metoprolol	6918	metoprolol		Drug	2	exact	rxnav	unreviewed
+beta_blocker_therapy	RxNorm	propranolol	8787	propranolol		Drug	2	exact	rxnav	unreviewed
+cardiopulmonary_exercise_test	LOINC	oxygen consumption	60842-2	Oxygen consumption (VO2)		Measurement	1	exact	nlm_clinical_tables	unreviewed
+cardiopulmonary_exercise_test	LOINC	oxygen consumption	103749-8	Oxygen consumption (VO2) --peak		Measurement	2	contains	nlm_clinical_tables	unreviewed
+cardiopulmonary_exercise_test	LOINC	oxygen consumption	60823-2	Oxygen consumption (VO2)/Body surface area [Volume Rate/Area]		Measurement	3	contains	nlm_clinical_tables	unreviewed
+cardiopulmonary_exercise_test	SNOMED	cardiopulmonary exercise test	447346005	Cardiopulmonary exercise test			1	exact	ols4	unreviewed
+cardiopulmonary_exercise_test	SNOMED	cardiopulmonary exercise test	787878002	Cardiopulmonary exercise test using arm ergometer			2	contains	ols4	unreviewed
+cardiopulmonary_exercise_test	SNOMED	cardiopulmonary exercise test	787877007	Cardiopulmonary exercise test using bicycle ergometer			3	contains	ols4	unreviewed
+central_sympatholytic_therapy	RxNorm	clonidine	142432	clonidine hydrochloride		Drug	1	contains	rxnav	unreviewed
+central_sympatholytic_therapy	RxNorm	methyldopa	6876	methyldopa		Drug	1	exact	rxnav	unreviewed
+central_sympatholytic_therapy	RxNorm	clonidine	2599	clonidine		Drug	2	exact	rxnav	unreviewed
+cerebral_blood_flow_measurement	SNOMED	cerebral blood flow	250847003	Cerebral blood flow			1	exact	ols4	unreviewed
+cerebral_blood_flow_measurement	SNOMED	transcranial Doppler ultrasonography	431648005	Transcranial Doppler ultrasonography			1	exact	ols4	unreviewed
+cerebral_blood_flow_measurement	SNOMED	cerebral blood flow	765294008	Radionuclide imaging using radioisotope with cerebral blood flow			2	contains	ols4	unreviewed
+cerebral_blood_flow_measurement	SNOMED	transcranial Doppler ultrasonography	440044001	Transcranial Doppler ultrasonography of intracranial artery for detection of emboli			2	contains	ols4	unreviewed
+cerebral_blood_flow_measurement	SNOMED	cerebral blood flow	765295009	Radionuclide imaging using technetium (99m-Tc) exametazime with cerebral blood flow			3	contains	ols4	unreviewed
+cerebral_blood_flow_measurement	SNOMED	transcranial Doppler ultrasonography	440119007	Transcranial Doppler ultrasonography of intracranial artery with study of vasoreactivity			3	contains	ols4	unreviewed
+chronic_migraine	SNOMED	migraine	37796009	Migraine			1	exact	ols4	unreviewed
+chronic_migraine	SNOMED	migraine	701602006	Migraine-therapy vagus nerve electrical stimulator			2	contains	ols4	unreviewed
+chronic_migraine	SNOMED	migraine	124001000119104	Common migraine with status migrainosus			3	contains	ols4	unreviewed
+compression_therapy	SNOMED	compression stockings	183143005	Compression stockings			1	exact	ols4	unreviewed
+compression_therapy	SNOMED	compression stockings	467848007	Compression stocking			2	exact	ols4	unreviewed
+compression_therapy	SNOMED	compression stockings	467763002	Compression stocking applicator			3	contains	ols4	unreviewed
+deconditioning_evidence	LOINC	oxygen consumption	60842-2	Oxygen consumption (VO2)		Measurement	1	exact	nlm_clinical_tables	unreviewed
+deconditioning_evidence	LOINC	oxygen consumption	103749-8	Oxygen consumption (VO2) --peak		Measurement	2	contains	nlm_clinical_tables	unreviewed
+deconditioning_evidence	LOINC	oxygen consumption	60823-2	Oxygen consumption (VO2)/Body surface area [Volume Rate/Area]		Measurement	3	contains	nlm_clinical_tables	unreviewed
+deconditioning_evidence	SNOMED	physical deconditioning	31031000119102	Physical deconditioning			1	exact	ols4	unreviewed
+differential_syncope_oh	SNOMED	inappropriate sinus tachycardia	425582007	Inappropriate sinus tachycardia			1	exact	ols4	unreviewed
+differential_syncope_oh	SNOMED	orthostatic hypotension	28651003	Orthostatic hypotension			1	exact	ols4	unreviewed
+differential_syncope_oh	SNOMED	vasovagal syncope	398665005	Vasovagal syncope			1	exact	ols4	unreviewed
+differential_syncope_oh	SNOMED	orthostatic hypotension	75181005	Chronic orthostatic hypotension			2	contains	ols4	unreviewed
+differential_syncope_oh	SNOMED	vasovagal syncope	234166002	Vasovagal syncope due to immersion			2	contains	ols4	unreviewed
+differential_syncope_oh	SNOMED	orthostatic hypotension	230664009	Sympathotonic orthostatic hypotension			3	contains	ols4	unreviewed
+droxidopa_therapy	RxNorm	droxidopa	1489913	droxidopa		Drug	1	exact	rxnav	unreviewed
+exercise_reconditioning	SNOMED	cardiac rehabilitation	313395003	Cardiac rehabilitation			1	exact	ols4	unreviewed
+exercise_reconditioning	SNOMED	exercise therapy	229065009	Exercise therapy			1	exact	ols4	unreviewed
+exercise_reconditioning	SNOMED	cardiac rehabilitation	704050007	Referral to cardiac rehabilitation program (procedure)			2	contains	ols4	unreviewed
+exercise_reconditioning	SNOMED	exercise therapy	441827009	Graded exercise therapy			2	contains	ols4	unreviewed
+exercise_reconditioning	SNOMED	cardiac rehabilitation	704051006	Referral to cardiac rehabilitation program declined (situation)			3	contains	ols4	unreviewed
+exercise_reconditioning	SNOMED	exercise therapy	390864007	Referral for exercise therapy			3	contains	ols4	unreviewed
+genetic_testing	SNOMED	genetic test	405824009	Genetic test			1	exact	ols4	unreviewed
+genetic_testing	SNOMED	genetic test	925211000000100	Familial hypercholesterolemia targeted genetic test (procedure)			2	contains	ols4	unreviewed
+genetic_testing	SNOMED	genetic test	925221000000106	Familial hypercholesterolemia comprehensive genetic test (procedure)			3	contains	ols4	unreviewed
+gi_dysmotility	SNOMED	gastroparesis	235675006	Gastroparesis (disorder)			1	exact	ols4	unreviewed
+gi_dysmotility	SNOMED	intestinal dysmotility	253768006	Congenital dysmotility of small intestine			1	loose	ols4	unreviewed
+gi_dysmotility	SNOMED	gastroparesis	713702000	Gastroparesis due to type 1 diabetes mellitus			2	contains	ols4	unreviewed
+gi_dysmotility	SNOMED	intestinal dysmotility	253785008	Generalized congenital intestinal dysmotility (disorder)			2	contains	ols4	unreviewed
+gi_dysmotility	SNOMED	gastroparesis	353821005	Idiopathic gastroparesis			3	contains	ols4	unreviewed
+gi_dysmotility	SNOMED	intestinal dysmotility	1197672004	Dysmotility of small intestine caused by drug			3	loose	ols4	unreviewed
+head_up_tilt_test	LOINC	tilt table study	46213-5	Tilt table study		Measurement	1	exact	nlm_clinical_tables	unreviewed
+head_up_tilt_test	SNOMED	tilt table test	14769009	Tilt table test			1	exact	ols4	unreviewed
+heart_rate_variability	LOINC	heart rate	8867-4	Heart rate		Measurement	1	exact	nlm_clinical_tables	unreviewed
+heart_rate_variability	LOINC	heart rate	18708-8	First Heart rate Set		Measurement	2	contains	nlm_clinical_tables	unreviewed
+heart_rate_variability	LOINC	heart rate	8877-3	Heart rate 12 hour		Measurement	3	contains	nlm_clinical_tables	unreviewed
+heart_rate_variability	SNOMED	heart rate variability	251671002	Fetal heart rate variability			1	contains	ols4	unreviewed
+heart_rate_variability	SNOMED	heart rate variability	426173002	Marked fetal heart rate variability			2	contains	ols4	unreviewed
+heart_rate_variability	SNOMED	heart rate variability	426704002	Moderate fetal heart rate variability			3	contains	ols4	unreviewed
+hyperadrenergic_evidence	LOINC	norepinephrine plasma	33844-2	Norepinephrine [Moles/volume] in Plasma --supine		Measurement	1	contains	nlm_clinical_tables	unreviewed
+hyperadrenergic_evidence	LOINC	norepinephrine standing	33843-4	Norepinephrine [Moles/volume] in Plasma --standing		Measurement	1	contains	nlm_clinical_tables	unreviewed
+hyperadrenergic_evidence	LOINC	norepinephrine plasma	2056-0	Catecholamines [Mass/volume] in Plasma		Measurement	2	loose	nlm_clinical_tables	unreviewed
+hyperadrenergic_evidence	LOINC	norepinephrine standing	17368-2	Norepinephrine [Mass/volume] in Plasma --standing		Measurement	2	contains	nlm_clinical_tables	unreviewed
+hyperadrenergic_evidence	LOINC	norepinephrine plasma	49257-9	Catecholamines [Interpretation] in Plasma Narrative		Measurement	3	loose	nlm_clinical_tables	unreviewed
+hyperadrenergic_evidence	LOINC	norepinephrine standing	1602-2	Norepinephrine [Mass/volume] in Plasma --10 minutes post standing		Measurement	3	contains	nlm_clinical_tables	unreviewed
+hyperadrenergic_evidence	SNOMED	standing blood pressure	163034007	Standing blood pressure			1	exact	ols4	unreviewed
+hyperadrenergic_evidence	SNOMED	standing blood pressure	400974009	Standing systolic blood pressure			2	contains	ols4	unreviewed
+hyperadrenergic_evidence	SNOMED	standing blood pressure	400975005	Standing diastolic blood pressure			3	contains	ols4	unreviewed
+hypermobility_heds	SNOMED	hypermobile Ehlers-Danlos syndrome	30652003	Hypermobile Ehlers-Danlos syndrome			1	exact	ols4	unreviewed
+hypermobility_heds	SNOMED	joint hypermobility	240262002	Localized benign joint hypermobility (disorder)			1	contains	ols4	unreviewed
+hypermobility_heds	SNOMED	joint hypermobility	298184008	Temporomandibular joint hypermobility			2	contains	ols4	unreviewed
+hypermobility_heds	SNOMED	joint hypermobility	240261009	Generalized benign joint hypermobility (disorder)			3	contains	ols4	unreviewed
+hypovolemic_evidence	LOINC	plasma volume	30898-1	Plasma volume by Scintigraphy		Measurement	1	contains	nlm_clinical_tables	unreviewed
+hypovolemic_evidence	LOINC	renin activity plasma	2915-7	Renin [Enzymatic activity/volume] in Plasma		Measurement	1	contains	nlm_clinical_tables	unreviewed
+hypovolemic_evidence	LOINC	plasma volume	111546-8	Plasma volume deviation [Volume] by calculation		Measurement	2	contains	nlm_clinical_tables	unreviewed
+hypovolemic_evidence	LOINC	renin activity plasma	17515-8	Renin [Enzymatic activity/volume] in Plasma --baseline		Measurement	2	contains	nlm_clinical_tables	unreviewed
+hypovolemic_evidence	LOINC	plasma volume	111543-5	Plasma volume deviation/Ideal volume by calculation		Measurement	3	contains	nlm_clinical_tables	unreviewed
+hypovolemic_evidence	LOINC	renin activity plasma	48786-8	Renin [Enzymatic activity/volume] in Plasma --30 minutes pre XXX challenge		Measurement	3	contains	nlm_clinical_tables	unreviewed
+hypovolemic_evidence	SNOMED	hypovolaemia	816082000	Hypovolemia (finding)			1	exact	ols4	unreviewed
+hypovolemic_evidence	SNOMED	hypovolaemia	386330008	Hypovolemia management (procedure)			2	contains	ols4	unreviewed
+hypovolemic_evidence	SNOMED	hypovolaemia	372114004	Assessment of hypovolemia risk factors (procedure)			3	contains	ols4	unreviewed
+immunomodulatory_therapy	RxNorm	immune globulin	1426680	immunoglobulin G, human		Drug	1	loose	rxnav	unreviewed
+immunomodulatory_therapy	RxNorm	rituximab	121191	rituximab		Drug	1	exact	rxnav	unreviewed
+ivabradine_therapy	RxNorm	ivabradine	1649479	ivabradine hydrochloride		Drug	1	contains	rxnav	unreviewed
+ivabradine_therapy	RxNorm	ivabradine	1649480	ivabradine		Drug	2	exact	rxnav	unreviewed
+long_covid	SNOMED	Chronic post-COVID-19 syndrome	1119304009	Chronic post-COVID-19 syndrome			1	exact	ols4	unreviewed
+mast_cell_activation	LOINC	tryptase serum	7748-7	Tryptase IgE Ab [Units/volume] in Serum		Measurement	1	contains	nlm_clinical_tables	unreviewed
+mast_cell_activation	LOINC	tryptase serum	108676-8	Tryptase [Measurement] in Serum or Plasma		Measurement	2	contains	nlm_clinical_tables	unreviewed
+mast_cell_activation	LOINC	tryptase serum	60539-4	Tryptase.beta [Mass/volume] in Serum or Plasma		Measurement	3	contains	nlm_clinical_tables	unreviewed
+mast_cell_activation	SNOMED	mast cell activation syndrome	16697871000119100	Mast cell activation syndrome			1	exact	ols4	unreviewed
+mast_cell_activation	SNOMED	mast cell activation syndrome	1260202003	Monoclonal mast cell activation syndrome			2	contains	ols4	unreviewed
+mast_cell_activation	SNOMED	mast cell activation syndrome	16697831000119103	Idiopathic mast cell activation syndrome			3	contains	ols4	unreviewed
+me_cfs	SNOMED	chronic fatigue syndrome	52702003	Chronic fatigue syndrome			1	exact	ols4	unreviewed
+me_cfs	SNOMED	malaise and fatigue	271795006	Malaise and fatigue			1	exact	ols4	unreviewed
+midodrine_therapy	RxNorm	midodrine	6963	midodrine		Drug	1	exact	rxnav	unreviewed
+midodrine_therapy	RxNorm	midodrine	993491	midodrine hydrochloride		Drug	2	contains	rxnav	unreviewed
+neuropathic_evidence	SNOMED	anhidrosis	39659002	Anhidrosis			1	exact	ols4	unreviewed
+neuropathic_evidence	SNOMED	autonomic neuropathy	277879009	Autonomic neuropathy			1	exact	ols4	unreviewed
+neuropathic_evidence	SNOMED	small fibre neuropathy	709489006	Small fiber neuropathy (disorder)			1	exact	ols4	unreviewed
+neuropathic_evidence	SNOMED	anhidrosis	230667002	Chronic idiopathic anhidrosis			2	contains	ols4	unreviewed
+neuropathic_evidence	SNOMED	autonomic neuropathy	838320004	Autonomic neuropathy due to medication induced hypoglycemia (disorder)			2	contains	ols4	unreviewed
+neuropathic_evidence	SNOMED	small fibre neuropathy	350471000119102	Idiopathic small fiber peripheral neuropathy (disorder)			2	contains	ols4	unreviewed
+neuropathic_evidence	SNOMED	anhidrosis	1187178004	Isolated generalized anhidrosis with normal sweat glands (disorder)			3	contains	ols4	unreviewed
+neuropathic_evidence	SNOMED	autonomic neuropathy	860883001	Generalized autonomic neuropathy due to diabetes mellitus (disorder)			3	contains	ols4	unreviewed
+neuropathic_evidence	SNOMED	small fibre neuropathy	782824007	Sodium channelopathy-related small fiber neuropathy (disorder)			3	contains	ols4	unreviewed
+plasma_blood_volume_assay	LOINC	blood volume	30899-9	Blood volume by Scintigraphy		Measurement	1	contains	nlm_clinical_tables	unreviewed
+plasma_blood_volume_assay	LOINC	hematocrit	101655-9	Basic metabolic and hematocrit panel - Blood		Measurement	1	contains	nlm_clinical_tables	unreviewed
+plasma_blood_volume_assay	LOINC	plasma volume	30898-1	Plasma volume by Scintigraphy		Measurement	1	contains	nlm_clinical_tables	unreviewed
+plasma_blood_volume_assay	LOINC	blood volume	103930-4	Blood volume Unspecified body region CVVHD		Measurement	2	contains	nlm_clinical_tables	unreviewed
+plasma_blood_volume_assay	LOINC	hematocrit	41986-1	Hematocrit test status/results Set CPHS		Measurement	2	contains	nlm_clinical_tables	unreviewed
+plasma_blood_volume_assay	LOINC	plasma volume	111546-8	Plasma volume deviation [Volume] by calculation		Measurement	2	contains	nlm_clinical_tables	unreviewed
+plasma_blood_volume_assay	LOINC	blood volume	111544-3	Blood volume deviation/Ideal volume by calculation		Measurement	3	contains	nlm_clinical_tables	unreviewed
+plasma_blood_volume_assay	LOINC	hematocrit	39227-4	Hematocrit test status CPHS		Measurement	3	contains	nlm_clinical_tables	unreviewed
+plasma_blood_volume_assay	LOINC	plasma volume	111543-5	Plasma volume deviation/Ideal volume by calculation		Measurement	3	contains	nlm_clinical_tables	unreviewed
+plasma_catecholamine_assay	LOINC	epinephrine plasma	2056-0	Catecholamines [Mass/volume] in Plasma		Measurement	1	loose	nlm_clinical_tables	unreviewed
+plasma_catecholamine_assay	LOINC	metanephrine plasma	29142-7	Metanephrines [Mass/volume] in Serum or Plasma		Measurement	1	contains	nlm_clinical_tables	unreviewed
+plasma_catecholamine_assay	LOINC	norepinephrine plasma	33844-2	Norepinephrine [Moles/volume] in Plasma --supine		Measurement	1	contains	nlm_clinical_tables	unreviewed
+plasma_catecholamine_assay	LOINC	epinephrine plasma	59787-2	Catecholamines [Moles/volume] in Plasma		Measurement	2	loose	nlm_clinical_tables	unreviewed
+plasma_catecholamine_assay	LOINC	metanephrine plasma	25474-8	Metanephrines [Moles/volume] in Serum or Plasma		Measurement	2	contains	nlm_clinical_tables	unreviewed
+plasma_catecholamine_assay	LOINC	norepinephrine plasma	2056-0	Catecholamines [Mass/volume] in Plasma		Measurement	2	loose	nlm_clinical_tables	unreviewed
+plasma_catecholamine_assay	LOINC	epinephrine plasma	44838-1	Catecholamines [Interpretation] in Plasma		Measurement	3	loose	nlm_clinical_tables	unreviewed
+plasma_catecholamine_assay	LOINC	metanephrine plasma	38494-1	Metanephrine Free [Mass/volume] in Serum or Plasma		Measurement	3	contains	nlm_clinical_tables	unreviewed
+plasma_catecholamine_assay	LOINC	norepinephrine plasma	49257-9	Catecholamines [Interpretation] in Plasma Narrative		Measurement	3	loose	nlm_clinical_tables	unreviewed
+post_vaccination_onset	SNOMED	adverse reaction to vaccine	219082005	Adverse reaction to cholera vaccine			1	contains	ols4	unreviewed
+post_vaccination_onset	SNOMED	adverse reaction to vaccine	293105009	Adverse reaction to anthrax vaccine			2	contains	ols4	unreviewed
+post_vaccination_onset	SNOMED	adverse reaction to vaccine	219075006	Adverse reaction to bacterial vaccine			3	contains	ols4	unreviewed
+postinfectious_evidence	SNOMED	Chronic post-COVID-19 syndrome	1119304009	Chronic post-COVID-19 syndrome			1	exact	ols4	unreviewed
+postinfectious_evidence	SNOMED	Postviral fatigue syndrome	51771007	Postviral fatigue syndrome			1	exact	ols4	unreviewed
+pyridostigmine_therapy	RxNorm	pyridostigmine	9000	pyridostigmine		Drug	1	exact	rxnav	unreviewed
+pyridostigmine_therapy	RxNorm	pyridostigmine	9001	pyridostigmine bromide		Drug	2	contains	rxnav	unreviewed
+qsart_sudomotor_testing	SNOMED	sweat measure	364692000	Sweat measure			1	exact	ols4	unreviewed
+qsart_sudomotor_testing	SNOMED	sweat test	168172001	Sweat test			1	exact	ols4	unreviewed
+qsart_sudomotor_testing	SNOMED	sweat measure	271279007	Sweat sodium measurement			2	loose	ols4	unreviewed
+qsart_sudomotor_testing	SNOMED	sweat test	64860001	Collection of sweat test			2	contains	ols4	unreviewed
+qsart_sudomotor_testing	SNOMED	sweat measure	313513005	Sweat weight measurement			3	loose	ols4	unreviewed
+qsart_sudomotor_testing	SNOMED	sweat test	86326008	Collection of sweat test, pediatric overnight (procedure)			3	contains	ols4	unreviewed
+serotonergic_therapy	RxNorm	sertraline	155137	sertraline hydrochloride		Drug	1	contains	rxnav	unreviewed
+serotonergic_therapy	RxNorm	venlafaxine	235988	venlafaxine hydrochloride		Drug	1	contains	rxnav	unreviewed
+serotonergic_therapy	RxNorm	sertraline	36437	sertraline		Drug	2	exact	rxnav	unreviewed
+serotonergic_therapy	RxNorm	venlafaxine	2605948	venlafaxine besylate monohydrate		Drug	2	contains	rxnav	unreviewed
+serotonergic_therapy	RxNorm	venlafaxine	2607741	venlafaxine besylate		Drug	3	contains	rxnav	unreviewed
+skin_biopsy_ienfd	SNOMED	punch biopsy of skin	87697008	Punch biopsy of skin			1	exact	ols4	unreviewed
+skin_biopsy_ienfd	SNOMED	skin biopsy	309066003	Skin biopsy specimen			1	contains	ols4	unreviewed
+skin_biopsy_ienfd	SNOMED	punch biopsy of skin	302399005	Punch biopsy of skin lesion			2	contains	ols4	unreviewed
+skin_biopsy_ienfd	SNOMED	skin biopsy	395029000	Skin biopsy IgA level			2	contains	ols4	unreviewed
+skin_biopsy_ienfd	SNOMED	punch biopsy of skin	309504008	Skin punch biopsy specimen			3	contains	ols4	unreviewed
+skin_biopsy_ienfd	SNOMED	skin biopsy	395032002	Skin biopsy IgG level			3	contains	ols4	unreviewed
+small_fiber_neuropathy_dx	SNOMED	small fibre neuropathy	709489006	Small fiber neuropathy (disorder)			1	exact	ols4	unreviewed
+small_fiber_neuropathy_dx	SNOMED	small fibre neuropathy	350471000119102	Idiopathic small fiber peripheral neuropathy (disorder)			2	contains	ols4	unreviewed
+small_fiber_neuropathy_dx	SNOMED	small fibre neuropathy	782824007	Sodium channelopathy-related small fiber neuropathy (disorder)			3	contains	ols4	unreviewed
+systemic_autoimmune_disease	SNOMED	Sjogren syndrome	1263493003	Myelitis due to Sjogren syndrome			1	contains	ols4	unreviewed
+systemic_autoimmune_disease	SNOMED	systemic lupus erythematosus	55464009	Systemic lupus erythematosus			1	exact	ols4	unreviewed
+systemic_autoimmune_disease	SNOMED	Sjogren syndrome	320681000119102	Tubulointerstitial nephropathy due to Sjogren syndrome			2	contains	ols4	unreviewed
+systemic_autoimmune_disease	SNOMED	systemic lupus erythematosus	239889005	Bullous systemic lupus erythematosus			2	contains	ols4	unreviewed
+systemic_autoimmune_disease	SNOMED	systemic lupus erythematosus	732960002	Secondary autoimmune hemolytic anemia co-occurrent and due to systemic lupus erythematosus (disorder)			3	contains	ols4	unreviewed
+thermoregulatory_sweat_test	SNOMED	sweat measure	364692000	Sweat measure			1	exact	ols4	unreviewed
+thermoregulatory_sweat_test	SNOMED	sweat test	168172001	Sweat test			1	exact	ols4	unreviewed
+thermoregulatory_sweat_test	SNOMED	sweat measure	271279007	Sweat sodium measurement			2	loose	ols4	unreviewed
+thermoregulatory_sweat_test	SNOMED	sweat test	64860001	Collection of sweat test			2	contains	ols4	unreviewed
+thermoregulatory_sweat_test	SNOMED	sweat measure	313513005	Sweat weight measurement			3	loose	ols4	unreviewed
+thermoregulatory_sweat_test	SNOMED	sweat test	86326008	Collection of sweat test, pediatric overnight (procedure)			3	contains	ols4	unreviewed
+valsalva_maneuver	SNOMED	Valsalva manoeuvre	261039008	Valsalva maneuver (qualifier value)			1	exact	ols4	unreviewed
+valsalva_maneuver	SNOMED	autonomic function studies	252800004	Autonomic function studies			1	exact	ols4	unreviewed
+valsalva_maneuver	SNOMED	Valsalva manoeuvre	698190002	Varicocele palpable without Valsalva maneuver (disorder)			2	contains	ols4	unreviewed
+valsalva_maneuver	SNOMED	Valsalva manoeuvre	698191003	Varicocele palpable with Valsalva maneuver only (disorder)			3	contains	ols4	unreviewed
+volume_expansion_therapy	RxNorm	desmopressin	3251	desmopressin		Drug	1	exact	rxnav	unreviewed
+volume_expansion_therapy	RxNorm	fludrocortisone	165516	fludrocortisone acetate		Drug	1	contains	rxnav	unreviewed
+volume_expansion_therapy	RxNorm	desmopressin	42634	desmopressin acetate		Drug	2	contains	rxnav	unreviewed
+volume_expansion_therapy	RxNorm	fludrocortisone	4452	fludrocortisone		Drug	2	exact	rxnav	unreviewed

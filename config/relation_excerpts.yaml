@@ -1,0 +1,467 @@
+# Supporting excerpts for the curated relations in relations.yaml.
+#
+# For every edge that cites a seed paper, this file records what the cited
+# paper actually says: a verbatim quote, where it appears, and a verdict on
+# whether it backs the edge. It is an audit layer over relations.yaml and does
+# not change the graph.
+#
+# Sources searched (fetched 2026-10-01):
+#   low2009, gibbons2013, zhang2022, angeli2024  full text, PMC open-access BioC
+#                                                (PMC3904426, PMC3874039,
+#                                                PMC9629858, PMC10761725)
+#   larsen2025                                   abstract only (medRxiv API,
+#                                                10.1101/2025.04.28.25326587);
+#                                                the full text was not reachable
+#
+# Verdicts:
+#   supports     the quote states the claim
+#   partial      related, but narrower, indirect or about a neighbouring claim
+#   not_found    the cited source was searched and says nothing that backs it
+#   contradicts  the source says the opposite
+#
+# `cited: false` marks a quote from a seed paper the edge does NOT cite, kept
+# because it backs (or is the better source for) the claim.
+#
+# Quotes were selected and verdicts assigned by Claude (an AI assistant) and
+# have not been reviewed by a clinician. Every quote is a verbatim substring of
+# its source, whitespace-normalised; table cells are quoted as printed.
+#
+# `removed` lists the edges deleted from relations.yaml on 2026-10-01 because no
+# seed paper supports them or their source contradicts them; kept for audit.
+
+excerpts:
+
+  - edge: [chronic_migraine, associated_with, pots]
+    evidence:
+      - {paper: angeli2024, cited: true, verdict: partial, section: "Results",
+         quote: "Other common chronic symptoms reported include headaches (60.3%, 228/378)",
+         note: "Headache as a symptom, not migraine as a diagnosis."}
+      - {paper: low2009, cited: true, verdict: supports, section: "Introduction",
+         quote: "There may be an overrepresentation of migraine, sleep disorders, and fatigue, and fibromyalgia is sometimes associated."}
+
+  - edge: [gi_dysmotility, associated_with, pots]
+    evidence:
+      - {paper: low2009, cited: true, verdict: partial, section: "Table 2, Orthostatic Symptoms as Frequency (%) in Patients with POTS",
+         quote: "Nausea 59 39 Bloating 36 24 Diarrhea 27 18 Constipation 23 15",
+         note: "Gastrointestinal symptom frequencies (n, %). The provenance note 'enteric autonomic involvement' is not stated."}
+
+  - edge: [hypermobility_heds, associated_with, pots]
+    evidence:
+      - {paper: angeli2024, cited: true, verdict: supports, section: "Introduction",
+         quote: "Other medical conditions, such as joint hypermobility, have been hypothesized to produce physiologies that can mimic or contribute to these phenotypes."}
+
+  - edge: [me_cfs, associated_with, pots]
+    evidence:
+      - {paper: larsen2025, cited: false, verdict: not_found,
+         note: "Not in the Larsen abstract; full text unavailable."}
+      - {paper: low2009, cited: true, verdict: supports, section: "Introduction",
+         quote: "This is based on the investigators’ documentation that 40% of patients with chronic fatigue syndrome have POTS."}
+      - {paper: gibbons2013, cited: true, verdict: supports, section: "Discussion",
+         quote: "These data confirm the well-established overlap between the POTS and chronic fatigue syndrome."}
+
+  - edge: [small_fiber_neuropathy_dx, associated_with, neuropathic_evidence]
+    evidence:
+      - {paper: gibbons2013, cited: true, verdict: supports, section: "Discussion",
+         quote: "Consistent with the notion that neuropathic POTS represents a distal autonomic and small fiber neuropathy, our diagnostic criteria included distal small fiber pathology, impaired distal sensory function and impaired distal sudomotor function."}
+      - {paper: zhang2022, cited: true, verdict: supports, section: "Discussion",
+         quote: "In the absence of formal criteria for neuropathic POTS, skin biopsy and QSART are routinely used to assess for associated SFN in patients with POTS."}
+
+  - edge: [systemic_autoimmune_disease, associated_with, autoimmune_evidence]
+    evidence:
+      - {paper: angeli2024, cited: false, verdict: not_found,
+         note: "Angeli 2024 does not discuss autoimmune disease."}
+      - {paper: zhang2022, cited: true, verdict: partial, section: "Discussion",
+         quote: "Patients with systemic autoimmune diseases may be at slightly increased risk for developing a neuropathic POTS phenotype - for instance, Sjogren’s syndrome is diagnosed at higher rates among POTS patients who have reduced IENFD.",
+         note: "Links autoimmune disease to the neuropathic flag, not the autoimmune flag."}
+
+  - edge: [differential_syncope_oh, differential_diagnosis_of, pots]
+    evidence:
+      - {paper: low2009, cited: true, verdict: supports, section: "Abstract",
+         quote: "POTS is defined as the development of orthostatic symptoms associated with a heart rate (HR) increment ≥30, usually to ≥120 bpm without orthostatic hypotension."}
+
+  - edge: [autonomic_autoantibody_assay, evidence_for, autoimmune_evidence]
+    evidence:
+      - {paper: angeli2024, cited: false, verdict: not_found,
+         note: "Angeli 2024 does not mention autoantibodies."}
+      - {paper: low2009, cited: true, verdict: partial, section: "Introduction",
+         quote: "Support for the notion of neuropathic POTS comes also from the 1 in 7 patients who have low titer of A3 acetylcholine receptor antibodies, a finding that suggests an autoimmune attach of autonomic nerves.",
+         note: "Low frames the antibody as support for neuropathic POTS, via an autoimmune attack."}
+
+  - edge: [cardiopulmonary_exercise_test, evidence_for, deconditioning_evidence]
+    evidence:
+      - {paper: low2009, cited: true, verdict: partial, section: "Introduction",
+         quote: "Exercise was associated with a greater elevation in HR in POTS patients, especially while upright, was secondary to reduced stroke volume, and was associated with poor exercise tolerance.",
+         note: "The provenance note 'reduced peak VO2' is not in Low 2009; VO2 is never mentioned."}
+
+  - edge: [head_up_tilt_test, evidence_for, hyperadrenergic_evidence]
+    evidence:
+      - {paper: angeli2024, cited: true, verdict: supports, section: "Introduction",
+         quote: "Hyperadrenergic POTS is characterized by high central sympathetic drive, evident by an increase in systolic blood pressure (SBP) on HUTT and a standing plasma norepinephrine level of 600 pg/mL or more."}
+      - {paper: low2009, cited: true, verdict: supports, section: "Introduction",
+         quote: "Hyperadrenergic POTS is defined as POTS associated with a systolic BP increment ≥10 mmHg during 10 minutes of HUT, and an orthostatic plasma norepinephrine ≥600 pg/mL (Fig. 1)."}
+
+  - edge: [plasma_blood_volume_assay, evidence_for, hypovolemic_evidence]
+    evidence:
+      - {paper: angeli2024, cited: true, verdict: partial, section: "Introduction",
+         quote: "Hypovolemic POTS is due to dysfunction of the renin–angiotensin–aldosterone system resulting in low plasma blood volume and may be identified with 24-h urine sodium concentration less than 100 mmol/L.",
+         note: "Angeli identifies hypovolemia by 24-h urine sodium, not by a blood volume assay."}
+
+  - edge: [plasma_catecholamine_assay, evidence_for, hyperadrenergic_evidence]
+    evidence:
+      - {paper: angeli2024, cited: true, verdict: supports, section: "Introduction",
+         quote: "Hyperadrenergic POTS is characterized by high central sympathetic drive, evident by an increase in systolic blood pressure (SBP) on HUTT and a standing plasma norepinephrine level of 600 pg/mL or more."}
+      - {paper: angeli2024, cited: true, verdict: partial, section: "Discussion",
+         quote: "For example, the current serum standing norepinephrine cut-off of 600 pg/mL may serve better to rule-out hyperadrenergic POTS based on the means and standard deviations identified in this study (Fig. 1).",
+         note: "Qualifies the 600 pg/mL threshold: better for ruling out than ruling in."}
+
+  - edge: [qsart_sudomotor_testing, evidence_for, neuropathic_evidence]
+    evidence:
+      - {paper: zhang2022, cited: true, verdict: supports, section: "Abstract",
+         quote: "Of 211 patients who underwent quantitative sudomotor axon reflex testing, 70 (33%) demonstrated reduced sweat output."}
+      - {paper: zhang2022, cited: true, verdict: supports, section: "Conclusions",
+         quote: "Skin biopsy and QSART are commonly used tests for neuropathic POTS that are not correlated with each other and may not be typically length-dependent."}
+
+  - edge: [skin_biopsy_ienfd, evidence_for, neuropathic_evidence]
+    evidence:
+      - {paper: gibbons2013, cited: true, verdict: supports, section: "Abstract",
+         quote: "Subjects were divided into neuropathic and non-neuropathic POTS, defined by abnormal IENFD and abnormal small fiber and sudomotor function."}
+      - {paper: zhang2022, cited: true, verdict: supports, section: "Results",
+         quote: "Of the 80 patients who underwent skin biopsy, 19 (24%) demonstrated reduced IENFD at least in one site."}
+
+  - edge: [thermoregulatory_sweat_test, evidence_for, neuropathic_evidence]
+    evidence:
+      - {paper: gibbons2013, cited: true, verdict: partial, section: "Discussion",
+         quote: "Similar observations have been made by other investigators studying thermoregulatory and axon-mediated sweating in POTS.",
+         note: "Gibbons measured axon-reflex sweating, not the thermoregulatory sweat test; TST appears only in this reference to other work."}
+      - {paper: angeli2024, cited: true, verdict: supports, section: "Methods",
+         quote: "neuropathic for abnormal sudomotor response or abnormal sweat pattern on TST"}
+
+  - edge: [valsalva_maneuver, evidence_for, neuropathic_evidence]
+    evidence:
+      - {paper: gibbons2013, cited: true, verdict: supports, section: "Abstract",
+         quote: "Nine of 24 subjects had neuropathic POTS and had significantly lower resting and tilted heart rates; reduced parasympathetic function; and lower phase 4 valsalva maneuver overshoot compared with those with non-neuropathic POTS (P<0.05)."}
+      - {paper: zhang2022, cited: true, verdict: supports, section: "Discussion",
+         quote: "In this cohort, a reduced blood pressure response to phase II of the Valsalva maneuver was associated with reduced sweat output on QSART."}
+
+  - edge: [beta_blocker_therapy, indicates, hyperadrenergic_evidence]
+    evidence:
+      - {paper: angeli2024, cited: true, verdict: supports, section: "Introduction",
+         quote: "Lastly, in hyperadrenergic POTS, measures are directed at dampening sympathetic output including avoidance of sympathetic agents such as serotonin-norepinephrine reuptake inhibitors, as well as utilizing pharmacotherapy such as beta-blockers."}
+      - {paper: low2009, cited: true, verdict: partial, section: "Table 5, Approach to Treatment of Common Types of POTS",
+         quote: "Volume expansion and reduce sympathetic action (central/peripheral)",
+         note: "Usual main approach for the hyperadrenergic row; beta blockers are not named in the row."}
+
+  - edge: [central_sympatholytic_therapy, indicates, hyperadrenergic_evidence]
+    evidence:
+      - {paper: low2009, cited: true, verdict: partial, section: "Discussion",
+         quote: "A paticularly difficult subset of patients has unstable hypertensive responses to tilt.",
+         note: "Clonidine is offered two sentences later for this subset ('An alternative treatment is clonidine or another α2 agonist.'). The paper does not say clonidine is reserved for hyperadrenergic POTS."}
+
+  - edge: [compression_therapy, indicates, neuropathic_evidence]
+    evidence:
+      - {paper: low2009, cited: true, verdict: supports, section: "Table 5, Approach to Treatment of Common Types of POTS",
+         quote: "Low-dose midodrine, with some volume expansion and compression",
+         note: "Usual main approach for the neuropathic row."}
+      - {paper: angeli2024, cited: false, verdict: supports, section: "Introduction",
+         quote: "In neuropathic POTS, treatments target increasing venous return either by external compression such as compression stockings or lower extremity countermaneuvers or by pharmacologic vasoconstriction such as with midodrine."}
+
+  - edge: [compression_therapy, indicates, hypovolemic_evidence]
+    evidence:
+      - {paper: low2009, cited: true, verdict: supports, section: "Discussion",
+         quote: "This reduces splanchnic-mesenteric venous capacity and is especially helpful in patients with poor venomotor tone or are hypovolemic.",
+         note: "Refers to the abdominal binder."}
+
+  - edge: [exercise_reconditioning, indicates, deconditioning_evidence]
+    evidence:
+      - {paper: low2009, cited: true, verdict: supports, section: "Conclusions",
+         quote: "Exercise training and reconditioning is emerging as a very important strategy in the deconditioned subject."}
+
+  - edge: [midodrine_therapy, indicates, neuropathic_evidence]
+    evidence:
+      - {paper: low2009, cited: true, verdict: supports, section: "Table 5, Approach to Treatment of Common Types of POTS",
+         quote: "Low-dose midodrine, with some volume expansion and compression",
+         note: "Usual main approach for the neuropathic row."}
+      - {paper: angeli2024, cited: false, verdict: supports, section: "Discussion",
+         quote: "In neuropathic POTS, pharmacotherapy targets vasoconstriction with agents such as pyridostigmine and midodrine."}
+
+  - edge: [pyridostigmine_therapy, indicates, neuropathic_evidence]
+    evidence:
+      - {paper: gibbons2013, cited: false, verdict: not_found,
+         note: "Gibbons 2013 does not mention pyridostigmine."}
+      - {paper: angeli2024, cited: true, verdict: supports, section: "Discussion",
+         quote: "In neuropathic POTS, pharmacotherapy targets vasoconstriction with agents such as pyridostigmine and midodrine."}
+
+  - edge: [volume_expansion_therapy, indicates, hypovolemic_evidence]
+    evidence:
+      - {paper: low2009, cited: true, verdict: supports, section: "Discussion",
+         quote: "The hypovolemic patient will do well with expanding plasma volume with generous salt intake and fludrocortisone."}
+
+  - edge: [autoimmune_evidence, is_a, mechanistic_phenotype]
+    evidence:
+      - {paper: low2009, cited: true, verdict: partial, section: "Introduction",
+         quote: "Support for the notion of neuropathic POTS comes also from the 1 in 7 patients who have low titer of A3 acetylcholine receptor antibodies, a finding that suggests an autoimmune attach of autonomic nerves.",
+         note: "The only seed-paper passage that frames an autoimmune mechanism; Low places it under neuropathic POTS."}
+      - {paper: angeli2024, cited: false, verdict: not_found,
+         note: "Angeli defines three phenotypes (neuropathic, hypovolemic, hyperadrenergic); autoimmune is not one of them."}
+
+  - edge: [deconditioning_evidence, is_a, mechanistic_phenotype]
+    evidence:
+      - {paper: low2009, cited: true, verdict: supports, section: "Abstract",
+         quote: "Major mechanisms are denervation, hypovolemia, deconditioning, and hyperadrenergic state."}
+
+  - edge: [hyperadrenergic_evidence, is_a, mechanistic_phenotype]
+    evidence:
+      - {paper: angeli2024, cited: true, verdict: supports, section: "Introduction",
+         quote: "POTS may be classified into phenotypes—neuropathic, hypovolemic, and hyperadrenergic—based on suspected pathophysiologic mechanism."}
+      - {paper: low2009, cited: true, verdict: supports, section: "Abstract",
+         quote: "Major mechanisms are denervation, hypovolemia, deconditioning, and hyperadrenergic state."}
+
+  - edge: [hypovolemic_evidence, is_a, mechanistic_phenotype]
+    evidence:
+      - {paper: angeli2024, cited: true, verdict: supports, section: "Introduction",
+         quote: "POTS may be classified into phenotypes—neuropathic, hypovolemic, and hyperadrenergic—based on suspected pathophysiologic mechanism."}
+      - {paper: low2009, cited: true, verdict: supports, section: "Abstract",
+         quote: "Major mechanisms are denervation, hypovolemia, deconditioning, and hyperadrenergic state."}
+
+  - edge: [neuropathic_evidence, is_a, mechanistic_phenotype]
+    evidence:
+      - {paper: angeli2024, cited: true, verdict: supports, section: "Introduction",
+         quote: "POTS may be classified into phenotypes—neuropathic, hypovolemic, and hyperadrenergic—based on suspected pathophysiologic mechanism."}
+      - {paper: gibbons2013, cited: true, verdict: supports, section: "Abstract",
+         quote: "POTS subtypes may be distinguished using small fiber and autonomic structural and functional criteria."}
+
+  - edge: [postinfectious_evidence, is_a, mechanistic_phenotype]
+    evidence:
+      - {paper: larsen2025, cited: true, verdict: partial, section: "Abstract",
+         quote: "Long COVID postural tachycardia syndrome (LC-POTS) is increasingly recognized as a manifestation of post-viral autonomic dysfunction following SARS-CoV-2 infection, however its pathogenic mechanisms remain incompletely understood."}
+
+  - edge: [cerebral_blood_flow_measurement, is_a, cerebrovascular_assessment]
+    evidence:
+      - {paper: larsen2025, cited: true, verdict: supports, section: "Abstract",
+         quote: "head-up tilt (HUT) with transcranial Doppler measures of cerebral blood flow velocity (CBFv)"}
+
+  - edge: [skin_biopsy_ienfd, is_a, structural_nerve_assessment]
+    evidence:
+      - {paper: gibbons2013, cited: true, verdict: supports, section: "Discussion",
+         quote: "Our definition thus has a structural small fiber criterion (intra-epidermal nerve fiber density), a functional small fiber criterion (quantitative sensory testing) and a functional autonomic criterion (quantitative sudomotor function testing)."}
+
+  - edge: [cardiopulmonary_exercise_test, measures, aerobic_capacity]
+    evidence:
+      - {paper: low2009, cited: true, verdict: partial, section: "Table 3, Evaluation of Suspected POTS",
+         quote: "Exercise testing",
+         note: "Listed among additional tests; aerobic capacity and VO2 are not mentioned."}
+
+  - edge: [cerebral_blood_flow_measurement, measures, cerebral_perfusion]
+    evidence:
+      - {paper: larsen2025, cited: true, verdict: supports, section: "Abstract",
+         quote: "Measures of cerebral perfusion and oxygen extraction (vCBF, NIRS), were also similar."}
+
+  - edge: [plasma_blood_volume_assay, measures, intravascular_volume]
+    evidence:
+      - {paper: angeli2024, cited: true, verdict: partial, section: "Introduction",
+         quote: "Hypovolemic POTS is due to dysfunction of the renin–angiotensin–aldosterone system resulting in low plasma blood volume and may be identified with 24-h urine sodium concentration less than 100 mmol/L.",
+         note: "Names low plasma blood volume, but no blood volume assay."}
+
+  - edge: [plasma_catecholamine_assay, measures, upright_plasma_norepinephrine]
+    evidence:
+      - {paper: angeli2024, cited: true, verdict: supports, section: "Methods",
+         quote: "hyperadrenergic for standing norepinephrine > 600 pg/mL or an increase in either systolic or diastolic blood pressure of ≥ 10 mm Hg on HUTT"}
+
+  - edge: [qsart_sudomotor_testing, measures, sweat_output]
+    evidence:
+      - {paper: zhang2022, cited: true, verdict: supports, section: "Methods",
+         quote: "These included IENFD from skin biopsy, sweat output from QSART, heart rate variability and blood pressure response measures from cardiovascular autonomic function testing, and serum antibody studies."}
+
+  - edge: [skin_biopsy_ienfd, measures, nerve_fiber_density]
+    evidence:
+      - {paper: gibbons2013, cited: true, verdict: supports, section: "Abstract",
+         quote: "Twenty-four subjects with POTS and 10 healthy control subjects had skin biopsy analysis of intra-epidermal nerve fiber density (IENFD), quantitative sensory testing (QST) and autonomic testing."}
+      - {paper: zhang2022, cited: true, verdict: supports, section: "Methods",
+         quote: "These included IENFD from skin biopsy, sweat output from QSART, heart rate variability and blood pressure response measures from cardiovascular autonomic function testing, and serum antibody studies."}
+
+  - edge: [thermoregulatory_sweat_test, measures, sweat_output]
+    evidence:
+      - {paper: angeli2024, cited: true, verdict: supports, section: "Methods",
+         quote: "neuropathic for abnormal sudomotor response or abnormal sweat pattern on TST"}
+      - {paper: gibbons2013, cited: true, verdict: partial, section: "Discussion",
+         quote: "Similar observations have been made by other investigators studying thermoregulatory and axon-mediated sweating in POTS.",
+         note: "Gibbons did not perform the thermoregulatory sweat test."}
+
+  - edge: [active_stand_test, measures, orthostatic_heart_rate_increment]
+    evidence:
+      - {paper: low2009, cited: true, verdict: partial, section: "Abstract",
+         quote: "POTS is defined as the development of orthostatic symptoms associated with a heart rate (HR) increment ≥30, usually to ≥120 bpm without orthostatic hypotension.",
+         note: "Defines the increment; does not name the active stand test."}
+
+  - edge: [head_up_tilt_test, measures, orthostatic_heart_rate_increment]
+    evidence:
+      - {paper: low2009, cited: true, verdict: partial, section: "Abstract",
+         quote: "POTS is defined as the development of orthostatic symptoms associated with a heart rate (HR) increment ≥30, usually to ≥120 bpm without orthostatic hypotension."}
+
+  - edge: [ambulatory_monitoring, measures, orthostatic_heart_rate_increment]
+    evidence:
+      - {paper: low2009, cited: true, verdict: partial, section: "Discussion",
+         quote: "Additional heart rate assessment could be considered on an elective basis, including an ambulatory event loop recorder to correlation heart rate to symptoms and treadmill exercise test to assess heart rate response to activity."}
+
+  - edge: [head_up_tilt_test, part_of, autonomic_reflex_screen]
+    evidence:
+      - {paper: angeli2024, cited: true, verdict: supports, section: "Methods",
+         quote: "All patients underwent our autonomic reflex screen which includes Quantitative Sudomotor Axon Reflex Testing (QSART), heart rate response to deep breathing, and HUTT."}
+      - {paper: low2009, cited: false, verdict: not_found,
+         note: "Low names the autonomic reflex screen but never lists its components or a CASS subscore."}
+
+  - edge: [heart_rate_variability, part_of, autonomic_reflex_screen]
+    evidence:
+      - {paper: angeli2024, cited: true, verdict: supports, section: "Methods",
+         quote: "All patients underwent our autonomic reflex screen which includes Quantitative Sudomotor Axon Reflex Testing (QSART), heart rate response to deep breathing, and HUTT.",
+         note: "Heart rate response to deep breathing is the cardiovagal heart rate variability test."}
+      - {paper: low2009, cited: false, verdict: not_found,
+         note: "As above: no components or CASS subscores in Low 2009."}
+
+  - edge: [qsart_sudomotor_testing, part_of, autonomic_reflex_screen]
+    evidence:
+      - {paper: angeli2024, cited: true, verdict: supports, section: "Methods",
+         quote: "All patients underwent our autonomic reflex screen which includes Quantitative Sudomotor Axon Reflex Testing (QSART), heart rate response to deep breathing, and HUTT."}
+      - {paper: low2009, cited: false, verdict: not_found,
+         note: "As above: no components or CASS subscores in Low 2009."}
+
+  - edge: [valsalva_maneuver, part_of, autonomic_reflex_screen]
+    evidence:
+      - {paper: gibbons2013, cited: true, verdict: partial, section: "Methods",
+         quote: "On day 2, subjects underwent autonomic tests that included heart rate variability to deep breathing, blood pressure and heart rate response to a Valsalva maneuver and 10-minute tilt-table test.",
+         note: "Valsalva is part of the autonomic test battery, which Gibbons does not call the autonomic reflex screen."}
+      - {paper: low2009, cited: false, verdict: not_found,
+         note: "As above: no components or CASS subscores in Low 2009."}
+
+  - edge: [autoimmune_evidence, proposed_mechanism_of, pots]
+    evidence:
+      - {paper: angeli2024, cited: false, verdict: not_found,
+         note: "Angeli 2024 does not discuss an autoimmune mechanism."}
+      - {paper: low2009, cited: true, verdict: partial, section: "Introduction",
+         quote: "Support for the notion of neuropathic POTS comes also from the 1 in 7 patients who have low titer of A3 acetylcholine receptor antibodies, a finding that suggests an autoimmune attach of autonomic nerves."}
+
+  - edge: [deconditioning_evidence, proposed_mechanism_of, pots]
+    evidence:
+      - {paper: low2009, cited: true, verdict: supports, section: "Abstract",
+         quote: "Major mechanisms are denervation, hypovolemia, deconditioning, and hyperadrenergic state."}
+      - {paper: low2009, cited: true, verdict: supports, section: "Discussion",
+         quote: "The concept that at least some of the chronic symptoms in POTS are due in part to secondary deconditioning raises the possibility that a “life-hardening” exercise training program might have utility in this condition.",
+         note: "Backs the provenance note that the causal direction is contested."}
+
+  - edge: [hyperadrenergic_evidence, proposed_mechanism_of, pots]
+    evidence:
+      - {paper: angeli2024, cited: true, verdict: supports, section: "Results",
+         quote: "These were not mutually exclusive, and many patients had a combination of phenotypes with 41.7% (147/352) having two phenotypes, and 11.4% (40/352) with a contribution from all three Table 2."}
+
+  - edge: [hypovolemic_evidence, proposed_mechanism_of, pots]
+    evidence:
+      - {paper: angeli2024, cited: true, verdict: supports, section: "Introduction",
+         quote: "Hypovolemic POTS is due to dysfunction of the renin–angiotensin–aldosterone system resulting in low plasma blood volume and may be identified with 24-h urine sodium concentration less than 100 mmol/L."}
+      - {paper: low2009, cited: true, verdict: supports, section: "Abstract",
+         quote: "Major mechanisms are denervation, hypovolemia, deconditioning, and hyperadrenergic state."}
+
+  - edge: [neuropathic_evidence, proposed_mechanism_of, pots]
+    evidence:
+      - {paper: angeli2024, cited: true, verdict: supports, section: "Introduction",
+         quote: "Neuropathic POTS involves impaired peripheral vasoconstriction and excessive blood pooling below the waist via impaired small fiber nerve function."}
+      - {paper: gibbons2013, cited: true, verdict: supports, section: "Abstract",
+         quote: "These findings suggest different pathophysiological processes underlie the postural tachycardia in neuropathic and non-neuropathic POTS patients."}
+
+  - edge: [postinfectious_evidence, proposed_mechanism_of, pots]
+    evidence:
+      - {paper: larsen2025, cited: true, verdict: supports, section: "Abstract",
+         quote: "Long COVID postural tachycardia syndrome (LC-POTS) is increasingly recognized as a manifestation of post-viral autonomic dysfunction following SARS-CoV-2 infection, however its pathogenic mechanisms remain incompletely understood."}
+      - {paper: low2009, cited: false, verdict: partial, section: "Introduction",
+         quote: "Early studies suggested that approximately one-half of patients have an antecedent presumed viral illness, although recent experience suggests that this is less common."}
+
+  - edge: [hypermobility_heds, proposed_mechanism_of, hypovolemic_evidence]
+    evidence:
+      - {paper: angeli2024, cited: true, verdict: supports, section: "Introduction",
+         quote: "For example, more compliant connective tissue in joint hypermobility syndromes may result in more venous pooling in the lower extremities and low effective intrathoracic volume."}
+
+  - edge: [beta_blocker_therapy, treats, pots]
+    evidence:
+      - {paper: low2009, cited: true, verdict: supports, section: "Conclusions",
+         quote: "Medications that are commonly used include beta blockers, midodrine, and fludrocortisones."}
+
+  - edge: [exercise_reconditioning, treats, pots]
+    evidence:
+      - {paper: low2009, cited: true, verdict: supports, section: "Discussion",
+         quote: "An exercise program, provided it is sustained and adequate for several months, can be very helpful."}
+
+  - edge: [ivabradine_therapy, treats, pots]
+    evidence:
+      - {paper: angeli2024, cited: true, verdict: supports, section: "Discussion",
+         quote: "For example, for hyperadrenergic POTS, the sympathetic output is blocked via beta-blockers, or sympathetic symptoms such as tachycardia may be combated by pharmacotherapies such ivabradine which inhibits I(f) channels."}
+
+  - edge: [midodrine_therapy, treats, pots]
+    evidence:
+      - {paper: low2009, cited: true, verdict: supports, section: "Conclusions",
+         quote: "Medications that are commonly used include beta blockers, midodrine, and fludrocortisones."}
+
+  - edge: [volume_expansion_therapy, treats, pots]
+    evidence:
+      - {paper: low2009, cited: true, verdict: supports, section: "Abstract",
+         quote: "All patients with POTS require a high salt diet, copious fluids, and postural training."}
+
+  - edge: [long_covid, trigger_of, postinfectious_evidence]
+    evidence:
+      - {paper: larsen2025, cited: true, verdict: supports, section: "Abstract",
+         quote: "Long COVID postural tachycardia syndrome (LC-POTS) is increasingly recognized as a manifestation of post-viral autonomic dysfunction following SARS-CoV-2 infection, however its pathogenic mechanisms remain incompletely understood."}
+
+removed:
+
+  - edge: [heart_rate_variability, evidence_for, hyperadrenergic_evidence]
+    old_provenance: "sympathovagal balance"
+    reason: "No paper cited and none of the five seed papers supports it."
+
+  - edge: [mast_cell_activation, mimics, hyperadrenergic_evidence]
+    old_provenance: "flushing and tachycardia without sympathetic excess"
+    reason: "No paper cited and none of the five seed papers mentions mast cell activation."
+
+  - edge: [post_vaccination_onset, trigger_of, pots]
+    old_provenance: "reported temporal association; contested"
+    reason: "No paper cited and none of the five seed papers supports it."
+
+  - edge: [genetic_testing, evidence_for, hyperadrenergic_evidence]
+    old_provenance: "low2009: SLC6A2 NET deficiency"
+    reason: "Cited Low 2009, which does not mention genetics or SLC6A2."
+    evidence:
+      - {paper: low2009, cited: true, verdict: not_found,
+         note: "Low 2009 does not mention genetics, SLC6A2 or the norepinephrine transporter."}
+
+  - edge: [cerebral_blood_flow_measurement, evidence_for, pots]
+    old_provenance: "larsen2025: symptom correlate independent of HR"
+    reason: "Contradicted: Larsen 2025 reports cerebrovascular measures failed to correlate with symptoms."
+    evidence:
+      - {paper: larsen2025, cited: true, verdict: contradicts, section: "Abstract",
+         quote: "Measures of cerebrovascular changes during orthostatic challenge were also similar and failed to correlate with symptoms of orthostatic intolerance.",
+         note: "The provenance note claims a symptom correlate independent of HR; the abstract reports no correlation."}
+
+  - edge: [droxidopa_therapy, indicates, neuropathic_evidence]
+    old_provenance: "low2009: peripheral noradrenergic deficit"
+    reason: "Cited Low 2009, which does not mention droxidopa."
+    evidence:
+      - {paper: low2009, cited: true, verdict: not_found,
+         note: "Low 2009 does not mention droxidopa."}
+
+  - edge: [pyridostigmine_therapy, indicates, autoimmune_evidence]
+    old_provenance: "angeli2024"
+    reason: "Cited Angeli 2024, which lists pyridostigmine only under neuropathic POTS."
+    evidence:
+      - {paper: angeli2024, cited: true, verdict: not_found,
+         note: "Angeli lists pyridostigmine only under neuropathic POTS."}
+
+  - edge: [immunomodulatory_therapy, indicates, autoimmune_evidence]
+    old_provenance: "angeli2024"
+    reason: "Cited Angeli 2024, which does not mention immunotherapy."
+    evidence:
+      - {paper: angeli2024, cited: true, verdict: not_found,
+         note: "Angeli 2024 does not mention immunotherapy."}
+
+  - edge: [mast_cell_activation, associated_with, pots]
+    old_provenance: "angeli2024"
+    reason: "Cited Angeli 2024, which does not mention mast cell activation."
+    evidence:
+      - {paper: angeli2024, cited: true, verdict: not_found,
+         note: "Angeli 2024 does not mention mast cell activation."}

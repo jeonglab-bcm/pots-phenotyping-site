@@ -1,0 +1,240 @@
+# Ontology relationships over the POTS phenotyping vocabulary.
+#
+# Two graphs are kept apart and joined only at the concept level:
+#
+#   1. This file: the CURATED graph. Nodes are the facets from facets.yaml plus
+#      the abstract classes declared below. Edges are hand-authored, each with a
+#      provenance tag naming the seed reference or the reasoning behind it.
+#      Loaded with source='curated'.
+#
+#   2. The RESOLVED graph, built by `pots-phenotyping ontology`. Nodes are OMOP
+#      concepts; edges come from a local OMOP vocabulary bundle
+#      (CONCEPT_RELATIONSHIP / CONCEPT_ANCESTOR) when one is supplied, otherwise
+#      from the public fallback services. Loaded with source='omop:<bundle>' or
+#      'ols4:snomed' and never mixed into the curated edges.
+#
+# Predicates. Only the first two are subsumption-like; the rest are domain
+# relations and MUST NOT be traversed as if they were is_a.
+#
+#   is_a                     - subsumption. Transitive.
+#   part_of                  - component of a composite test or battery.
+#                              Transitive; does not imply is_a.
+#   evidence_for             - a measurement supplies objective evidence for a
+#                              mechanistic flag.
+#   indicates                - prescription of a treatment is weak evidence that
+#                              a clinician hypothesised a mechanism.
+#   treats                   - therapeutic target.
+#   measures                 - the physiological quantity a test quantifies.
+#   associated_with          - non-causal co-occurrence.
+#   proposed_mechanism_of    - a mechanism proposed to produce a comorbidity's
+#                              contribution to POTS.
+#   trigger_of               - exposure temporally preceding onset.
+#   differential_diagnosis_of- must be excluded before the diagnosis stands.
+
+predicates:
+  is_a:                      {transitive: true,  subsumption: true,  inverse: subsumes}
+  part_of:                   {transitive: true,  subsumption: false, inverse: has_part}
+  evidence_for:              {transitive: false, subsumption: false, inverse: assessed_by}
+  indicates:                 {transitive: false, subsumption: false, inverse: indicated_by}
+  treats:                    {transitive: false, subsumption: false, inverse: treated_by}
+  measures:                  {transitive: false, subsumption: false, inverse: measured_by}
+  associated_with:           {transitive: false, subsumption: false, inverse: associated_with, symmetric: true}
+  proposed_mechanism_of:     {transitive: false, subsumption: false, inverse: has_proposed_mechanism}
+  trigger_of:                {transitive: false, subsumption: false, inverse: triggered_by}
+  differential_diagnosis_of: {transitive: false, subsumption: false, inverse: has_differential_diagnosis}
+
+# Abstract nodes. These are not facets: nothing is harvested for them. They give
+# the is_a and part_of edges somewhere to land, so the taxonomy has a root and
+# the batteries have a whole.
+classes:
+  - {id: pots, label: 'Postural orthostatic tachycardia syndrome', kind: disorder}
+  - {id: pots_phenotype_axis, label: 'POTS phenotyping axis', kind: root}
+  - {id: mechanistic_phenotype, label: 'Mechanistic phenotype', kind: class}
+  - {id: objective_evidence, label: 'Objective evidence source', kind: class}
+  - {id: clinical_context, label: 'Clinical context', kind: class}
+  - {id: therapeutic_proxy, label: 'Therapeutic proxy', kind: class}
+
+  - {id: autonomic_function_testing, label: 'Autonomic function testing', kind: procedure_class}
+  - {id: autonomic_reflex_screen, label: 'Autonomic reflex screen', kind: test_battery}
+  - {id: orthostatic_challenge_testing, label: 'Orthostatic challenge testing', kind: test_battery}
+  - {id: sudomotor_assessment, label: 'Sudomotor assessment', kind: procedure_class}
+  - {id: neurochemical_assessment, label: 'Sympathetic neurochemical assessment', kind: procedure_class}
+  - {id: volume_assessment, label: 'Intravascular volume assessment', kind: procedure_class}
+  - {id: structural_nerve_assessment, label: 'Structural peripheral nerve assessment', kind: procedure_class}
+  - {id: cerebrovascular_assessment, label: 'Cerebrovascular assessment', kind: procedure_class}
+  - {id: immunological_assessment, label: 'Immunological assessment', kind: procedure_class}
+
+  - {id: vasoconstrictor_agent, label: 'Vasoconstrictor agent', kind: drug_class}
+  - {id: negative_chronotrope, label: 'Negative chronotropic agent', kind: drug_class}
+  - {id: volume_expander, label: 'Volume expanding agent', kind: drug_class}
+  - {id: sympatholytic_agent, label: 'Sympatholytic agent', kind: drug_class}
+  - {id: cholinergic_agent, label: 'Cholinergic agent', kind: drug_class}
+  - {id: immunomodulator, label: 'Immunomodulatory agent', kind: drug_class}
+  - {id: nonpharmacologic_intervention, label: 'Non-pharmacological intervention', kind: intervention_class}
+
+  - {id: orthostatic_heart_rate_increment, label: 'Orthostatic heart rate increment', kind: quantity}
+  - {id: upright_plasma_norepinephrine, label: 'Upright plasma norepinephrine', kind: quantity}
+  - {id: intravascular_volume, label: 'Intravascular volume', kind: quantity}
+  - {id: sweat_output, label: 'Sweat output', kind: quantity}
+  - {id: nerve_fiber_density, label: 'Intraepidermal nerve fibre density', kind: quantity}
+  - {id: cerebral_perfusion, label: 'Cerebral perfusion', kind: quantity}
+  - {id: aerobic_capacity, label: 'Aerobic capacity', kind: quantity}
+
+# Refined 2026-10-01 against config/relation_excerpts.yaml: every non-taxonomy
+# edge below is backed (fully or partly) by a quoted passage in a seed paper,
+# and its provenance names that paper. Edges with no supporting passage, or
+# contradicted by their source, were removed; they are listed under `removed`
+# in relation_excerpts.yaml with the reason. Edges marked 'taxonomy' are
+# structural grouping, not literature claims, and were kept.
+
+relations:
+
+  # ---- taxonomy backbone -------------------------------------------------
+  - [mechanistic_phenotype, is_a, pots_phenotype_axis, 'taxonomy']
+  - [objective_evidence,    is_a, pots_phenotype_axis, 'taxonomy']
+  - [clinical_context,      is_a, pots_phenotype_axis, 'taxonomy']
+  - [therapeutic_proxy,     is_a, pots_phenotype_axis, 'taxonomy']
+
+  - [hyperadrenergic_evidence, is_a, mechanistic_phenotype, 'angeli2024; low2009']
+  - [neuropathic_evidence,     is_a, mechanistic_phenotype, 'angeli2024; gibbons2013']
+  - [hypovolemic_evidence,     is_a, mechanistic_phenotype, 'angeli2024; low2009']
+  - [deconditioning_evidence,  is_a, mechanistic_phenotype, 'low2009']
+  - [autoimmune_evidence,      is_a, mechanistic_phenotype, 'low2009: autoimmune attack of autonomic nerves']
+  - [postinfectious_evidence,  is_a, mechanistic_phenotype, 'larsen2025']
+
+  # Mechanism flags are asserted proposed mechanisms of POTS, NOT subtypes of
+  # it. Angeli 2024 found 42% of 352 patients met two of the three classical
+  # definitions and 11% met all three, so a partition would be false.
+  - [hyperadrenergic_evidence, proposed_mechanism_of, pots, 'angeli2024: overlapping, not exclusive']
+  - [neuropathic_evidence,     proposed_mechanism_of, pots, 'angeli2024; gibbons2013']
+  - [hypovolemic_evidence,     proposed_mechanism_of, pots, 'angeli2024; low2009']
+  - [deconditioning_evidence,  proposed_mechanism_of, pots, 'low2009: causal direction contested']
+  - [autoimmune_evidence,      proposed_mechanism_of, pots, 'low2009: autoimmune attack of autonomic nerves']
+  - [postinfectious_evidence,  proposed_mechanism_of, pots, 'larsen2025']
+
+  # ---- measurement taxonomy and batteries --------------------------------
+  - [autonomic_reflex_screen,        is_a, autonomic_function_testing, 'taxonomy']
+  - [orthostatic_challenge_testing,  is_a, autonomic_function_testing, 'taxonomy']
+  - [sudomotor_assessment,           is_a, autonomic_function_testing, 'taxonomy']
+  - [neurochemical_assessment,       is_a, objective_evidence, 'taxonomy']
+  - [volume_assessment,              is_a, objective_evidence, 'taxonomy']
+  - [structural_nerve_assessment,    is_a, objective_evidence, 'taxonomy']
+  - [cerebrovascular_assessment,     is_a, objective_evidence, 'taxonomy']
+  - [immunological_assessment,       is_a, objective_evidence, 'taxonomy']
+  - [autonomic_function_testing,     is_a, objective_evidence, 'taxonomy']
+
+  - [head_up_tilt_test,       is_a, orthostatic_challenge_testing, 'taxonomy']
+  - [active_stand_test,       is_a, orthostatic_challenge_testing, 'taxonomy']
+  - [qsart_sudomotor_testing, is_a, sudomotor_assessment, 'taxonomy']
+  - [thermoregulatory_sweat_test, is_a, sudomotor_assessment, 'taxonomy']
+  - [skin_biopsy_ienfd,       is_a, structural_nerve_assessment, 'gibbons2013']
+  - [plasma_catecholamine_assay, is_a, neurochemical_assessment, 'taxonomy']
+  - [plasma_blood_volume_assay,  is_a, volume_assessment, 'taxonomy']
+  - [cerebral_blood_flow_measurement, is_a, cerebrovascular_assessment, 'larsen2025']
+  - [autonomic_autoantibody_assay, is_a, immunological_assessment, 'taxonomy']
+  - [heart_rate_variability, is_a, autonomic_function_testing, 'taxonomy']
+  - [valsalva_maneuver,      is_a, autonomic_function_testing, 'taxonomy']
+  - [cardiopulmonary_exercise_test, is_a, objective_evidence, 'taxonomy']
+  - [ambulatory_monitoring,  is_a, objective_evidence, 'taxonomy']
+  - [genetic_testing,        is_a, objective_evidence, 'taxonomy']
+
+  # The Mayo autonomic reflex screen is a composite: these are components of one
+  # study, not independent orders. part_of matters for OMOP because the
+  # components may appear as a single procedure code or as several.
+  - [qsart_sudomotor_testing, part_of, autonomic_reflex_screen, 'angeli2024: screen includes QSART']
+  - [valsalva_maneuver,       part_of, autonomic_reflex_screen, 'gibbons2013: autonomic battery included Valsalva']
+  - [heart_rate_variability,  part_of, autonomic_reflex_screen, 'angeli2024: screen includes heart rate response to deep breathing']
+  - [head_up_tilt_test,       part_of, autonomic_reflex_screen, 'angeli2024: screen includes HUTT']
+
+  # ---- what each test measures -------------------------------------------
+  - [head_up_tilt_test,   measures, orthostatic_heart_rate_increment, 'low2009: HR increment >=30 defines POTS']
+  - [active_stand_test,   measures, orthostatic_heart_rate_increment, 'low2009: HR increment >=30 defines POTS']
+  - [ambulatory_monitoring, measures, orthostatic_heart_rate_increment, 'low2009: ambulatory heart rate assessment']
+  - [plasma_catecholamine_assay, measures, upright_plasma_norepinephrine, 'angeli2024']
+  - [plasma_blood_volume_assay,  measures, intravascular_volume, 'angeli2024']
+  - [qsart_sudomotor_testing,    measures, sweat_output, 'zhang2022']
+  - [thermoregulatory_sweat_test, measures, sweat_output, 'gibbons2013; angeli2024: abnormal sweat pattern on TST']
+  - [skin_biopsy_ienfd,          measures, nerve_fiber_density, 'gibbons2013; zhang2022']
+  - [cerebral_blood_flow_measurement, measures, cerebral_perfusion, 'larsen2025']
+  - [cardiopulmonary_exercise_test,   measures, aerobic_capacity, 'low2009: exercise testing listed']
+
+  # ---- measurement to mechanism ------------------------------------------
+  - [plasma_catecholamine_assay, evidence_for, hyperadrenergic_evidence, 'angeli2024: upright NE threshold']
+  - [head_up_tilt_test,   evidence_for, hyperadrenergic_evidence, 'angeli2024; low2009: systolic BP rise on tilt']
+
+  - [qsart_sudomotor_testing, evidence_for, neuropathic_evidence, 'zhang2022: reduced sweat output ~33%']
+  - [skin_biopsy_ienfd,       evidence_for, neuropathic_evidence, 'gibbons2013; zhang2022: reduced IENFD ~24%']
+  - [thermoregulatory_sweat_test, evidence_for, neuropathic_evidence, 'gibbons2013; angeli2024: abnormal TST sweat pattern defines neuropathic']
+  - [valsalva_maneuver,       evidence_for, neuropathic_evidence, 'gibbons2013: lower phase 4 overshoot; zhang2022: reduced phase II response']
+
+  - [plasma_blood_volume_assay, evidence_for, hypovolemic_evidence, 'angeli2024']
+
+  - [cardiopulmonary_exercise_test, evidence_for, deconditioning_evidence, 'low2009: reduced stroke volume and poor exercise tolerance']
+
+  - [autonomic_autoantibody_assay, evidence_for, autoimmune_evidence, 'low2009: A3 acetylcholine receptor antibodies in 1 in 7']
+
+  # ---- treatment taxonomy ------------------------------------------------
+  - [vasoconstrictor_agent, is_a, therapeutic_proxy, 'taxonomy']
+  - [negative_chronotrope,  is_a, therapeutic_proxy, 'taxonomy']
+  - [volume_expander,       is_a, therapeutic_proxy, 'taxonomy']
+  - [sympatholytic_agent,   is_a, therapeutic_proxy, 'taxonomy']
+  - [cholinergic_agent,     is_a, therapeutic_proxy, 'taxonomy']
+  - [immunomodulator,       is_a, therapeutic_proxy, 'taxonomy']
+  - [nonpharmacologic_intervention, is_a, therapeutic_proxy, 'taxonomy']
+
+  - [volume_expansion_therapy, is_a, volume_expander, 'taxonomy']
+  - [midodrine_therapy,        is_a, vasoconstrictor_agent, 'taxonomy']
+  - [droxidopa_therapy,        is_a, vasoconstrictor_agent, 'taxonomy']
+  - [ivabradine_therapy,       is_a, negative_chronotrope, 'taxonomy']
+  - [beta_blocker_therapy,     is_a, negative_chronotrope, 'taxonomy']
+  - [beta_blocker_therapy,     is_a, sympatholytic_agent, 'taxonomy: poly-hierarchy is intentional']
+  - [central_sympatholytic_therapy, is_a, sympatholytic_agent, 'taxonomy']
+  - [pyridostigmine_therapy,   is_a, cholinergic_agent, 'taxonomy']
+  - [immunomodulatory_therapy, is_a, immunomodulator, 'taxonomy']
+  - [exercise_reconditioning,  is_a, nonpharmacologic_intervention, 'taxonomy']
+  - [compression_therapy,      is_a, nonpharmacologic_intervention, 'taxonomy']
+  - [serotonergic_therapy,     is_a, therapeutic_proxy, 'taxonomy']
+
+  # ---- treatment to mechanism -------------------------------------------
+  - [volume_expansion_therapy, indicates, hypovolemic_evidence, 'low2009: first-line for volume depletion']
+  - [midodrine_therapy,        indicates, neuropathic_evidence, 'low2009: vasoconstrictor failure and pooling']
+  - [compression_therapy,      indicates, neuropathic_evidence, 'low2009: opposes venous pooling']
+  - [compression_therapy,      indicates, hypovolemic_evidence, 'low2009']
+  - [beta_blocker_therapy,     indicates, hyperadrenergic_evidence, 'low2009; angeli2024']
+  - [central_sympatholytic_therapy, indicates, hyperadrenergic_evidence, 'low2009: clonidine for unstable hypertensive responses to tilt']
+  - [pyridostigmine_therapy,   indicates, neuropathic_evidence, 'angeli2024: vasoconstriction in neuropathic POTS']
+  - [exercise_reconditioning,  indicates, deconditioning_evidence, 'low2009']
+
+  - [midodrine_therapy,        treats, pots, 'low2009']
+  - [ivabradine_therapy,       treats, pots, 'angeli2024']
+  - [beta_blocker_therapy,     treats, pots, 'low2009']
+  - [volume_expansion_therapy, treats, pots, 'low2009']
+  - [exercise_reconditioning,  treats, pots, 'low2009']
+
+  # ivabradine lowers rate without a mechanistic commitment, so it is
+  # deliberately NOT given an `indicates` edge.
+
+  # ---- clinical context --------------------------------------------------
+  - [hypermobility_heds,         is_a, clinical_context, 'taxonomy']
+  - [mast_cell_activation,       is_a, clinical_context, 'taxonomy']
+  - [me_cfs,                     is_a, clinical_context, 'taxonomy']
+  - [long_covid,                 is_a, clinical_context, 'taxonomy']
+  - [post_vaccination_onset,     is_a, clinical_context, 'taxonomy']
+  - [systemic_autoimmune_disease, is_a, clinical_context, 'taxonomy']
+  - [small_fiber_neuropathy_dx,  is_a, clinical_context, 'taxonomy']
+  - [gi_dysmotility,             is_a, clinical_context, 'taxonomy']
+  - [chronic_migraine,           is_a, clinical_context, 'taxonomy']
+  - [differential_syncope_oh,    is_a, clinical_context, 'taxonomy']
+
+  - [hypermobility_heds,          associated_with, pots, 'angeli2024']
+  - [me_cfs,                      associated_with, pots, 'low2009: 40% of chronic fatigue syndrome patients have POTS; gibbons2013']
+  - [gi_dysmotility,              associated_with, pots, 'low2009: nausea and bloating common']
+  - [chronic_migraine,            associated_with, pots, 'angeli2024; low2009: overrepresentation of migraine']
+  - [systemic_autoimmune_disease, associated_with, autoimmune_evidence, 'zhang2022: autoimmune disease trend with abnormal testing']
+  - [small_fiber_neuropathy_dx,   associated_with, neuropathic_evidence, 'gibbons2013; zhang2022']
+
+  - [hypermobility_heds, proposed_mechanism_of, hypovolemic_evidence, 'angeli2024: compliant connective tissue, venous pooling']
+
+  - [long_covid,             trigger_of, postinfectious_evidence, 'larsen2025']
+
+  - [differential_syncope_oh, differential_diagnosis_of, pots, 'low2009: exclusion is part of the definition']

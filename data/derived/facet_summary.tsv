@@ -1,0 +1,42 @@
+facet_id	group_id	label	n_query_hits	n_mesh_hits	n_articles_any
+chronic_migraine	comorbidity	Migraine and chronic headache	200	53	208
+differential_syncope_oh	comorbidity	Competing orthostatic diagnoses	520	294	615
+gi_dysmotility	comorbidity	Gastrointestinal dysmotility	172	26	174
+hypermobility_heds	comorbidity	Joint hypermobility and hypermobile Ehlers-Danlos syndrome	193	90	198
+long_covid	comorbidity	Long COVID and post-acute sequelae of SARS-CoV-2	308	151	310
+mast_cell_activation	comorbidity	Mast cell activation syndrome	97	26	101
+me_cfs	comorbidity	ME/CFS and post-exertional malaise	437	134	450
+post_vaccination_onset	comorbidity	Post-vaccination onset	112	54	113
+small_fiber_neuropathy_dx	comorbidity	Small fibre neuropathy diagnosis	65	19	67
+systemic_autoimmune_disease	comorbidity	Sjogren and other systemic autoimmune disease	44	28	65
+active_stand_test	measurement	Active stand test	123	273	381
+ambulatory_monitoring	measurement	Ambulatory heart rate and blood pressure monitoring	47	27	57
+autonomic_autoantibody_assay	measurement	Autonomic autoantibody assay	12	33	38
+cardiopulmonary_exercise_test	measurement	Cardiopulmonary exercise testing	27	49	68
+cerebral_blood_flow_measurement	measurement	Cerebral blood flow velocity	131	50	138
+genetic_testing	measurement	Genetic testing	111	13	112
+head_up_tilt_test	measurement	Head-up tilt table test	460	289	546
+heart_rate_variability	measurement	Heart rate variability and baroreflex sensitivity	220	560	651
+plasma_blood_volume_assay	measurement	Plasma and blood volume measurement	74	33	84
+plasma_catecholamine_assay	measurement	Supine and upright plasma catecholamines	54	72	98
+qsart_sudomotor_testing	measurement	QSART and sudomotor testing	26	8	32
+skin_biopsy_ienfd	measurement	Skin biopsy and intraepidermal nerve fibre density	25	28	40
+thermoregulatory_sweat_test	measurement	Thermoregulatory sweat test	10	5	12
+valsalva_maneuver	measurement	Valsalva manoeuvre	95	316	373
+autoimmune_evidence	mechanism	Autoimmune evidence	182	53	186
+deconditioning_evidence	mechanism	Deconditioning evidence	105	42	129
+hyperadrenergic_evidence	mechanism	Hyperadrenergic evidence	223	139	274
+hypovolemic_evidence	mechanism	Hypovolemic evidence	176	48	187
+neuropathic_evidence	mechanism	Neuropathic evidence	231	168	340
+postinfectious_evidence	mechanism	Post-infectious evidence	328	155	332
+beta_blocker_therapy	treatment	Beta blockade	131	67	152
+central_sympatholytic_therapy	treatment	Central sympatholytics	9	14	18
+compression_therapy	treatment	Compression garments	66	5	66
+droxidopa_therapy	treatment	Droxidopa	5	2	5
+exercise_reconditioning	treatment	Exercise reconditioning	140	81	185
+immunomodulatory_therapy	treatment	Immunomodulation	41	17	45
+ivabradine_therapy	treatment	Ivabradine	102	34	107
+midodrine_therapy	treatment	Midodrine	54	27	61
+pyridostigmine_therapy	treatment	Pyridostigmine	22	10	25
+serotonergic_therapy	treatment	Serotonergic and other central agents	14	6	16
+volume_expansion_therapy	treatment	Volume expansion therapy	62	50	93
