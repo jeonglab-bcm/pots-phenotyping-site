@@ -244,17 +244,17 @@ Valid descriptors that no record in this corpus carries. Not errors: they mean n
 | predicate | n_edges | transitive | subsumption |
 | --- | --- | --- | --- |
 | is_a | 102 | yes | yes |
-| evidence_for | 32 | no | no |
-| associated_with | 22 | no | no |
-| indicates | 18 | no | no |
-| proposed_mechanism_of | 16 | no | no |
-| treats | 15 | no | no |
-| measures | 10 | no | no |
+| evidence_for | 23 | no | no |
+| associated_with | 23 | no | no |
+| treats | 17 | no | no |
+| indicates | 14 | no | no |
+| proposed_mechanism_of | 11 | no | no |
 | trigger_of | 9 | no | no |
-| differential_diagnosis_of | 6 | no | no |
-| part_of | 4 | yes | no |
+| part_of | 8 | yes | no |
+| measures | 8 | no | no |
+| differential_diagnosis_of | 7 | no | no |
 
-Nodes: 110. Edges: 234. Closure rows: 271.
+Nodes: 110. Edges: 222. Closure rows: 275.
 
 ## OMOP concept resolution
 

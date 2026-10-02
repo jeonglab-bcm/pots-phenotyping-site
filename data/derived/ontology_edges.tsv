@@ -1,82 +1,71 @@
 subject_id	predicate	object_id	provenance	source
-anxiety_depression	associated_with	pots	low2009; gibbons2013; lau2026	curated
-chronic_migraine	associated_with	pots	lau2026; chung2026; low2009; angeli2024; zhang2022	curated
-differential_syncope_oh	associated_with	pots	lau2026; chung2026; low2009	curated
+anxiety_depression	associated_with	pots	lau2026; low2009; gibbons2013	curated
+chronic_migraine	associated_with	pots	lau2026; chung2026; angeli2024; low2009	curated
+deconditioning_evidence	associated_with	pots	gibbons2013	curated
+differential_syncope_oh	associated_with	pots	chung2026; low2009	curated
 endometriosis	associated_with	pots	lau2026	curated
 fibromyalgia	associated_with	deconditioning_evidence	low2009	curated
-fibromyalgia	associated_with	pots	lau2026; chung2026; low2009	curated
+fibromyalgia	associated_with	pots	lau2026; low2009	curated
 functional_neurological_disorder	associated_with	pots	lau2026	curated
-gi_dysmotility	associated_with	hyperadrenergic_evidence	chung2026	curated
 gi_dysmotility	associated_with	neuropathic_evidence	gibbons2013	curated
-gi_dysmotility	associated_with	pots	chung2026; lau2026; angeli2024; low2009	curated
-hypermobility_heds	associated_with	pots	lau2026; chung2026; zhang2022	curated
+gi_dysmotility	associated_with	pots	lau2026; chung2026; gibbons2013	curated
+hormonal_transition_onset	associated_with	pots	low2009	curated
+hypermobility_heds	associated_with	pots	lau2026; angeli2024	curated
 iron_deficiency	associated_with	pots	lau2026	curated
-long_covid	associated_with	pots	lau2026; chung2026	curated
-mast_cell_activation	associated_with	pots	lau2026; chung2026	curated
-me_cfs	associated_with	pots	lau2026; chung2026; low2009; gibbons2013; angeli2024	curated
-neurodevelopmental_disorder	associated_with	pots	lau2026	curated
-postinfectious_evidence	associated_with	autoimmune_evidence	chung2026	curated
-sleep_disturbance	associated_with	pots	chung2026; low2009	curated
-small_fiber_neuropathy_dx	associated_with	pots	lau2026; zhang2022	curated
-systemic_autoimmune_disease	associated_with	autoimmune_evidence	chung2026	curated
-systemic_autoimmune_disease	associated_with	neuropathic_evidence	zhang2022	curated
-systemic_autoimmune_disease	associated_with	pots	lau2026; chung2026	curated
-anxiety_depression	differential_diagnosis_of	pots	low2009	curated
-arrhythmia_differential	differential_diagnosis_of	pots	chung2026; low2009	curated
-differential_syncope_oh	differential_diagnosis_of	pots	lau2026; chung2026; low2009; zhang2022; angeli2024	curated
-medication_induced_tachycardia	differential_diagnosis_of	pots	lau2026; chung2026	curated
+long_covid	associated_with	pots	lau2026; chung2026; larsen2025	curated
+mast_cell_activation	associated_with	gi_dysmotility	lau2026	curated
+mast_cell_activation	associated_with	pots	lau2026	curated
+me_cfs	associated_with	pots	lau2026; chung2026; gibbons2013	curated
+neurodevelopmental_disorder	associated_with	pots	lau2026; chung2026	curated
+neuropathic_evidence	associated_with	small_fiber_neuropathy_dx	angeli2024; gibbons2013	curated
+sleep_disturbance	associated_with	pots	lau2026; chung2026; angeli2024; low2009	curated
+small_fiber_neuropathy_dx	associated_with	pots	lau2026; gibbons2013; zhang2022	curated
+systemic_autoimmune_disease	associated_with	neuropathic_evidence	lau2026; zhang2022	curated
+systemic_autoimmune_disease	associated_with	pots	lau2026; chung2026; zhang2022	curated
+anxiety_depression	differential_diagnosis_of	pots	low2009; gibbons2013	curated
+arrhythmia_differential	differential_diagnosis_of	pots	lau2026; chung2026; low2009	curated
+differential_syncope_oh	differential_diagnosis_of	pots	lau2026; chung2026; angeli2024; low2009; zhang2022	curated
+functional_neurological_disorder	differential_diagnosis_of	pots	lau2026	curated
+medication_induced_tachycardia	differential_diagnosis_of	pots	lau2026; chung2026; gibbons2013	curated
 secondary_sinus_tachycardia	differential_diagnosis_of	pots	lau2026; chung2026; gibbons2013	curated
-structural_cardiopulmonary_disease	differential_diagnosis_of	pots	chung2026; angeli2024	curated
-active_stand_test	evidence_for	hyperadrenergic_evidence	lau2026	curated
-active_stand_test	evidence_for	pots	lau2026; chung2026; angeli2024	curated
-ambulatory_monitoring	evidence_for	differential_syncope_oh	chung2026	curated
-ambulatory_monitoring	evidence_for	hyperadrenergic_evidence	lau2026	curated
-ambulatory_monitoring	evidence_for	pots	lau2026; low2009	curated
-autonomic_autoantibody_assay	evidence_for	autoimmune_evidence	low2009; lau2026; chung2026	curated
-autonomic_autoantibody_assay	evidence_for	neuropathic_evidence	low2009; zhang2022	curated
+structural_cardiopulmonary_disease	differential_diagnosis_of	pots	chung2026; angeli2024; gibbons2013	curated
+active_stand_test	evidence_for	pots	lau2026; chung2026	curated
+ambulatory_monitoring	evidence_for	arrhythmia_differential	chung2026	curated
+ambulatory_monitoring	evidence_for	pots	lau2026; chung2026	curated
+autonomic_autoantibody_assay	evidence_for	autoimmune_evidence	lau2026; zhang2022	curated
+autonomic_autoantibody_assay	evidence_for	neuropathic_evidence	zhang2022	curated
 cardiac_mri	evidence_for	deconditioning_evidence	chung2026	curated
-cardiopulmonary_exercise_test	evidence_for	deconditioning_evidence	lau2026; low2009	curated
+cardiopulmonary_exercise_test	evidence_for	deconditioning_evidence	lau2026	curated
 cardiopulmonary_exercise_test	evidence_for	hypovolemic_evidence	chung2026	curated
 cerebral_blood_flow_measurement	evidence_for	cerebral_hypoperfusion_evidence	chung2026	curated
-end_tidal_co2	evidence_for	pots	larsen2025	curated
-head_up_tilt_test	evidence_for	deconditioning_evidence	low2009	curated
-head_up_tilt_test	evidence_for	hyperadrenergic_evidence	angeli2024; low2009; lau2026; larsen2025	curated
-head_up_tilt_test	evidence_for	hypovolemic_evidence	low2009	curated
-head_up_tilt_test	evidence_for	pots	lau2026; chung2026; angeli2024; low2009	curated
+head_up_tilt_test	evidence_for	hyperadrenergic_evidence	angeli2024; low2009	curated
+head_up_tilt_test	evidence_for	pots	lau2026; angeli2024; low2009; zhang2022; larsen2025	curated
 heart_rate_variability	evidence_for	neuropathic_evidence	gibbons2013; zhang2022	curated
-muscle_sympathetic_nerve_activity	evidence_for	neuropathic_evidence	chung2026	curated
-plasma_blood_volume_assay	evidence_for	deconditioning_evidence	chung2026	curated
-plasma_blood_volume_assay	evidence_for	hypovolemic_evidence	chung2026	curated
-plasma_catecholamine_assay	evidence_for	hyperadrenergic_evidence	angeli2024; low2009; chung2026	curated
+muscle_sympathetic_nerve_activity	evidence_for	neuropathic_evidence	chung2026; zhang2022	curated
+plasma_catecholamine_assay	evidence_for	hyperadrenergic_evidence	angeli2024	curated
 qsart_sudomotor_testing	evidence_for	neuropathic_evidence	chung2026; angeli2024; low2009; gibbons2013; zhang2022; larsen2025	curated
 quantitative_sensory_testing	evidence_for	neuropathic_evidence	gibbons2013	curated
-regional_norepinephrine_spillover	evidence_for	neuropathic_evidence	chung2026; low2009	curated
-renin_aldosterone_assay	evidence_for	hypovolemic_evidence	chung2026	curated
-skin_biopsy_ienfd	evidence_for	neuropathic_evidence	chung2026; angeli2024; gibbons2013; zhang2022; larsen2025	curated
-skin_biopsy_ienfd	evidence_for	small_fiber_neuropathy_dx	chung2026	curated
+regional_norepinephrine_spillover	evidence_for	neuropathic_evidence	chung2026; low2009; gibbons2013; zhang2022	curated
+skin_biopsy_ienfd	evidence_for	neuropathic_evidence	chung2026; angeli2024; gibbons2013; zhang2022	curated
 thermoregulatory_sweat_test	evidence_for	neuropathic_evidence	angeli2024; low2009	curated
-urine_sodium_24h	evidence_for	hypovolemic_evidence	angeli2024; low2009	curated
+urine_sodium_24h	evidence_for	hypovolemic_evidence	angeli2024	curated
 valsalva_maneuver	evidence_for	hyperadrenergic_evidence	gibbons2013; zhang2022	curated
-valsalva_maneuver	evidence_for	neuropathic_evidence	low2009; zhang2022; gibbons2013	curated
+valsalva_maneuver	evidence_for	neuropathic_evidence	gibbons2013; zhang2022	curated
 valsalva_maneuver	evidence_for	pots	low2009	curated
 antihistamine_therapy	indicates	mast_cell_activation	lau2026	curated
-beta_blocker_therapy	indicates	hyperadrenergic_evidence	angeli2024; lau2026; chung2026; low2009	curated
-central_sympatholytic_therapy	indicates	hyperadrenergic_evidence	lau2026; chung2026; low2009	curated
+beta_blocker_therapy	indicates	hyperadrenergic_evidence	lau2026; chung2026; angeli2024	curated
+central_sympatholytic_therapy	indicates	hyperadrenergic_evidence	lau2026; chung2026	curated
 compression_therapy	indicates	hypovolemic_evidence	low2009	curated
-compression_therapy	indicates	neuropathic_evidence	angeli2024; chung2026; low2009	curated
-exercise_reconditioning	indicates	deconditioning_evidence	low2009; lau2026; chung2026; gibbons2013	curated
-exercise_reconditioning	indicates	hypovolemic_evidence	angeli2024	curated
+compression_therapy	indicates	neuropathic_evidence	angeli2024	curated
+exercise_reconditioning	indicates	cerebral_hypoperfusion_evidence	lau2026	curated
+exercise_reconditioning	indicates	deconditioning_evidence	lau2026; chung2026; low2009; gibbons2013	curated
 immunomodulatory_therapy	indicates	autoimmune_evidence	lau2026	curated
-immunomodulatory_therapy	indicates	systemic_autoimmune_disease	lau2026	curated
-ivabradine_therapy	indicates	hyperadrenergic_evidence	angeli2024; lau2026; chung2026	curated
+ivabradine_therapy	indicates	hyperadrenergic_evidence	lau2026; angeli2024	curated
 midodrine_therapy	indicates	hypovolemic_evidence	lau2026	curated
-midodrine_therapy	indicates	neuropathic_evidence	angeli2024; low2009; lau2026; chung2026	curated
-phenobarbital_therapy	indicates	hyperadrenergic_evidence	low2009	curated
+midodrine_therapy	indicates	neuropathic_evidence	angeli2024	curated
 physical_countermaneuvers	indicates	neuropathic_evidence	angeli2024	curated
-prokinetic_therapy	indicates	gi_dysmotility	lau2026	curated
-pyridostigmine_therapy	indicates	neuropathic_evidence	angeli2024; chung2026; low2009	curated
-volume_expansion_therapy	indicates	hypovolemic_evidence	lau2026; angeli2024; low2009; chung2026	curated
-volume_expansion_therapy	indicates	neuropathic_evidence	low2009	curated
+pyridostigmine_therapy	indicates	neuropathic_evidence	angeli2024	curated
+volume_expansion_therapy	indicates	hypovolemic_evidence	lau2026; angeli2024	curated
 active_stand_test	is_a	orthostatic_challenge_testing	taxonomy	curated
 adolescent_growth_spurt	is_a	onset_trigger	taxonomy	curated
 ambulatory_monitoring	is_a	objective_evidence	taxonomy	curated
@@ -179,57 +168,56 @@ vasoconstrictor_agent	is_a	therapeutic_proxy	taxonomy	curated
 volume_assessment	is_a	objective_evidence	taxonomy	curated
 volume_expander	is_a	therapeutic_proxy	taxonomy	curated
 volume_expansion_therapy	is_a	volume_expander	taxonomy	curated
-active_stand_test	measures	orthostatic_heart_rate_increment	lau2026; chung2026; angeli2024	curated
-ambulatory_monitoring	measures	orthostatic_heart_rate_increment	chung2026	curated
-cerebral_blood_flow_measurement	measures	cerebral_perfusion	chung2026; larsen2025	curated
-head_up_tilt_test	measures	orthostatic_heart_rate_increment	lau2026; chung2026; angeli2024; low2009; zhang2022; larsen2025; gibbons2013	curated
-plasma_blood_volume_assay	measures	intravascular_volume	chung2026	curated
-plasma_catecholamine_assay	measures	upright_plasma_norepinephrine	angeli2024; low2009; larsen2025	curated
-qsart_sudomotor_testing	measures	sweat_output	chung2026; gibbons2013; zhang2022; angeli2024; low2009	curated
-skin_biopsy_ienfd	measures	nerve_fiber_density	chung2026; angeli2024; gibbons2013; zhang2022; larsen2025	curated
-thermoregulatory_sweat_test	measures	sweat_output	angeli2024; low2009	curated
-urine_sodium_24h	measures	intravascular_volume	low2009	curated
-head_up_tilt_test	part_of	autonomic_reflex_screen	angeli2024; gibbons2013; larsen2025	curated
-heart_rate_variability	part_of	autonomic_reflex_screen	angeli2024; gibbons2013; chung2026; zhang2022; larsen2025	curated
-qsart_sudomotor_testing	part_of	autonomic_reflex_screen	angeli2024; chung2026; larsen2025	curated
-valsalva_maneuver	part_of	autonomic_reflex_screen	gibbons2013; chung2026; zhang2022; larsen2025	curated
-anxiety_depression	proposed_mechanism_of	deconditioning_evidence	low2009	curated
+active_stand_test	measures	orthostatic_heart_rate_increment	lau2026; angeli2024	curated
+cardiopulmonary_exercise_test	measures	aerobic_capacity	chung2026	curated
+head_up_tilt_test	measures	orthostatic_heart_rate_increment	lau2026; angeli2024; gibbons2013; zhang2022	curated
+plasma_catecholamine_assay	measures	upright_plasma_norepinephrine	chung2026; angeli2024	curated
+qsart_sudomotor_testing	measures	sweat_output	angeli2024; gibbons2013; zhang2022	curated
+skin_biopsy_ienfd	measures	nerve_fiber_density	angeli2024; gibbons2013; zhang2022	curated
+thermoregulatory_sweat_test	measures	sweat_output	angeli2024	curated
+urine_sodium_24h	measures	intravascular_volume	angeli2024	curated
+active_stand_test	part_of	orthostatic_challenge_testing	lau2026; chung2026; angeli2024	curated
+cerebral_blood_flow_measurement	part_of	orthostatic_challenge_testing	larsen2025	curated
+head_up_tilt_test	part_of	autonomic_reflex_screen	angeli2024; gibbons2013	curated
+head_up_tilt_test	part_of	orthostatic_challenge_testing	lau2026; chung2026; angeli2024; gibbons2013; larsen2025	curated
+heart_rate_variability	part_of	autonomic_reflex_screen	chung2026; angeli2024; gibbons2013	curated
+qsart_sudomotor_testing	part_of	autonomic_reflex_screen	chung2026; angeli2024; larsen2025	curated
+thermoregulatory_sweat_test	part_of	autonomic_reflex_screen	low2009	curated
+valsalva_maneuver	part_of	autonomic_reflex_screen	gibbons2013	curated
 autoimmune_evidence	proposed_mechanism_of	hyperadrenergic_evidence	lau2026	curated
-autoimmune_evidence	proposed_mechanism_of	neuropathic_evidence	chung2026; low2009; zhang2022; gibbons2013	curated
-autoimmune_evidence	proposed_mechanism_of	pots	lau2026; chung2026; gibbons2013; zhang2022	curated
-cerebral_hypoperfusion_evidence	proposed_mechanism_of	pots	chung2026	curated
-deconditioning_evidence	proposed_mechanism_of	pots	chung2026; low2009; gibbons2013; lau2026	curated
-hyperadrenergic_evidence	proposed_mechanism_of	pots	lau2026; chung2026; angeli2024; low2009; gibbons2013; zhang2022; larsen2025	curated
-hypermobility_heds	proposed_mechanism_of	hypovolemic_evidence	lau2026; angeli2024	curated
-hypermobility_heds	proposed_mechanism_of	neuropathic_evidence	angeli2024	curated
-hypermobility_heds	proposed_mechanism_of	pots	chung2026	curated
-hypovolemic_evidence	proposed_mechanism_of	pots	lau2026; chung2026; angeli2024; low2009; gibbons2013; zhang2022	curated
+autoimmune_evidence	proposed_mechanism_of	neuropathic_evidence	chung2026; low2009; gibbons2013; zhang2022	curated
+autoimmune_evidence	proposed_mechanism_of	pots	lau2026; chung2026; gibbons2013	curated
+cerebral_hypoperfusion_evidence	proposed_mechanism_of	pots	lau2026; chung2026; low2009	curated
+deconditioning_evidence	proposed_mechanism_of	pots	lau2026; chung2026; low2009; gibbons2013	curated
+hyperadrenergic_evidence	proposed_mechanism_of	pots	lau2026; chung2026; angeli2024; low2009; gibbons2013; zhang2022	curated
+hypermobility_heds	proposed_mechanism_of	hypovolemic_evidence	lau2026	curated
+hypovolemic_evidence	proposed_mechanism_of	pots	lau2026; chung2026; angeli2024; gibbons2013; zhang2022	curated
 neuropathic_evidence	proposed_mechanism_of	hypovolemic_evidence	lau2026	curated
-neuropathic_evidence	proposed_mechanism_of	pots	lau2026; chung2026; angeli2024; low2009; gibbons2013; zhang2022; larsen2025	curated
-postinfectious_evidence	proposed_mechanism_of	neuropathic_evidence	gibbons2013	curated
-postinfectious_evidence	proposed_mechanism_of	pots	larsen2025; lau2026; chung2026; low2009	curated
-systemic_autoimmune_disease	proposed_mechanism_of	neuropathic_evidence	chung2026	curated
+neuropathic_evidence	proposed_mechanism_of	pots	lau2026; chung2026; angeli2024; low2009; gibbons2013; zhang2022	curated
+postinfectious_evidence	proposed_mechanism_of	pots	chung2026; low2009; larsen2025	curated
 auricular_vagus_nerve_stimulation	treats	pots	lau2026	curated
-beta_blocker_therapy	treats	pots	lau2026; chung2026; low2009; angeli2024	curated
+beta_blocker_therapy	treats	pots	lau2026; chung2026; angeli2024; low2009	curated
 central_sympatholytic_therapy	treats	pots	lau2026; chung2026	curated
-compression_therapy	treats	pots	lau2026; chung2026; low2009; angeli2024	curated
-exercise_reconditioning	treats	pots	lau2026; chung2026; low2009; gibbons2013	curated
+compression_therapy	treats	pots	lau2026; chung2026; angeli2024; low2009	curated
+exercise_reconditioning	treats	pots	lau2026; chung2026; angeli2024; low2009; gibbons2013	curated
 immunomodulatory_therapy	treats	pots	lau2026	curated
 ivabradine_therapy	treats	pots	lau2026; chung2026; angeli2024	curated
-lifestyle_modification	treats	pots	chung2026	curated
-midodrine_therapy	treats	pots	chung2026; low2009; lau2026; angeli2024	curated
-offending_medication_withdrawal	treats	pots	chung2026	curated
+lifestyle_modification	treats	pots	lau2026; chung2026; angeli2024	curated
+midodrine_therapy	treats	pots	lau2026; chung2026; angeli2024; low2009	curated
+offending_medication_withdrawal	treats	pots	lau2026; chung2026	curated
 phenobarbital_therapy	treats	pots	low2009	curated
-physical_countermaneuvers	treats	pots	chung2026; low2009; angeli2024	curated
-pyridostigmine_therapy	treats	pots	lau2026; chung2026; angeli2024; low2009	curated
-serotonergic_therapy	treats	pots	chung2026	curated
-volume_expansion_therapy	treats	pots	lau2026; chung2026; low2009; angeli2024	curated
+physical_countermaneuvers	treats	pots	lau2026; chung2026; low2009	curated
+prokinetic_therapy	treats	gi_dysmotility	lau2026	curated
+pyridostigmine_therapy	treats	gi_dysmotility	lau2026	curated
+pyridostigmine_therapy	treats	pots	lau2026; chung2026; angeli2024	curated
+serotonergic_therapy	treats	pots	lau2026	curated
+volume_expansion_therapy	treats	pots	lau2026; chung2026; angeli2024	curated
 adolescent_growth_spurt	trigger_of	pots	lau2026	curated
-hormonal_transition_onset	trigger_of	pots	lau2026; chung2026	curated
+hormonal_transition_onset	trigger_of	pots	lau2026	curated
+long_covid	trigger_of	postinfectious_evidence	larsen2025	curated
 long_covid	trigger_of	pots	lau2026; chung2026; larsen2025	curated
-physical_trauma_onset	trigger_of	pots	lau2026; chung2026	curated
+physical_trauma_onset	trigger_of	pots	lau2026	curated
 post_vaccination_onset	trigger_of	pots	lau2026; chung2026	curated
-postinfectious_evidence	trigger_of	autoimmune_evidence	chung2026	curated
-postinfectious_evidence	trigger_of	pots	chung2026	curated
-prolonged_bed_rest	trigger_of	deconditioning_evidence	low2009	curated
+postinfectious_evidence	trigger_of	pots	lau2026; chung2026	curated
+prolonged_bed_rest	trigger_of	deconditioning_evidence	lau2026	curated
 surgery_onset	trigger_of	pots	lau2026; chung2026	curated

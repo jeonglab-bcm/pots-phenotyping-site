@@ -33,8 +33,8 @@ The database is disposable: it is rebuilt from `data/articles.jsonl` by `pots-ph
 | `mesh_term_check` | 224 |
 | `omop_concept` | 277 |
 | `omop_concept_relationship` | 934 |
-| `ontology_closure` | 271 |
-| `ontology_edge` | 234 |
+| `ontology_closure` | 275 |
+| `ontology_edge` | 222 |
 | `ontology_node` | 110 |
 | `ontology_predicate` | 10 |
 | `query_block` | 7 |
