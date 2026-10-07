@@ -27,11 +27,13 @@ clinician's mechanistic hypothesis. 72 facets in total.
 
 **The ontology is built evidence first.** The questions it must answer are in
 [`docs/COMPETENCY_QUESTIONS.md`](docs/COMPETENCY_QUESTIONS.md). Every link
-that rests on the literature was found in one of seven seed papers by two
-kinds of reader: Claude (two of three whole-paper readings agree) and at least
-one System One decision model (Jev, winnow or laya) answering typed questions
-paragraph by paragraph. `scripts/assemble_ensemble.py` writes those links, with
-Claude's verbatim quote and the readers that found each, into
+that rests on the literature comes from the whole corpus (2,007 papers: 854
+open-access full texts and 1,153 abstracts). Three System One decision models
+(winnow, Kev-4B and lev) answer typed questions paragraph by paragraph; where
+all three find a link in a paper, Claude reads the paragraphs and keeps the
+paper as evidence only if it confirms the link with a verbatim quote.
+`scripts/assemble_corpus.py` writes those links (329), every backing paper
+with Claude's quote, into
 `config/relation_excerpts.yaml`, and `scripts/build_relations.py` generates
 them into `config/relations.yaml`. POTS is the root: links
 point from tests and treatments to causes, and from causes and conditions to

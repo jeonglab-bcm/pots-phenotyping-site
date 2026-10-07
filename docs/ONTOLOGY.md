@@ -10,7 +10,8 @@ toward it.
 **Literature links are built evidence first.** The questions the graph answers
 are in [`COMPETENCY_QUESTIONS.md`](COMPETENCY_QUESTIONS.md). Every link other
 than `is_a` starts as a claim in `config/relation_excerpts.yaml`: a verbatim
-passage from one of the seven seed papers, where it appears, and a verdict
+passage from a corpus paper (found there by all three System One readers and
+confirmed by Claude; see `scripts/assemble_corpus.py`), where it appears, and a verdict
 (`supports`, `partial`, or `contradicts` for passages arguing against). A link
 exists only if at least one passage supports it fully or partly.
 `scripts/build_relations.py` writes those links into the generated block of
