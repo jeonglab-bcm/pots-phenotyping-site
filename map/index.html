@@ -157,6 +157,25 @@ details.more summary { cursor: pointer; color: var(--ink-2); }
 /* table */
 #tableWrap { flex: 1; overflow: auto; }
 .tbar { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; border-bottom: 1px solid var(--line); align-items: center; }
+.chips { margin: 0 20px 12px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; color: var(--ink-2); }
+.chip { font: inherit; font-size: 13px; border: 1px solid var(--border); border-radius: 999px; padding: 3px 11px;
+  background: var(--surface); color: var(--ink-2); cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--page); border-color: var(--ink); }
+#gridWrap { flex: 1; min-width: 0; overflow: auto; padding: 14px 16px; }
+#gridPanel { width: 380px; flex: none; padding: 18px; overflow: auto; }
+table.grid { border-collapse: separate; border-spacing: 3px; width: auto; font-size: 13px; }
+table.grid th, table.grid td { border-bottom: 0; }
+table.grid th { position: static; text-transform: none; letter-spacing: 0; font-weight: 600; color: var(--ink-2); font-size: 12px;
+  text-align: center; padding: 4px 2px; width: 64px; vertical-align: bottom; line-height: 1.25; }
+table.grid thead th { position: sticky; top: 0; z-index: 1; }
+table.grid th.rowh { text-align: left; width: auto; font-weight: 400; color: var(--ink); font-size: 13px; white-space: nowrap; padding: 0 10px 0 0; vertical-align: middle; }
+table.grid tr.gsec th { text-align: left; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding-top: 12px; }
+table.grid td { width: 64px; height: 26px; padding: 0; }
+.gc { width: 100%; height: 100%; border: 0; border-radius: 6px; font: inherit; font-size: 12px; cursor: pointer;
+  font-variant-numeric: tabular-nums; background: color-mix(in srgb, var(--c-mechanism) var(--a), transparent); color: var(--ink); }
+.gc.hi { color: #ffffff; font-weight: 700; }
+.gc.sel { outline: 2px solid var(--ink); }
+td.ge { background: var(--wash); border-radius: 6px; }
 .minp { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-2); }
 .cause .cnt { color: var(--muted); font-weight: 400; font-size: 12.5px; }
 td.np { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -188,7 +207,8 @@ td.rel { color: var(--ink-2); }
   </div>
   <div class="tools">
     <div class="seg" role="group" aria-label="View">
-      <button data-view="dag" aria-pressed="true">DAG</button>
+      <button data-view="grid" aria-pressed="true">Grid</button>
+      <button data-view="dag" aria-pressed="false">DAG</button>
       <button data-view="map" aria-pressed="false">Map</button>
       <button data-view="tree" aria-pressed="false">Outline</button>
       <button data-view="causes" aria-pressed="false">By cause</button>
@@ -200,6 +220,7 @@ td.rel { color: var(--ink-2); }
   </div>
 </header>
 <div class="note">Draft for review: every link here was found in a corpus paper by all three System One models (winnow, Kev, lev) and confirmed by Claude with a verbatim quote. Thicker arrows are backed by more papers. Not yet checked by a clinician.</div>
+<div class="chips" id="relChips" role="group" aria-label="Relationships shown"></div>
 
 <main>
   <section class="view" id="v-map">
@@ -209,7 +230,7 @@ td.rel { color: var(--ink-2); }
     </div>
     <aside class="card" id="panel" aria-live="polite"></aside>
   </section>
-  <section class="view on" id="v-dag">
+  <section class="view" id="v-dag">
     <div class="card" id="dagWrap">
       <div class="dtbar"><button class="btn" id="dagFit">Reset view</button>
         <label class="btn"><input type="checkbox" id="dagLabels"> Name every relationship</label>
@@ -229,6 +250,10 @@ td.rel { color: var(--ink-2); }
       <div id="dagCy" aria-label="DAG of supported links rooted at POTS"></div>
     </div>
     <aside class="card" id="dagPanel" aria-live="polite"></aside>
+  </section>
+  <section class="view on" id="v-grid">
+    <div class="card" id="gridWrap" aria-label="Grid of links into each possible cause and POTS"></div>
+    <aside class="card" id="gridPanel" aria-live="polite"></aside>
   </section>
   <section class="view" id="v-tree">
     <div class="card" id="treeWrap" aria-label="Hierarchy of topics"></div>
@@ -286,11 +311,15 @@ const ALL_MAIN = DATA.edges.filter(e => isMain(e.source) && isMain(e.target));
 // How many papers back a link (each corpus paper gives one quote). Arrow width and the filter use it.
 const papersOf = e => new Set(e.excerpts.filter(x => x.cited).map(x => x.paper)).size;
 DATA.edges.forEach(e => { e.papers = papersOf(e); });
-const STRONG = 10;
-const DEFAULT_MIN = 10;                                     // links backed by this many papers are drawn in bold
+const STRONG = 10;                                     // links backed by this many papers are drawn in bold
+const DEFAULT_MIN = 5;                                  // where the filter starts
 const edgeW = e => Math.min(8, 1.2 + 1.1 * Math.log2(Math.max(1, e.papers)));
 let minPapers = 1;
-const passes = e => e.basis !== "paper" || e.papers >= minPapers;
+// "often occurs with" (co-occurrence, undirected) is a third of the links and most of the tangle; it starts hidden.
+const relOn = new Set(Object.keys(DATA.phrases).filter(p => p !== "associated_with"));
+const passes = e => e.basis !== "paper" || (e.papers >= minPapers && relOn.has(e.predicate));
+// weak links fade, strong ones darken: the well-backed structure reads first
+const edgeO = e => e.basis !== "paper" ? 0.9 : Math.min(1, 0.3 + 0.7 * Math.log2(e.papers + 1) / 6);
 let mainEdges = ALL_MAIN;
 const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -482,13 +511,14 @@ function restyle() {
         "background-color": css("--c-pots"), "background-opacity": 1, "border-width": 0,
         "color": css("--on-pots"), "font-weight": "bold", "font-size": 16, "width": 120, "height": 46 } },
     { selector: "edge", style: {
-        "width": ele => edgeW(ele.data()), "line-color": edge, "curve-style": "bezier", "target-arrow-shape": "triangle",
-        "target-arrow-color": edge, "arrow-scale": 0.7,
+        "width": ele => edgeW(ele.data()), "line-color": ele => ele.data("papers") >= STRONG ? ink2 : edge,
+        "curve-style": "bezier", "target-arrow-shape": "triangle", "opacity": ele => edgeO(ele.data()),
+        "target-arrow-color": ele => ele.data("papers") >= STRONG ? ink2 : edge, "arrow-scale": 0.7,
         "line-style": ele => verdictOf(ele.data()) === "partial" ? "dashed" : "solid",
         "transition-property": "opacity", "transition-duration": "120ms" } },
     { selector: "edge.bend", style: {
         "curve-style": "unbundled-bezier", "control-point-distances": ele => ele.data("bend"), "control-point-weights": 0.5 } },
-    { selector: "edge.hl", style: {
+    { selector: "edge.hl", style: { "opacity": 1,
         "width": ele => edgeW(ele.data()) + 1, "line-color": ele => color(ele.data("source")), "target-arrow-color": ele => color(ele.data("source")),
         "z-index": 9, "label": ele => DATA.phrases[ele.data("predicate")], "font-size": 11, "font-style": "italic",
         "color": css("--ink-2"), "text-rotation": "autorotate", "text-margin-y": -8,
@@ -803,13 +833,15 @@ function dagStyle() {
     { selector: 'node[group = "pots"]', style: { "background-color": css("--c-pots"), "background-opacity": 1, "border-width": 0,
         "color": css("--on-pots"), "font-weight": "bold", "font-size": 16, "width": 110, "height": 42 } },
     { selector: "edge", style: {
-        "width": ele => edgeW(ele.data()), "line-color": edge, "target-arrow-color": edge, "target-arrow-shape": "triangle", "arrow-scale": 0.7,
+        "width": ele => edgeW(ele.data()), "line-color": ele => ele.data("papers") >= STRONG ? ink2 : edge,
+        "target-arrow-color": ele => ele.data("papers") >= STRONG ? ink2 : edge, "target-arrow-shape": "triangle", "arrow-scale": 0.7,
+        "opacity": ele => edgeO(ele.data()),
         "curve-style": "bezier", "line-style": ele => verdictOf(ele.data()) === "partial" ? "dashed" : "solid" } },
     { selector: "edge.routed", style: { "curve-style": "unbundled-bezier",
         "control-point-weights": ele => ele.data("cpw"), "control-point-distances": ele => ele.data("cpd") } },
     { selector: "edge.between", style: { "curve-style": "unbundled-bezier", "control-point-distances": 70, "control-point-weights": 0.5 } },
     { selector: "edge.cap", style: cap },
-    { selector: "edge.hl", style: { ...cap, "width": ele => edgeW(ele.data()) + 1, "z-index": 9,
+    { selector: "edge.hl", style: { ...cap, "opacity": 1, "width": ele => edgeW(ele.data()) + 1, "z-index": 9,
         "line-color": ele => color(ele.data("source")), "target-arrow-color": ele => color(ele.data("source")) } },
     { selector: ".dim", style: { "opacity": 0.12 } },
     { selector: "node.sel", style: { "border-width": 3, "border-color": ink } },
@@ -923,11 +955,84 @@ document.getElementById("removedBox").innerHTML =
     ${(r.evidence || []).map(x => x.quote ? oneExcerpt(x)
       : `<div class="exnote">${esc(DATA.seeds[x.paper] ? DATA.seeds[x.paper].short : x.paper)}${x.section ? ", " + esc(x.section) : ""}: ${esc(x.note || "")}</div>`).join("")}</div>`).join("");
 
+// ---------- grid: what points into each possible cause and POTS ----------
+// One row per topic, one column per cause (and POTS); a cell is shaded by how many papers back the link.
+// No arrows, so nothing tangles however many links are shown.
+const gridPanel = document.getElementById("gridPanel");
+const GRID_COLS = ["pots", ...MECH_ORDER];
+const GRID_ROWS = [["mechanism", "Possible causes"], ["measurement", "Tests"], ["treatment", "Treatments"], ["comorbidity", "Conditions"]];
+let gridSel = null;
+function gridCells() {
+  const cells = {};      // "row|col" -> links
+  let outside = 0;
+  for (const e of mainEdges.filter(e => e.basis === "paper")) {
+    let s = e.source, o = e.target;
+    // symmetric links are stored from one side; flip them when only the other side is a column
+    if (e.predicate === "associated_with" && !GRID_COLS.includes(o) && GRID_COLS.includes(s)) [s, o] = [o, s];
+    if (!GRID_COLS.includes(o) || s === o) { outside++; continue; }
+    (cells[s + "|" + o] = cells[s + "|" + o] || []).push(e);
+  }
+  return { cells, outside };
+}
+function renderGrid() {
+  const { cells, outside } = gridCells();
+  const top = Math.max(1, ...Object.values(cells).map(es => Math.max(...es.map(e => e.papers))));
+  const rowsOf = g => [...new Set(Object.keys(cells).map(k => k.split("|")[0]))].filter(id => byId[id].group === g)
+    .sort((a, b) => GRID_COLS.reduce((s, c) => s + Math.max(0, ...(cells[b + "|" + c] || []).map(e => e.papers)), 0)
+                  - GRID_COLS.reduce((s, c) => s + Math.max(0, ...(cells[a + "|" + c] || []).map(e => e.papers)), 0));
+  const cell = (r, c) => {
+    const es = cells[r + "|" + c];
+    if (!es) return `<td class="ge"></td>`;
+    const n = Math.max(...es.map(e => e.papers));
+    const a = Math.round(12 + 88 * Math.log(n + 1) / Math.log(top + 1));
+    const title = es.map(e => `${byId[e.source].short} ${DATA.phrases[e.predicate]} ${byId[e.target].short}: ${plural(e.papers, "paper")}`).join("\n");
+    return `<td><button class="gc${a > 55 ? " hi" : ""}${gridSel === r + "|" + c ? " sel" : ""}" style="--a:${a}%" data-cell="${r}|${c}" title="${esc(title)}">${n}</button></td>`;
+  };
+  document.getElementById("gridWrap").innerHTML = `<table class="grid"><thead><tr><th></th>${GRID_COLS.map(c =>
+      `<th><a class="n" data-id="${c}">${esc(byId[c].short)}</a></th>`).join("")}</tr></thead><tbody>${GRID_ROWS.map(([g, name]) => {
+        const rows = rowsOf(g);
+        return rows.length ? `<tr class="gsec"><th colspan="${GRID_COLS.length + 1}">${name} (${rows.length})</th></tr>` +
+          rows.map(r => `<tr><th class="rowh"><span class="dot" style="display:inline-block;margin-right:6px;background:var(--c-${g})"></span><a class="n" data-id="${r}">${esc(byId[r].short)}</a></th>${GRID_COLS.map(c => cell(r, c)).join("")}</tr>`).join("") : "";
+      }).join("")}</tbody></table>
+    <p class="exnote" style="margin-top:10px">Numbers are papers backing the link. ${outside ? `${plural(outside, "link")} between two conditions, or into a condition, ${outside === 1 ? "is" : "are"} not in the grid; see <b>All links</b>.` : ""}</p>`;
+  const wrap = document.getElementById("gridWrap");
+  wrap.querySelectorAll(".gc").forEach(b => b.onclick = () => gridCell(b.dataset.cell));
+  wireLinks(wrap, gridNode);
+  if (!gridSel) gridIntro();
+}
+function gridCell(key) {
+  gridSel = key;
+  document.querySelectorAll(".gc").forEach(b => b.classList.toggle("sel", b.dataset.cell === key));
+  const es = gridCells().cells[key] || [];
+  gridPanel.innerHTML = es.sort((a, b) => b.papers - a.papers).map(e => `<span class="pill">${plural(e.papers, "paper")}</span>
+    <h2 style="margin-top:8px">${sentence(e)}</h2><h3>What the papers say</h3>${excerptHTML(e, { compact: true })}`).join("<hr>");
+  wireLinks(gridPanel, gridNode);
+  gridPanel.scrollTop = 0;
+}
+function gridNode(id) { gridSel = null; document.querySelectorAll(".gc.sel").forEach(b => b.classList.remove("sel"));
+  gridPanel.innerHTML = nodeDetailHTML(id); wireLinks(gridPanel, gridNode); gridPanel.scrollTop = 0; }
+function gridIntro() {
+  gridPanel.innerHTML = `<h2>Grid</h2><p>Each row is a topic, each column a possible cause of POTS or POTS itself. A filled cell
+    means the row points to the column (a test is evidence for it, a treatment hints at it, a condition is linked to it), and
+    the number is how many papers back that link: the darker, the more.</p><p>Click a cell for the claims and the quotes,
+    or a name for everything about that topic. The menus above filter the grid like every other view.</p>`;
+}
+
+// ---------- relationship chips ----------
+const relCounts = {}; DATA.edges.filter(e => e.basis === "paper").forEach(e => relCounts[e.predicate] = (relCounts[e.predicate] || 0) + 1);
+const chips = document.getElementById("relChips");
+chips.innerHTML = `<span>Show:</span>` + Object.keys(relCounts).sort((a, b) => relCounts[b] - relCounts[a]).map(p =>
+  `<button class="chip" data-rel="${p}" aria-pressed="${relOn.has(p)}">${DATA.phrases[p]} <span class="cnt">${relCounts[p]}</span></button>`).join("");
+chips.querySelectorAll(".chip").forEach(b => b.onclick = () => {
+  relOn.has(b.dataset.rel) ? relOn.delete(b.dataset.rel) : relOn.add(b.dataset.rel);
+  b.setAttribute("aria-pressed", relOn.has(b.dataset.rel));
+  minSel.onchange();
+});
+
 // ---------- search & views ----------
 document.getElementById("names").innerHTML = DATA.nodes.filter(n => isMain(n.id))
   .map(n => `<option value="${esc(n.short)}">${esc(n.label)}</option>`).join("");
-let current = "dag";
-dagReady = true; dagInit();
+let current = "grid";     // the grid has no arrows to tangle; the DAG is drawn when first opened
 
 // ---------- filter by how many papers back a link ----------
 const minSel = document.getElementById("minPapers");
@@ -945,7 +1050,9 @@ minSel.onchange = () => {
   if (dag) { dag.destroy(); dag = null; dagSelected = null; }
   dagReady = current === "dag";
   if (dagReady) dagInit();
-  causeCards(); renderTable(); buildTree();
+  causeCards(); renderTable(); buildTree(); renderGrid();
+  [...minSel.options].forEach(o => { const k = +o.value;
+    o.textContent = `${k} paper${k > 1 ? "s" : ""} (${lit.filter(e => e.papers >= k && relOn.has(e.predicate)).length} links)`; });
 };
 // Start with the well-backed links: with every link drawn, the DAG is a tangle.
 minSel.value = String(DEFAULT_MIN); minSel.onchange();
